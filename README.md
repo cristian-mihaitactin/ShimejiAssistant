@@ -59,7 +59,7 @@ b. Back end:
 
 ## 3. Important links:
 
-Trello board: https://trello.com/b/6KIDMemh/licenta-shimeji
+Trello board: https://trello.com/b/KyjnXhHb/main-board
 
 
 # ~ Notes:
