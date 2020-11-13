@@ -1,19 +1,10 @@
-# electron-boilerplate
-
-A minimalistic boilerplate for [Electron runtime](http://electron.atom.io). Tested on Windows, macOS and Linux.  
-
-This project contains only bare minimum of tooling and dependencies to provide you with simple to understand and extensible base (but still, this is fully functional Electron environment). The boilerplate also doesn't impose on you any frontend technologies, so feel free to pick your favourite.
-
 # Quick start
 
-Make sure you have [Node.js](https://nodejs.org) installed, then type the following commands known to every Node developer...
+Make sure you have [Node.js](https://nodejs.org) installed.
 ```
-git clone https://github.com/szwacz/electron-boilerplate.git
-cd electron-boilerplate
 npm install
 npm start
 ```
-...and you have a running desktop application on your screen.
 
 # Structure of the project
 
@@ -24,10 +15,6 @@ The application consists of two main folders...
 `app` - contains all static assets which don't need any pre-processing. Put here images, CSSes, HTMLs, etc.
 
 The build process compiles the content of the `src` folder and puts it into the `app` folder, so after the build has finished, your `app` folder contains the full, runnable application.
-
-Treat `src` and `app` folders like two halves of one bigger thing.
-
-The drawback of this design is that `app` folder contains some files which should be git-ignored and some which shouldn't (see `.gitignore` file). But this two-folders split makes development builds much, much faster.
 
 # Development
 
@@ -50,16 +37,6 @@ Environmental variables are done in a bit different way (not via `process.env`).
 import env from "env";
 console.log(env.name);
 ```
-
-## Upgrading Electron version
-
-To do so edit `package.json`:
-```json
-"devDependencies": {
-  "electron": "2.0.2"
-}
-```
-*Side note:* [Electron authors recommend](http://electron.atom.io/docs/tutorial/electron-versioning/) to use fixed version here.
 
 ## Adding npm modules to your app
 

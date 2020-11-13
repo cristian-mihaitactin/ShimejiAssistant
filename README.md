@@ -46,12 +46,13 @@ What tech will it use:The app will have 3 main systems:
 
 a. Front end:
 
-	* Angular 8
+	* Webpack
+	* Babel
 
 b. Back end:
 
 	* App:
-		* ElectronJS with Electron-builder with typescript
+		* ElectronJS with Electron-builder
 	* Auth Server:
 		* Aspnet Core
 
