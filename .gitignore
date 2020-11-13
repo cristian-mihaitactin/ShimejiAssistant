@@ -351,3 +351,5 @@ MigrationBackup/
 
 # Visual Code
 .vscode/
+
+desktop.ini
