@@ -1,6 +1,6 @@
-# ShimejiAssistant
+# Bucky Assistant
 
-# Simeji Assistent Project
+# Bucky Assistent Project
 
 ## 1. What is the project about.
 
