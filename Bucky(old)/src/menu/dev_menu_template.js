@@ -1,6 +1,6 @@
-import { BrowserWindow } from "electron";
+import { app, BrowserWindow } from "electron";
 
-export default {
+export const devMenuTemplate = {
   label: "Development",
   submenu: [
     {
@@ -15,6 +15,13 @@ export default {
       accelerator: "Alt+CmdOrCtrl+I",
       click: () => {
         BrowserWindow.getFocusedWindow().toggleDevTools();
+      }
+    },
+    {
+      label: "Quit",
+      accelerator: "CmdOrCtrl+Q",
+      click: () => {
+        app.quit();
       }
     }
   ]
