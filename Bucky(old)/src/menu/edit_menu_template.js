@@ -1,4 +1,4 @@
-export default {
+export const editMenuTemplate = {
   label: "Edit",
   submenu: [
     { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },

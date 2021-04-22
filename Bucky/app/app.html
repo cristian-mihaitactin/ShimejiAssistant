@@ -1,27 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Electron Boilerplate</title>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Electron Boilerplate</title>
+    <style>
+      @import url('../node_modules/bootstrap/dist/css/bootstrap.min.css');
+    </style>
+    <style>
+      @import url('../node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css');
+    </style>
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css"> -->
+    <script>
+      // var $ = require( "jquery" );
+      window.$ = window.jQuery = require('jquery');
+      require('popper.js');
+      require('bootstrap');
+      require('malihu-custom-scrollbar-plugin')($);
+    </script>
+    <script></script>
+    <script></script>
+  </head>
+  <body>
+   <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Bootstrap Sidebar</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <p>Dummy Heading</p>
+            <li class="active">
+                <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
+                <ul class="collapse list-unstyled" id="homeSubmenu">
+                    <li>
+                        <a href="#">Home 1</a>
+                    </li>
+                    <li>
+                        <a href="#">Home 2</a>
+                    </li>
+                    <li>
+                        <a href="#">Home 3</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">About</a>
+            </li>
+            <li>
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
+                <ul class="collapse list-unstyled" id="pageSubmenu">
+                    <li>
+                        <a href="#">Page 1</a>
+                    </li>
+                    <li>
+                        <a href="#">Page 2</a>
+                    </li>
+                    <li>
+                        <a href="#">Page 3</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Portfolio</a>
+            </li>
+            <li>
+                <a href="#">Contact</a>
+            </li>
+        </ul>
+    </nav>
+    <div id="app" class="container" style="display: none;">
+    <div class="row">
+      <div id="content">
+          <nav class="navbar navbar-expand-lg navbar-light bg-light">
+              <div class="container-fluid">
+                  <button type="button" id="sidebarCollapse" class="btn btn-info">
+                      <i class="fas fa-align-left"></i>
+                      <span>Toggle Sidebar</span>
+                  </button>
+              </div>
+          </nav>
+        </div>
+    </div>
+    <div class="row">
+      <div class=" col-6">
+        <h1 id="greet"></h1>
+      <p>
+        Welcome to
+        <a href="https://www.electronjs.org/" class="electron-website-link">
+          Electron
+        </a>
+        app running on this <strong id="os"></strong> machine.
+      </p>
+      <p>App author: <strong id="author"></strong></p>
+      <p>Environment: <strong id="env"></strong></p>
+      <p>Electron version: <strong id="electron-version"></strong></p>
+      </div>
+      <div>
+      </div>
+    </div>
+    </div>
+    <script src="app.js"></script>
+    <script>
+      $(document).ready(function () {
 
-  <div id="app" class="container" style="display: none;">
-    <h1 id="greet"></h1>
-    <p>
-      Welcome to <a href="https://www.electronjs.org/" class="js-external-link">Electron</a> app running on this <strong id="os"></strong> machine.
-    </p>
-    <p>
-      App author: <strong id="author"></strong>
-    </p>
-    <p>
-      Environment: <strong id="env"></strong>
-    </p>
-    <p>
-      Electron version: <strong id="electron-version"></strong>
-    </p>
-  </div>
+    $("#sidebar").mCustomScrollbar({
+         theme: "minimal"
+    });
 
-  <script src="app.js"></script>
-</body>
+    $('#sidebarCollapse').on('click', function () {
+        // open or close navbar
+        $('#sidebar').toggleClass('active');
+        // close dropdowns
+        $('.collapse.in').toggleClass('in');
+        // and also adjust aria-expanded attributes we use for the open/closed arrows
+        // in our CSS
+        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+    });
+
+});
+    </script>
+  </body>
 </html>
