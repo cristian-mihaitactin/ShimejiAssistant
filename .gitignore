@@ -353,3 +353,4 @@ MigrationBackup/
 .vscode/
 
 desktop.ini
+Bucky/credentials.json
