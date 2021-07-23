@@ -45,7 +45,6 @@ app.on("ready", () => {
   setApplicationMenu();
   initIpc();
 
-  /*
   const mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
@@ -59,10 +58,9 @@ app.on("ready", () => {
       enableRemoteModule: env.name === "test"
     }
   });
-*/
   const buckyWindow = createWindow("antler", {
-    width: 280,
-    height: 285,
+    width: 300,
+    height: 300,
     transparent: true,
     frame: false,
     webPreferences: {
@@ -76,7 +74,6 @@ app.on("ready", () => {
     }
   });
 
-  /*
   mainWindow.loadURL(
     url.format({
       pathname: path.join(__dirname, "app.html"),
@@ -84,7 +81,6 @@ app.on("ready", () => {
       slashes: true
     })
   );
-*/
   buckyWindow.loadURL(
     url.format({
       pathname: path.join(__dirname, "antler.html"),
@@ -94,8 +90,8 @@ app.on("ready", () => {
   );
 
   if (env.name === "development") {
-    //mainWindow.openDevTools();
-    buckyWindow.openDevTools();
+    mainWindow.openDevTools();
+    //buckyWindow.openDevTools();
   }
 });
 

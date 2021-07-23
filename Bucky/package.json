@@ -30,10 +30,11 @@
     "release": "npm test && webpack --config=build/webpack.app.config.js --env=production && electron-builder"
   },
   "dependencies": {
-    "jquery": "^3.6.0",
     "bootstrap": "^4.6.0",
     "fs-jetpack": "^4.1.0",
+    "googleapis": "^39.2.0",
     "imports-loader": "^2.0.0",
+    "jquery": "^3.6.0",
     "jquery-mousewheel": "^3.1.13",
     "malihu-custom-scrollbar-plugin": "^3.1.5",
     "popper.js": "^1.16.1"
