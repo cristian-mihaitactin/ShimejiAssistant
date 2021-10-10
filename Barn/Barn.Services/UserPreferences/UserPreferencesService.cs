@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Barn.Services.UserPreferences
 {
-    public class UserPreferencesModel : IUserPreferencesService
+    public class UserPreferencesService : IUserPreferencesService
     {
         public bool CreateUserPreference(Entities.UserPreferences userPref)
         {

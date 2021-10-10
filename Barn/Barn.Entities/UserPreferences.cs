@@ -7,5 +7,4 @@ namespace Barn.Entities
             public Guid Id { get; set; }
             public Guid UserId { get; set; }
     }
-
 }
