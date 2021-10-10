@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Barn.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,24 +9,31 @@ namespace Barn.Services.User
 {
     public class UserService : IUserService
     {
-        public bool CreateUser(Entities.User user)
+        private IGenericRepo<Guid, Entities.User> _userRepo;
+
+        public UserService(IGenericRepo<Guid, Entities.User> userRepo)
         {
-            throw new NotImplementedException();
+            _userRepo = userRepo;
         }
 
-        public bool DeleteUser(Entities.User user)
+        public bool CreateUser(Entities.User user)
         {
-            throw new NotImplementedException();
+            return _userRepo.Insert(user);
         }
 
         public Entities.User GetUserById(Guid id)
         {
-            throw new NotImplementedException();
+            return _userRepo.GetById(id);
         }
 
         public bool UpdateUser(Entities.User user)
         {
-            throw new NotImplementedException();
+            return _userRepo.Update(user);
+        }
+
+        public bool DeleteUser(Guid id)
+        {
+            return _userRepo.Delete(id);
         }
     }
 }

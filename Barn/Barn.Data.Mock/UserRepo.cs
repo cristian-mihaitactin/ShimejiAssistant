@@ -55,10 +55,6 @@ namespace Barn.Data.Mock
             Insert(_firstUser);
             Insert(_genericUser);
         }
-        public bool Delete(User entity)
-        {
-            return _userDB.Remove(entity);
-        }
 
         public IEnumerable<User> GetAll()
         {
@@ -102,6 +98,25 @@ namespace Barn.Data.Mock
             _userPrefRepo.Update(entity.UserPreferences);
 
             return true;
+        }
+        public bool Delete(Guid id)
+        {
+
+            var user = _userDB.Where(u => u.Id == id).FirstOrDefault();
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            var userPrefDeleted = _userPrefRepo.Delete(user.UserPreferences.Id);
+
+            if (userPrefDeleted)
+            {
+                return _userDB.Remove(user);
+            }
+
+            return false;
         }
     }
 }

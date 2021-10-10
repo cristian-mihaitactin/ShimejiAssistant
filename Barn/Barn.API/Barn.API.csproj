@@ -10,5 +10,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Barn.Data.Mock\Barn.Data.Mock.csproj" />
+    <ProjectReference Include="..\Barn.Services\Barn.Services.csproj" />
+  </ItemGroup>
+
 
 </Project>

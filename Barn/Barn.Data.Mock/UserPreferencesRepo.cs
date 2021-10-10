@@ -12,10 +12,6 @@ namespace Barn.Data.Mock
     {
         private IList<UserPreferences> _userPrefDB = new List<UserPreferences>();
 
-        public bool Delete(UserPreferences entity)
-        {
-            return _userPrefDB.Remove(entity);
-        }
 
         public IEnumerable<UserPreferences> GetAll()
         {
@@ -58,6 +54,17 @@ namespace Barn.Data.Mock
             _userPrefDB[_userPrefDB.IndexOf(existingEntitiy)] = entity;
 
             return true;
+        }
+
+        public bool Delete(Guid id)
+        {
+            var usPref = _userPrefDB.Where(u => u.Id == id).FirstOrDefault();
+            if (usPref == null)
+            {
+                return false;
+            }
+
+            return _userPrefDB.Remove(usPref);
         }
     }
 }

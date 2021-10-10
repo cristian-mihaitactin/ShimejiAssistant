@@ -7,7 +7,7 @@ namespace Barn.Services.User
         Barn.Entities.User GetUserById(Guid id);
         bool CreateUser(Barn.Entities.User user);
         bool UpdateUser(Barn.Entities.User user);
-        bool DeleteUser(Barn.Entities.User user);
+        bool DeleteUser(Guid id);
 
     }
 }
