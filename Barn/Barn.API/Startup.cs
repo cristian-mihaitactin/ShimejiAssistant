@@ -2,6 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Barn.Data.Mock;
+using Barn.Entities;
+using Barn.Services.Interfaces;
+using Barn.Services.User;
+using Barn.Services.UserPreferences;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +34,12 @@ namespace Barn.API
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserPreferencesService, UserPreferencesService>();
+
+            services.AddSingleton<IGenericRepo<Guid, User>, UserRepo>();
+            services.AddSingleton<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
