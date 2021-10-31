@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.31727.386
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.API", "Barn.API\Barn.API.csproj", "{E752A1AC-7589-43B6-AEDD-EFE0AF9ADFB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barn.Services", "Barn.Services\Barn.Services.csproj", "{47698E33-2A46-48C8-81D6-75F7743BEE0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.Services", "Barn.Services\Barn.Services.csproj", "{47698E33-2A46-48C8-81D6-75F7743BEE0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barn.Data.Mock", "Barn.Data.Mock\Barn.Data.Mock.csproj", "{5FE32870-689E-4FD6-A43D-9096EEDCBD31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.Data.Mock", "Barn.Data.Mock\Barn.Data.Mock.csproj", "{5FE32870-689E-4FD6-A43D-9096EEDCBD31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barn.Entities", "Barn.Entities\Barn.Entities.csproj", "{71B5506A-BD51-4A36-BA83-97D581B146D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.Entities", "Barn.Entities\Barn.Entities.csproj", "{71B5506A-BD51-4A36-BA83-97D581B146D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Barn.Data.EF", "Barn.Data.EF\Barn.Data.EF.csproj", "{855372C0-780C-46AF-B774-3FA63CE493BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,18 @@ Global
 		{71B5506A-BD51-4A36-BA83-97D581B146D9}.Release|x64.Build.0 = Release|Any CPU
 		{71B5506A-BD51-4A36-BA83-97D581B146D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{71B5506A-BD51-4A36-BA83-97D581B146D9}.Release|x86.Build.0 = Release|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Debug|x64.Build.0 = Debug|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Debug|x86.Build.0 = Debug|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Release|x64.ActiveCfg = Release|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Release|x64.Build.0 = Release|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Release|x86.ActiveCfg = Release|Any CPU
+		{855372C0-780C-46AF-B774-3FA63CE493BF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
