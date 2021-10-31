@@ -41,14 +41,65 @@ namespace Barn.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
 
-            // --------------------------------- EF ---------------------------------//
 
+            // --------------------------------- OpenId ---------------------------------//
+            services.AddOpenIddict()
+
+            // Register the OpenIddict core components.
+            .AddCore(options =>
+            {
+                // Configure OpenIddict to use the Entity Framework Core stores and models.
+                // Note: call ReplaceDefaultEntities() to replace the default entities.
+                options.UseEntityFrameworkCore()
+                       .UseDbContext<ApplicationDbContext>()
+                               .ReplaceDefaultEntities<Guid>();
+            })
+
+            // Register the OpenIddict server components.
+            .AddServer(options =>
+            {
+                // Enable the token endpoint.
+                options.SetTokenEndpointUris("/connect/token");
+
+                // Enable the client credentials flow.
+                options.AllowClientCredentialsFlow();
+
+                // Register the signing and encryption credentials.
+                options.AddDevelopmentEncryptionCertificate()
+                      .AddDevelopmentSigningCertificate();
+
+                // Register the ASP.NET Core host and configure the ASP.NET Core options.
+                options.UseAspNetCore()
+                      .EnableTokenEndpointPassthrough();
+            })
+
+            // Register the OpenIddict validation components.
+            .AddValidation(options =>
+            {
+                // Import the configuration from the local OpenIddict server instance.
+                options.UseLocalServer();
+
+                // Register the ASP.NET Core host.
+                options.UseAspNetCore();
+            });
+
+            // Register the worker responsible of seeding the database with the sample clients.
+            // Note: in a real world application, this step should be part of a setup script.
+            services.AddHostedService<Worker>();
+
+            // --------------------------------- EF ---------------------------------//
             // We are adding the DI services - We setup a Db Context
             services.AddDbContext<ApplicationDbContext>(options =>
+            {
+
                 // Adding configuration to use Sqlite with our application
                 options.UseSqlServer( // adding the connection string path to our db
-                        Configuration.GetConnectionString("DefaultConnection")));
-
+                        Configuration.GetConnectionString("DefaultConnection"));
+                // Register the entity sets needed by OpenIddict.
+                // Note: use the generic overload if you need
+                // to replace the default OpenIddict entities.
+                options.UseOpenIddict<Guid>();
+            });
 
             services.AddSingleton<IGenericRepo<Guid, User>, UserRepo>();
             services.AddSingleton<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
@@ -78,6 +129,7 @@ namespace Barn.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
