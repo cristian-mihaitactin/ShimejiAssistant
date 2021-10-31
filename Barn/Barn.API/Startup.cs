@@ -46,7 +46,7 @@ namespace Barn.API
             // We are adding the DI services - We setup a Db Context
             services.AddDbContext<ApplicationDbContext>(options =>
                 // Adding configuration to use Sqlite with our application
-                options.UseSqlite( // adding the connection string path to our db
+                options.UseSqlServer( // adding the connection string path to our db
                         Configuration.GetConnectionString("DefaultConnection")));
 
 

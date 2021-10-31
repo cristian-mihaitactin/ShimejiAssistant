@@ -22,22 +22,22 @@ namespace Barn.Data.EF
             modelBuilder.Entity<UserDTO>()
                 .Property(u => u.RowVersion)
                 .IsRowVersion(); // Cuncurrency property using fluent mapping
+            modelBuilder.Entity<UserDTO>()
+                .Property(a => a.Id)
+                .HasColumnType("uniqueidentifier");
 
             modelBuilder.Entity<UserDTO>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
             modelBuilder.Entity<UserDTO>().ToTable("Users");
 
-            //var testUser = new UserDTO
-            //{
-            //    Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            //    UserName = "Dave Coffee",
-            //    Email = "dave.test@test.com"
-            //};
-
             // [UserPreferences] mapping
             modelBuilder.Entity<UserPreferencesDTO>()
                 .Property(a => a.RowVersion)
                 .IsRowVersion();
+
+            modelBuilder.Entity<UserPreferencesDTO>()
+                .Property(a => a.Id)
+                .HasColumnType("uniqueidentifier");
 
             modelBuilder.Entity<UserPreferencesDTO>()
                 .HasOne(up => up.User)
