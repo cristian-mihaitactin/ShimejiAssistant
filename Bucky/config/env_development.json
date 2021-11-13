@@ -1,5 +1,8 @@
 {
   "name": "development",
   "description": "Add here any environment specific stuff you like.",
-  "Barn_Url": "https://localhost:5001"
+  "RESTAPI_URL": "http://localhost",
+  "RESTAPI_PORT" : "5000",
+  "path_users" : "/api/User"
+
 }

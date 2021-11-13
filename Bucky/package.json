@@ -39,7 +39,8 @@
     "jquery": "^3.6.0",
     "jquery-mousewheel": "^3.1.13",
     "malihu-custom-scrollbar-plugin": "^3.1.5",
-    "popper.js": "^1.16.1"
+    "popper.js": "^1.16.1",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
