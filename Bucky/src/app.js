@@ -1,4 +1,5 @@
 import "./stylesheets/styles.css";
+import {getUser} from "./services/barn-service";
 
 // Everything below is just a demo. You can delete all of it.
 
@@ -7,18 +8,20 @@ import jetpack from "fs-jetpack";
 import { greet } from "./hello_world/hello_world";
 import env from "env";
 
+/*
 document.querySelector("#app").style.display = "block";
 document.querySelector("#greet").innerHTML = greet();
 document.querySelector("#env").innerHTML = env.name;
 document.querySelector("#electron-version").innerHTML =
   process.versions.electron;
+*/
 
 const osMap = {
   win32: "Windows",
   darwin: "macOS",
   linux: "Linux"
 };
-document.querySelector("#os").innerHTML = osMap[process.platform];
+// document.querySelector("#os").innerHTML = osMap[process.platform];
 
 // We can communicate with main process through messages.
 ipcRenderer.on("app-path", (event, appDirPath) => {
@@ -26,10 +29,11 @@ ipcRenderer.on("app-path", (event, appDirPath) => {
   // files from disk like it's node.js! Welcome to Electron world :)
   const appDir = jetpack.cwd(appDirPath);
   const manifest = appDir.read("package.json", "json");
-  document.querySelector("#author").innerHTML = manifest.author;
+  // document.querySelector("#author").innerHTML = manifest.author;
 });
 ipcRenderer.send("need-app-path");
 
+/*
 document.querySelector(".electron-website-link").addEventListener(
   "click",
   event => {
@@ -38,3 +42,9 @@ document.querySelector(".electron-website-link").addEventListener(
   },
   false
 );
+*/
+getUser('00000000-0000-0000-0000-000000000000').then( (data) => {
+  console.log(data);
+  document.querySelector("#userLabel").innerHTML = data.userName;
+});
+

@@ -45,6 +45,8 @@ app.on("ready", () => {
   setApplicationMenu();
   initIpc();
 
+  console.log(env.Barn_Url);
+
   const mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
