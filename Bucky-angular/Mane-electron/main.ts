@@ -68,14 +68,14 @@ app.on("ready", () => {
 
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, `/../../dist/SPA/index.html`),
+      pathname: path.join(__dirname, `/../../SPA/dist/SPA/index.html`),
       protocol: "file:",
       slashes: true
     })
   );
   buckyWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, `/../../../dist/SPA/index.html`),
+      pathname: path.join(__dirname, `/../../Antler/dist/Antler/index.html`),
       protocol: "file:",
       slashes: true
     })

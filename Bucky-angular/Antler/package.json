@@ -1,5 +1,5 @@
 {
-  "name": "mane-spa",
+  "name": "antler",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,10 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "bucky-build": "ng build --base-href ./ && tsc --p electron-mane",
-    "bucky-run": "bucky-build && npm run electron-run",
-    "electron-build": "tsc --project ./electron-mane/tsconfig.json",
-    "electron-run": "electron electron-mane/dist/main.js"
+    "antler-build": "ng build --base-href ./"
   },
   "private": true,
   "dependencies": {
@@ -24,9 +21,7 @@
     "@angular/platform-browser": "^6.0.3",
     "@angular/platform-browser-dynamic": "^6.0.3",
     "@angular/router": "^6.0.3",
-    "bootstrap": "^5.1.3",
     "core-js": "^2.5.4",
-    "fs-jetpack": "^4.2.0",
     "rxjs": "6.0.0",
     "zone.js": "^0.8.26"
   },
