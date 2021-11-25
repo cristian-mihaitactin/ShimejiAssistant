@@ -24,9 +24,9 @@ export class AuthService {
     tokens$: Observable<AuthTokenModel>;
     profile$: Observable<ProfileModel>;
     loggedIn$: Observable<boolean>;
-
+    private http: Http
     constructor(
-        private http: Http,
+        //private http: Http,
     ) {
         this.state = new BehaviorSubject<AuthStateModel>(this.initalState);
         this.state$ = this.state.asObservable();
@@ -69,7 +69,8 @@ export class AuthService {
             map(state => state.tokens),
             flatMap(tokens => this.getTokens({ refresh_token: tokens.refresh_token }, 'refresh_token').pipe(
                 catchError(error => throwError('Session Expired')))
-            ));
+            ),
+            map(res => res.json()));
     }
 
     private storeToken(tokens: AuthTokenModel): void {
@@ -96,7 +97,7 @@ export class AuthService {
         this.state.next(Object.assign({}, previousState, newState));
     }
 
-    private getTokens(data: RefreshGrantModel | LoginModel, grantType: string): Observable<AuthTokenModel> {
+    private getTokens(data: RefreshGrantModel | LoginModel, grantType: string): Observable<Response> {
         const headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
         const options = new RequestOptions({ headers: headers });
 
@@ -106,7 +107,7 @@ export class AuthService {
         Object.keys(data)
             .forEach(key => params.append(key, data[key]));
         return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
-            tap(res => {
+            tap(res  => {
                 const tokens: AuthTokenModel = res.json();
                 const now = new Date();
                 tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
