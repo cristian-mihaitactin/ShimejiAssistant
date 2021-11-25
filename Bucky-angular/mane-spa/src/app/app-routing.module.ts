@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes, RouterModule } from '@angular/router';
+import { SideviewComponent } from './sideview/sideview.component';
 
-const routes: Routes = [];
-
+const routes: Routes = [
+  { path: '', component: SideviewComponent }
+];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]

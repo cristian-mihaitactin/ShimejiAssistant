@@ -68,7 +68,7 @@ app.on("ready", () => {
 
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, `/../../SPA/dist/SPA/index.html`),
+      pathname: path.join(__dirname, `/../../mane-spa/dist/mane-spa/index.html`),
       protocol: "file:",
       slashes: true
     })
