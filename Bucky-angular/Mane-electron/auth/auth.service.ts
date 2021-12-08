@@ -1,17 +1,18 @@
 import { environment } from './../environments/environment';
-import { Http, Headers, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Observable, first, throwError, catchError, interval, of } from 'rxjs';
-import { map, filter, scan, flatMap, tap } from 'rxjs/operators';
+import { map, filter, scan, flatMap, tap} from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
+import { from } from 'rxjs';
 import { RefreshGrantModel } from './models/refresh-grant-model';
 import { ProfileModel } from './models/profile-model';
 import { AuthStateModel } from './models/auth-state-model';
 import { AuthTokenModel } from './models/auth-tokens-model';
 import { RegisterModel } from './models/register-model';
 import { LoginModel } from './models/login-model';
-
-const jwtDecode = require('jwt-decode');
+import {AxiosResponse, AxiosRequestHeaders, AxiosResponseHeaders, AxiosRequestConfig, Method} from 'axios'
+import {Axios} from 'axios-observable'
+import jwt_decode  from 'jwt-decode'
 
 export class AuthService {
 
@@ -24,9 +25,7 @@ export class AuthService {
     tokens$: Observable<AuthTokenModel>;
     profile$: Observable<ProfileModel>;
     loggedIn$: Observable<boolean>;
-    private http: Http
     constructor(
-        //private http: Http,
     ) {
         this.state = new BehaviorSubject<AuthStateModel>(this.initalState);
         this.state$ = this.state.asObservable();
@@ -44,9 +43,21 @@ export class AuthService {
             tap(() => this.scheduleRefresh()));
     }
 
-    register(data: RegisterModel): Observable<Response> {
-        return this.http.post(`${environment.baseApiUrl}/account/register`, data).pipe(
-            catchError (res => throwError(res.json())));
+    register(data: RegisterModel): Observable<AxiosResponse> {
+        const config = {
+            baseURL: `${environment.baseApiUrl}`,
+            url: '/account/register',
+            method: "POST" as Method,
+            data: data,
+            
+        }
+        
+        return Axios.request(config)
+        .pipe(
+                catchError (res => throwError(() => {
+                    console.log(res);
+                    new Error(res.json())
+                })));
     }
 
     login(user: LoginModel): Observable<any> {
@@ -70,7 +81,7 @@ export class AuthService {
             flatMap(tokens => this.getTokens({ refresh_token: tokens.refresh_token }, 'refresh_token').pipe(
                 catchError(error => throwError('Session Expired')))
             ),
-            map(res => res.json()));
+            map(res => res.data.json()));
     }
 
     private storeToken(tokens: AuthTokenModel): void {
@@ -97,26 +108,39 @@ export class AuthService {
         this.state.next(Object.assign({}, previousState, newState));
     }
 
-    private getTokens(data: RefreshGrantModel | LoginModel, grantType: string): Observable<Response> {
-        const headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
-        const options = new RequestOptions({ headers: headers });
+    private getTokens(data: RefreshGrantModel | LoginModel, grantType: string): Observable<AxiosResponse> {
+        //const headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
+        //const options = new RequestOptions({ headers: headers });
 
         Object.assign(data, { grant_type: grantType, scope: 'openid offline_access' });
 
         const params = new URLSearchParams();
         Object.keys(data)
             .forEach(key => params.append(key, data[key]));
-        return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
-            tap(res  => {
-                const tokens: AuthTokenModel = res.json();
-                const now = new Date();
-                tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
 
-                const profile: ProfileModel = jwtDecode(tokens.id_token);
-
-                this.storeToken(tokens);
-                this.updateState({ authReady: true, tokens, profile });
-            }));
+        
+        const options = {
+            baseURL: `${environment.baseApiUrl}`,
+            url: '/connect/token',
+            method: "POST" as Method,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            params: params,
+        }
+        
+        // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
+        return Axios.request(options)
+        .pipe(
+                tap(res  => {
+                    const tokens: AuthTokenModel = res.data.json();
+                    const now = new Date();
+                    tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
+    
+                    const profile: ProfileModel = jwt_decode(tokens.id_token);
+    
+                    this.storeToken(tokens);
+                    this.updateState({ authReady: true, tokens, profile });
+                }));
+        //});
     }
 
     private startupTokenRefresh(): Observable<AuthTokenModel> {
@@ -126,7 +150,7 @@ export class AuthService {
                     this.updateState({ authReady: true });
                     return throwError('No token in Storage');
                 }
-                const profile: ProfileModel = jwtDecode(tokens.id_token);
+                const profile: ProfileModel = jwt_decode(tokens.id_token);
                 this.updateState({ tokens, profile });
 
                 if (+tokens.expiration_date > new Date().getTime()) {

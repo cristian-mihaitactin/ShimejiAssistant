@@ -1,4 +1,5 @@
 ﻿using Barn.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace Barn.API.Models
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }
+        public string Email { get; set; }
+
+        public UserModel() { }
 
         public UserModel(User user)
         {
