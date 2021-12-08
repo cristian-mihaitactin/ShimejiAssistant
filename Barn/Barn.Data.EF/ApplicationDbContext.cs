@@ -1,10 +1,13 @@
 ﻿using Barn.Data.EF.DTOs;
+using Barn.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace Barn.Data.EF
 {
-    public class ApplicationDbContext: DbContext
+    public class ApplicationDbContext: IdentityDbContext<UserDTO, IdentityRole<Guid>, Guid>
     {
         // a Db set is where we tell entity framework where to map a class (entity) to a table
         public DbSet<UserDTO> Users { get; set; }

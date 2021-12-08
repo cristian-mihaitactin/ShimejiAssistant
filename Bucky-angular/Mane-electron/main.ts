@@ -2,13 +2,13 @@ import { app, ipcMain,shell } from "electron";
 import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
-
+ import { AuthService } from './auth/auth.service'
 // import env from "env";
 
 import createWindow from "./helpers/window";
 //const {createWindow} = require("./helpers/window");
 
-
+const authService = new AuthService();
 //////////////////////////////////////
 
 // Special module holding environment variables which you declared
@@ -81,6 +81,20 @@ app.on("ready", () => {
     })
   );
 
+  //////////////////testing the auth///////////
+// authService.register(
+//   {
+//     userName : "myNewUser",
+//     password : "123!@#qweQWE",
+//     confirmPassword: "123!@#qweQWE"
+//   }
+// ).subscribe(() => {
+//     console.log('Successfully registered');
+// },
+// error => console.log( error ));
+//////
+
+
   /*
   if (env.name === "development") {
     mainWindow.openDevTools();
@@ -97,4 +111,5 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 });
-//////
+
+
