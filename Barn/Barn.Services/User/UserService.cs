@@ -1,32 +1,29 @@
-﻿using Barn.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Barn.Services.Interfaces;
+using Barn.Entities.Users;
 
 namespace Barn.Services.User
 {
     public class UserService : IUserService
     {
-        private IGenericRepo<Guid, Entities.User> _userRepo;
+        private IGenericRepo<Guid, Entities.Users.User> _userRepo;
 
-        public UserService(IGenericRepo<Guid, Entities.User> userRepo)
+        public UserService(IGenericRepo<Guid, Entities.Users.User> userRepo)
         {
             _userRepo = userRepo;
         }
 
-        public bool CreateUser(Entities.User user)
+        public bool CreateUser(Entities.Users.User user)
         {
             return _userRepo.Insert(user);
         }
 
-        public Entities.User GetUserById(Guid id)
+        public Entities.Users.User GetUserById(Guid id)
         {
             return _userRepo.GetById(id);
         }
 
-        public bool UpdateUser(Entities.User user)
+        public bool UpdateUser(Entities.Users.User user)
         {
             return _userRepo.Update(user);
         }

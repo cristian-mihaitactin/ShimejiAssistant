@@ -1,5 +1,6 @@
 ﻿using Barn.Entities;
 using Barn.Services.Interfaces;
+using Barn.Entities.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;

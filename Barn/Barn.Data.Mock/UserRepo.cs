@@ -3,7 +3,7 @@ using Barn.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Barn.Entities.User;
+using Barn.Entities.Users;
 
 namespace Barn.Data.Mock
 {

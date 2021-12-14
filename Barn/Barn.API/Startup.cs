@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Barn.Data.EF;
-using Barn.Data.EF.DTOs;
 using Barn.Data.Mock;
 using Barn.Entities;
-using Barn.Entities.User;
+using Barn.Entities.Users;
 using Barn.Services.Interfaces;
 using Barn.Services.User;
 using Barn.Services.UserPreferences;
@@ -49,7 +48,7 @@ namespace Barn.API
 
             // --------------------------------- OpenId ---------------------------------//
             // Register the Identity services.
-            services.AddIdentity<UserDTO, IdentityRole<Guid>>()
+            services.AddIdentity<User, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 

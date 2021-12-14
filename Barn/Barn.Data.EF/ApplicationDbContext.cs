@@ -1,17 +1,19 @@
-﻿using Barn.Data.EF.DTOs;
-using Barn.Entities;
+﻿using Barn.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Barn.Entities.Users;
 
 namespace Barn.Data.EF
 {
-    public class ApplicationDbContext: IdentityDbContext<UserDTO, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext: IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         // a Db set is where we tell entity framework where to map a class (entity) to a table
-        public DbSet<UserDTO> Users { get; set; }
-        public DbSet<UserPreferencesDTO> UsersPreferences { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserPreferences> UsersPreferences { get; set; }
+        public DbSet<BuckyProfile> BuckyProfiles { get; set; }
+        public DbSet<BuckyBehaviour> BuckyBehaviours{ get; set; }
 
         // This is the run time configuration of 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -22,37 +24,45 @@ namespace Barn.Data.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // [User] mapping
-            modelBuilder.Entity<UserDTO>()
+            modelBuilder.Entity<User>()
                 .Property(u => u.RowVersion)
                 .IsRowVersion(); // Cuncurrency property using fluent mapping
-            modelBuilder.Entity<UserDTO>()
+            modelBuilder.Entity<User>()
                 .Property(a => a.Id)
                 .HasColumnType("uniqueidentifier");
 
-            modelBuilder.Entity<UserDTO>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
+            modelBuilder.Entity<User>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
 
-            modelBuilder.Entity<UserDTO>().ToTable("Users");
+            modelBuilder.Entity<User>().ToTable("Users");
 
             // [UserPreferences] mapping
-            modelBuilder.Entity<UserPreferencesDTO>()
+            modelBuilder.Entity<UserPreferences>()
                 .Property(a => a.RowVersion)
                 .IsRowVersion();
 
-            modelBuilder.Entity<UserPreferencesDTO>()
+            modelBuilder.Entity<UserPreferences>()
                 .Property(a => a.Id)
                 .HasColumnType("uniqueidentifier");
 
-            modelBuilder.Entity<UserPreferencesDTO>()
+            modelBuilder.Entity<UserPreferences>()
                 .HasOne(up => up.User)
                 .WithOne(u => u.UserPreferences)
-                .HasForeignKey<UserPreferencesDTO>(u => u.UserId);
+                .HasForeignKey<UserPreferences>(u => u.UserId);
 
-            modelBuilder.Entity<UserPreferencesDTO>().ToTable("UserPreferences");
+            modelBuilder.Entity<UserPreferences>().ToTable("UserPreferences");
 
+            // [Bucky Profile]
             // Seeding
-            modelBuilder.Entity<UserDTO>(u =>
+            Seed(modelBuilder);
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+        public void Seed(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(u =>
             {
-                u.HasData(new UserDTO
+                u.HasData(new User
                 {
                     Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                     UserName = "Dave Coffee",
@@ -60,16 +70,14 @@ namespace Barn.Data.EF
                 });
             });
 
-            modelBuilder.Entity<UserPreferencesDTO>( up =>
+            modelBuilder.Entity<UserPreferences>(up =>
             {
-                up.HasData(new UserPreferencesDTO
+                up.HasData(new UserPreferences
                 {
                     Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                     UserId = Guid.Parse("11111111-1111-1111-1111-111111111111")
                 });
             });
-
-            base.OnModelCreating(modelBuilder);
         }
     }
 }

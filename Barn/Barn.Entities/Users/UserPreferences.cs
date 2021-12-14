@@ -1,15 +1,16 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Barn.Data.EF.DTOs
+namespace Barn.Entities.Users
 {
-    public class UserPreferencesDTO
+    public class UserPreferences
     {
         [Key]
         public Guid Id { get; set; }
-        public UserDTO User { get; set; }
+        public User User { get; set; }
         public Guid UserId { get; set; }
+        public BuckyProfile BuckyProfile { get; set; }
+        public Guid BuckyProfileID { get; set; }
         public byte[] RowVersion { get; set; }
     }
 }

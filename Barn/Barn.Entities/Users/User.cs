@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
-namespace Barn.Data.EF.DTOs
+namespace Barn.Entities.Users
 {
-    public class UserDTO: IdentityUser<Guid>
+    public class User: IdentityUser<Guid>
     {
         [Key]
         public override Guid Id { get; set; }
@@ -13,7 +12,7 @@ namespace Barn.Data.EF.DTOs
         public override string UserName { get; set; }
         [Required]
         public override string Email { get; set; }
-        public UserPreferencesDTO UserPreferences { get; set; }
+        public UserPreferences UserPreferences { get; set; }
         public byte[] RowVersion { get; set; }
 
     }
