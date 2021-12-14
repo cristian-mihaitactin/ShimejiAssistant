@@ -51,7 +51,37 @@ namespace Barn.Data.EF
 
             modelBuilder.Entity<UserPreferences>().ToTable("UserPreferences");
 
-            // [Bucky Profile]
+            // [BuckyProfile]
+            modelBuilder.Entity<BuckyProfile>()
+                .Property(a => a.RowVersion)
+                .IsRowVersion();
+            modelBuilder.Entity<BuckyProfile>()
+                .Property(a => a.Id)
+                .HasColumnType("uniqueidentifier");
+
+            modelBuilder.Entity<UserPreferences>()
+                .HasOne(up => up.BuckyProfile)
+                .WithOne()
+                .HasForeignKey<UserPreferences>(u => u.BuckyProfileID)
+                .IsRequired(false);
+
+            modelBuilder.Entity<BuckyProfile>().ToTable("BuckyProfile");
+
+            // [BuckyBehaviour]
+            modelBuilder.Entity<BuckyBehaviour>()
+                .Property(a => a.RowVersion)
+                .IsRowVersion();
+            modelBuilder.Entity<BuckyBehaviour>()
+                .Property(a => a.Id)
+                .HasColumnType("uniqueidentifier");
+
+            modelBuilder.Entity<BuckyBehaviour>()
+                .HasOne(b => b.BuckyProfile)
+                .WithMany(profile => profile.Behaviours)
+                .HasForeignKey(a => a.BuckyProfileId);
+
+            modelBuilder.Entity<BuckyBehaviour>().ToTable("BuckyBehaviour");
+
             // Seeding
             Seed(modelBuilder);
 

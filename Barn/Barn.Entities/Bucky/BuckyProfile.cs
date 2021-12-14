@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Barn.Entities
 {
-    public class BuckyProfile
+    public class BuckyProfile: EntityWithRowVersion
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

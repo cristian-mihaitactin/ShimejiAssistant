@@ -6,22 +6,15 @@ using System.Threading.Tasks;
 
 namespace Barn.Entities
 {
-    public class BuckyBehaviour
+    public class BuckyBehaviour: EntityWithRowVersion
     {
 
         public Guid Id { get; set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public ActionType ActionType { get; private set; }
-        public string ImageBlobPath { get; private set; }
-
-        public BuckyBehaviour(Guid id, string name, string description, ActionType actionType, string imageBlobPath)
-        {
-            Id = id;
-            Name = name;
-            Description = description;
-            ActionType = actionType;
-            ImageBlobPath = imageBlobPath;
-        }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public ActionType ActionType { get; set; }
+        public string ImageBlobPath { get; set; }
+        public BuckyProfile BuckyProfile { get; set; }
+        public Guid BuckyProfileId { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Barn.Entities.Users
 {
-    public class UserPreferences
+    public class UserPreferences: EntityWithRowVersion
     {
         [Key]
         public Guid Id { get; set; }
@@ -11,6 +11,5 @@ namespace Barn.Entities.Users
         public Guid UserId { get; set; }
         public BuckyProfile BuckyProfile { get; set; }
         public Guid BuckyProfileID { get; set; }
-        public byte[] RowVersion { get; set; }
     }
 }
