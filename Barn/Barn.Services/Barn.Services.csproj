@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Barn.AzIntegration\Barn.AzIntegration.csproj" />
     <ProjectReference Include="..\Barn.Entities\Barn.Entities.csproj" />
   </ItemGroup>
 

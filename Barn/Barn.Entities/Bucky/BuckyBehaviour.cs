@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Barn.Entities
+namespace Barn.Entities.Bucky
 {
     public class BuckyBehaviour: EntityWithRowVersion
     {

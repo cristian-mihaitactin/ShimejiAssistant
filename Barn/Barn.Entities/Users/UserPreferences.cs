@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Barn.Entities.Bucky;
 
 namespace Barn.Entities.Users
 {
