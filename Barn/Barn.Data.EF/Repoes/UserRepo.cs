@@ -51,35 +51,29 @@ namespace Barn.Data.Mock
 
             }
 
-            var existingEntitiy = _dbContext.Users.Where(u => u.Id == entity.Id).FirstOrDefault();
+            var existingEntitiy = _dbContext.Users.FirstOrDefault(u => u.Id == entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
             }
 
-            _dbContext.Users[_dbContext.Users.IndexOf(existingEntitiy)] = entity;
+            _dbContext.Users.Update(entity);
             _userPrefRepo.Update(entity.UserPreferences);
 
             return true;
         }
-        public bool Delete(Guid id)
+        public void Delete(Guid id)
         {
 
             var user = _dbContext.Users.Where(u => u.Id == id).FirstOrDefault();
 
             if (user == null)
             {
-                return false;
+                return;
             }
 
-            var userPrefDeleted = _userPrefRepo.Delete(user.UserPreferences.Id);
-
-            if (userPrefDeleted)
-            {
-                return _dbContext.Users.Remove(user);
-            }
-
-            return false;
+            _userPrefRepo.Delete(user.UserPreferences.Id);
+            _dbContext.Users.Remove(user);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace Barn.Services.Interfaces
         IEnumerable<V> GetAll();
         bool Insert(V entity);
         bool Update(V entity);
-        bool Delete(K id);
+        void Delete(K id);
     }
 }

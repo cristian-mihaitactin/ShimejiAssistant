@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Barn.Data.EF\Barn.Data.EF.csproj" />
-    <ProjectReference Include="..\Barn.Data.Mock\Barn.Data.Mock.csproj" />
     <ProjectReference Include="..\Barn.Services\Barn.Services.csproj" />
   </ItemGroup>
 
