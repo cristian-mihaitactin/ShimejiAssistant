@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Barn.Entities
+namespace Barn.Entities.User
 {
     public class UserPreferences
     {

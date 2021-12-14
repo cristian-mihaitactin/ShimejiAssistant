@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 
-namespace Barn.Entities
+namespace Barn.Entities.User
 {
     public class User
     {

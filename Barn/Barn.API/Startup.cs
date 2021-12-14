@@ -6,6 +6,7 @@ using Barn.Data.EF;
 using Barn.Data.EF.DTOs;
 using Barn.Data.Mock;
 using Barn.Entities;
+using Barn.Entities.User;
 using Barn.Services.Interfaces;
 using Barn.Services.User;
 using Barn.Services.UserPreferences;
