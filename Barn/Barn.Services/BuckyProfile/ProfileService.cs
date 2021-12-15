@@ -8,7 +8,7 @@ using Barn.Services.Interfaces;
 
 namespace Barn.Services.BuckyProfile
 {
-    public class ProfileService
+    public class ProfileService: IProfileService
     {
         private BehaviourClient _behaviourClient;
         private IGenericRepo<Guid, Entities.Bucky.BuckyProfile> _buckyProfileRepo;
