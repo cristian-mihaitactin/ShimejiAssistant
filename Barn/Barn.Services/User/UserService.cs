@@ -28,9 +28,9 @@ namespace Barn.Services.User
             return _userRepo.Update(user);
         }
 
-        public bool DeleteUser(Guid id)
+        public void DeleteUser(Guid id)
         {
-            return _userRepo.Delete(id);
+            _userRepo.Delete(id);
         }
     }
 }

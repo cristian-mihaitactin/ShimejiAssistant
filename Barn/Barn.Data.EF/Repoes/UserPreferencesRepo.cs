@@ -26,7 +26,7 @@ namespace Barn.Data.Mock
 
         public UserPreferences GetById(Guid id)
         {
-            return _dbContext.UsersPreferences.Where(u => u.Id == id).FirstOrDefault();
+            return _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
         }
 
         public bool Insert(UserPreferences entity)
@@ -51,26 +51,26 @@ namespace Barn.Data.Mock
 
             }
 
-            var existingEntitiy = _dbContext.UsersPreferences.Where(u => u.Id == entity.Id).FirstOrDefault();
+            var existingEntitiy = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
             }
 
-            _dbContext.UsersPreferences[_dbContext.UsersPreferences.IndexOf(existingEntitiy)] = entity;
+            _dbContext.UsersPreferences.Update(entity);
 
             return true;
         }
 
-        public bool Delete(Guid id)
+        public void Delete(Guid id)
         {
-            var usPref = _dbContext.UsersPreferences.Where(u => u.Id == id).FirstOrDefault();
+            var usPref = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
             if (usPref == null)
             {
-                return false;
+                return;
             }
 
-            return _dbContext.UsersPreferences.Remove(usPref);
+            _dbContext.UsersPreferences.Remove(usPref);
         }
     }
 }

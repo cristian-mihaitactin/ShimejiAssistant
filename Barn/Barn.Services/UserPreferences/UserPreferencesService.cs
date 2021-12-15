@@ -31,9 +31,9 @@ namespace Barn.Services.UserPreferences
             return _userPrefRepo.Update(userPref);
         }
 
-        public bool DeleteUserPreference(Guid id)
+        public void DeleteUserPreference(Guid id)
         {
-            return _userPrefRepo.Delete(id);
+            _userPrefRepo.Delete(id);
         }
     }
 }

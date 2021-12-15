@@ -65,7 +65,7 @@ namespace Barn.Data.Mock
         public void Delete(Guid id)
         {
 
-            var user = _dbContext.Users.Where(u => u.Id == id).FirstOrDefault();
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
 
             if (user == null)
             {
