@@ -6,7 +6,7 @@ using Barn.Entities.Bucky;
 
 namespace Barn.API.Models
 {
-    public class BehaviourModel
+    public class BuckyBehaviourModel
     {
         public ActionType ActionType { get; set; }
         public byte[] ImageBytes { get; set; }

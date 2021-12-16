@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace Barn.API.Models
 {
-    public class ProfileModel
+    public class BuckyProfileModel
     {
         public Guid Id { get; set; }
-        private List<BehaviourModel> _behaviours;
-        public IList<BehaviourModel> Behaviours => _behaviours;
+        private List<BuckyBehaviourModel> _behaviours;
+        public IList<BuckyBehaviourModel> Behaviours => _behaviours;
     }
 }

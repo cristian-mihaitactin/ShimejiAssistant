@@ -8,23 +8,23 @@ using Barn.Services.Interfaces;
 
 namespace Barn.Services.BuckyProfile
 {
-    public class ProfileService: IProfileService
+    public class BuckyProfileService: IBuckyProfileService
     {
         private BehaviourClient _behaviourClient;
         private IGenericRepo<Guid, Entities.Bucky.BuckyProfile> _buckyProfileRepo;
 
-        public ProfileService(string connectionString,IGenericRepo<Guid, 
+        public BuckyProfileService(string connectionString,IGenericRepo<Guid, 
             Entities.Bucky.BuckyProfile> buckyProfileRepo)
         {
             _behaviourClient = new BehaviourClient(connectionString);
             _buckyProfileRepo = buckyProfileRepo;
         }
 
-        public Profile GetProfile(Guid id)
+        public BuckyProfileDTO GetProfile(Guid id)
         {
             //Get profile and behaviours from sql
             var buckyProfile = _buckyProfileRepo.GetById(id);
-            var profile = new Profile(buckyProfile);
+            var profile = new BuckyProfileDTO(buckyProfile);
 
             //Get behaviour blobs
             foreach (var profileBehaviour in profile.Behaviours)

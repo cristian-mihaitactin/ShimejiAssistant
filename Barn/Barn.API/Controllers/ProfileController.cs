@@ -14,11 +14,11 @@ namespace Barn.API.Controllers
     [ApiController]
     public class ProfileController : ControllerBase
     {
-        private IProfileService _profileService;
+        private IBuckyProfileService _profileService;
         // Create a field to store the mapper object
         private readonly IMapper _mapper;
 
-        public ProfileController(IMapper mapper, IProfileService profileService)
+        public ProfileController(IMapper mapper, IBuckyProfileService profileService)
         {
             _profileService = profileService;
             _mapper = mapper;
@@ -26,10 +26,10 @@ namespace Barn.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public ProfileModel Get(Guid id)
+        public BuckyProfileModel Get(Guid id)
         {
             var profile = _profileService.GetProfile(id);
-            return _mapper.Map<ProfileModel>(profile);
+            return _mapper.Map<BuckyProfileModel>(profile);
         }
     }
 }

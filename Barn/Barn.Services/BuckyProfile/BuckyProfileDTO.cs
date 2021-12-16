@@ -4,18 +4,18 @@ using Barn.Entities;
 
 namespace Barn.Services.BuckyProfile
 {
-    public class Profile
+    public class BuckyProfileDTO
     {
         private readonly Entities.Bucky.BuckyProfile _buckyProfile;
-        private List<Behaviour> _behaviours;
-        public IList<Behaviour> Behaviours => _behaviours;
+        private List<BuckyBehaviourDTO> _behaviours;
+        public IList<BuckyBehaviourDTO> Behaviours => _behaviours;
 
-        public Profile(Entities.Bucky.BuckyProfile buckyProfile)
+        public BuckyProfileDTO(Entities.Bucky.BuckyProfile buckyProfile)
         {
             _buckyProfile = buckyProfile;
             foreach (var buckyBehaviour in _buckyProfile.Behaviours)
             {
-                _behaviours.Add(new Behaviour(buckyBehaviour));
+                _behaviours.Add(new BuckyBehaviourDTO(buckyBehaviour));
             }
         }
     }

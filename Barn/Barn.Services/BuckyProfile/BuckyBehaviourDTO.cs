@@ -3,7 +3,7 @@ using Barn.Entities.Bucky;
 
 namespace Barn.Services.BuckyProfile
 {
-    public class Behaviour
+    public class BuckyBehaviourDTO
     {
         private readonly BuckyBehaviour _buckyBehaviour;
         public BuckyBehaviour BuckyBehaviour => _buckyBehaviour;
@@ -11,7 +11,7 @@ namespace Barn.Services.BuckyProfile
 
         public byte[] ImageBytes { get; set; }
 
-        public Behaviour(BuckyBehaviour buckyBehaviour)
+        public BuckyBehaviourDTO(BuckyBehaviour buckyBehaviour)
         {
             _buckyBehaviour = buckyBehaviour;
         }
