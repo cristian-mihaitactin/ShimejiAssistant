@@ -4,11 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "antler-build": "ng build --base-href ./"
+    "build": "ng build --base-href ./"
   },
   "private": true,
   "dependencies": {
