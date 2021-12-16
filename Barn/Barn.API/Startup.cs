@@ -140,8 +140,8 @@ namespace Barn.API
                 options.UseOpenIddict<Guid>();
             });
 
-            services.AddSingleton<IGenericRepo<Guid, User>, UserRepo>();
-            services.AddSingleton<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
+            services.AddScoped<IGenericRepo<Guid, User>, UserRepo>();
+            services.AddScoped<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
             // Auto Mapper Configurations
 
             var mapperConfig = new MapperConfiguration(mc =>
