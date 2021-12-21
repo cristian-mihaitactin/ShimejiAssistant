@@ -6,29 +6,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Barn.Data.EF;
 
 namespace Barn.Data.Mock
 {
     public class UserPreferencesRepo : IGenericRepo<Guid, UserPreferences>
     {
-        private IList<UserPreferences> _userPrefDB = new List<UserPreferences>();
+        private ApplicationDbContext _dbContext;
 
+        public UserPreferencesRepo(ApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public IEnumerable<UserPreferences> GetAll()
         {
-            return _userPrefDB;
+            return _dbContext.UsersPreferences;
         }
 
         public UserPreferences GetById(Guid id)
         {
-            return _userPrefDB.Where(u => u.Id == id).FirstOrDefault();
+            return _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
         }
 
         public bool Insert(UserPreferences entity)
         {
-            if (!_userPrefDB.Contains(entity))
+            if (!_dbContext.UsersPreferences.Contains(entity))
             {
-                _userPrefDB.Add(entity);
+                _dbContext.UsersPreferences.Add(entity);
             }
             else
             {
@@ -40,32 +45,32 @@ namespace Barn.Data.Mock
 
         public bool Update(UserPreferences entity)
         {
-            if (!_userPrefDB.Contains(entity))
+            if (!_dbContext.UsersPreferences.Contains(entity))
             {
                 return false;
 
             }
 
-            var existingEntitiy = _userPrefDB.Where(u => u.Id == entity.Id).FirstOrDefault();
+            var existingEntitiy = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
             }
 
-            _userPrefDB[_userPrefDB.IndexOf(existingEntitiy)] = entity;
+            _dbContext.UsersPreferences.Update(entity);
 
             return true;
         }
 
-        public bool Delete(Guid id)
+        public void Delete(Guid id)
         {
-            var usPref = _userPrefDB.Where(u => u.Id == id).FirstOrDefault();
+            var usPref = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
             if (usPref == null)
             {
-                return false;
+                return;
             }
 
-            return _userPrefDB.Remove(usPref);
+            _dbContext.UsersPreferences.Remove(usPref);
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Barn.API.Models;
 using Barn.Data.EF;
-using Barn.Data.EF.DTOs;
 using Barn.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Threading.Tasks;
+using Barn.Entities.Users;
 
 namespace Barn.API.Controllers
 {
@@ -14,12 +14,12 @@ namespace Barn.API.Controllers
     [Route("[controller]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<UserDTO> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
         private static bool _databaseChecked;
 
         public AccountController(
-            UserManager<UserDTO> userManager,
+            UserManager<User> userManager,
             ApplicationDbContext applicationDbContext)
         {
             _userManager = userManager;
@@ -35,7 +35,7 @@ namespace Barn.API.Controllers
             EnsureDatabaseCreated(_applicationDbContext);
             if (ModelState.IsValid)
             {
-                var user = new UserDTO { UserName = model.UserName, Email = model.UserName };
+                var user = new User { UserName = model.UserName, Email = model.UserName };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

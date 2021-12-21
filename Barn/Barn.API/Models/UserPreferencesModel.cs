@@ -1,6 +1,5 @@
-﻿using Barn.Entities;
+﻿using Barn.Entities.Users;
 using System;
-using System.Collections.Generic;
 
 namespace Barn.API.Models
 {

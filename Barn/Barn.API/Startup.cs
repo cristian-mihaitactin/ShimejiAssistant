@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Barn.API.Mapper;
 using Barn.Data.EF;
-using Barn.Data.EF.DTOs;
+using Barn.Data.EF.Repoes;
 using Barn.Data.Mock;
 using Barn.Entities;
+using Barn.Entities.Users;
+using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
 using Barn.Services.User;
 using Barn.Services.UserPreferences;
@@ -35,6 +39,7 @@ namespace Barn.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             // services.AddCors();
             services.AddControllers();
 
@@ -44,11 +49,12 @@ namespace Barn.API
             // --------------------------------- Services ---------------------------------//
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
+            services.AddScoped<IBuckyProfileService, BuckyProfileService>();
 
 
             // --------------------------------- OpenId ---------------------------------//
             // Register the Identity services.
-            services.AddIdentity<UserDTO, IdentityRole<Guid>>()
+            services.AddIdentity<User, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -138,8 +144,18 @@ namespace Barn.API
                 options.UseOpenIddict<Guid>();
             });
 
-            services.AddSingleton<IGenericRepo<Guid, User>, UserRepo>();
-            services.AddSingleton<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
+            services.AddScoped<IGenericRepo<Guid, User>, UserRepo>();
+            services.AddScoped<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
+            services.AddScoped<IGenericRepo<Guid, Entities.Bucky.BuckyProfile>, BuckyProfileRepo>();
+            // Auto Mapper Configurations
+
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

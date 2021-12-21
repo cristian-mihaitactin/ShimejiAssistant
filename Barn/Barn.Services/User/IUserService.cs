@@ -1,13 +1,13 @@
 ﻿using System;
-using Barn.Entities;
+
 namespace Barn.Services.User
 {
     public interface IUserService
     {
-        Barn.Entities.User GetUserById(Guid id);
-        bool CreateUser(Barn.Entities.User user);
-        bool UpdateUser(Barn.Entities.User user);
-        bool DeleteUser(Guid id);
+        Entities.Users.User GetUserById(Guid id);
+        bool CreateUser(Entities.Users.User user);
+        bool UpdateUser(Entities.Users.User user);
+        void DeleteUser(Guid id);
 
     }
 }
