@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Barn.Entities;
 using Barn.Entities.Bucky;
@@ -15,8 +16,8 @@ namespace Barn.AzIntegration.BuckyBehaviour
 
         public async Task<BehaviourBlob> GetBehaviourBlob(Entities.Bucky.BuckyBehaviour behaviour)
         {
-            var blobbytes = await _blobService.GetBlobAsync(behaviour.BuckyProfile.Name,
-                Enum.GetName(typeof(ActionType), behaviour.ActionType));
+            var blobbytes = await _blobService.GetBlobAsync(behaviour.BuckyProfile.Name.ToLowerInvariant(),
+                Enum.GetName(typeof(ActionType), behaviour.ActionType)?.ToLowerInvariant() + ".png");
 
             return new BehaviourBlob()
             {

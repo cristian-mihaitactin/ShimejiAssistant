@@ -17,11 +17,10 @@ namespace Barn.API.Mapper
             CreateMap<User, UserModel>();
             CreateMap<UserModel, User>();
 
-            CreateMap<BuckyBehaviourDTO, BuckyBehaviourModel>();
-            CreateMap<BuckyBehaviourModel, BuckyBehaviourDTO>();
-
             CreateMap<Barn.Services.BuckyProfile.BuckyProfileDTO, BuckyProfileModel>();
             CreateMap<BuckyProfileModel, Barn.Services.BuckyProfile.BuckyProfileDTO>();
+            CreateMap<BuckyBehaviourDTO, BuckyBehaviourModel>();//.
+            CreateMap<BuckyBehaviourModel, BuckyBehaviourDTO>();
         }
     }
 }

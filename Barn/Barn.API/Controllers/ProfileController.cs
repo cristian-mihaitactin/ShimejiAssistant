@@ -29,7 +29,9 @@ namespace Barn.API.Controllers
         public BuckyProfileModel Get(Guid id)
         {
             var profile = _profileService.GetProfile(id);
-            return _mapper.Map<BuckyProfileModel>(profile);
+            //var behaviourModels = profile.Behaviours.Select(b => _mapper.Map<BuckyBehaviourModel>(b)).ToList();
+            var profileModel =  _mapper.Map<BuckyProfileModel>(profile);
+            return profileModel;
         }
     }
 }

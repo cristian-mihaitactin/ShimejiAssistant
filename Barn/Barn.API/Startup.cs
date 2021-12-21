@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Barn.API.Mapper;
 using Barn.Data.EF;
+using Barn.Data.EF.Repoes;
 using Barn.Data.Mock;
 using Barn.Entities;
 using Barn.Entities.Users;
+using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
 using Barn.Services.User;
 using Barn.Services.UserPreferences;
@@ -47,6 +49,7 @@ namespace Barn.API
             // --------------------------------- Services ---------------------------------//
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
+            services.AddScoped<IBuckyProfileService, BuckyProfileService>();
 
 
             // --------------------------------- OpenId ---------------------------------//
@@ -143,6 +146,7 @@ namespace Barn.API
 
             services.AddScoped<IGenericRepo<Guid, User>, UserRepo>();
             services.AddScoped<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
+            services.AddScoped<IGenericRepo<Guid, Entities.Bucky.BuckyProfile>, BuckyProfileRepo>();
             // Auto Mapper Configurations
 
             var mapperConfig = new MapperConfiguration(mc =>

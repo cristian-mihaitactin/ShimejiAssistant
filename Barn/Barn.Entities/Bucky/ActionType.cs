@@ -2,10 +2,10 @@
 {
     public enum ActionType
     {
-        STANDBY,
-        NOTIFICATION,
-        DRAGGED,
-        ATTENTION,
-        TALKING,
+        Standby,
+        Notification,
+        Dragged,
+        Attention = 4,
+        Bow = 8,
     }
 }

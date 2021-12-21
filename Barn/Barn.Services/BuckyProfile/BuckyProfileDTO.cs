@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Barn.Entities;
 
 namespace Barn.Services.BuckyProfile
@@ -7,15 +8,27 @@ namespace Barn.Services.BuckyProfile
     public class BuckyProfileDTO
     {
         private readonly Entities.Bucky.BuckyProfile _buckyProfile;
-        private List<BuckyBehaviourDTO> _behaviours;
-        public IList<BuckyBehaviourDTO> Behaviours => _behaviours;
+        public IList<BuckyBehaviourDTO> Behaviours { get; set; }
+    
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
 
+        public BuckyProfileDTO()
+        {
+            Behaviours = new List<BuckyBehaviourDTO>();
+        }
         public BuckyProfileDTO(Entities.Bucky.BuckyProfile buckyProfile)
         {
+            Id = buckyProfile.Id;
+            Name = buckyProfile.Name;
+            Description = buckyProfile.Description;
+
             _buckyProfile = buckyProfile;
+            Behaviours = new List<BuckyBehaviourDTO>();
             foreach (var buckyBehaviour in _buckyProfile.Behaviours)
             {
-                _behaviours.Add(new BuckyBehaviourDTO(buckyBehaviour));
+                Behaviours.Add(new BuckyBehaviourDTO(buckyBehaviour));
             }
         }
     }
