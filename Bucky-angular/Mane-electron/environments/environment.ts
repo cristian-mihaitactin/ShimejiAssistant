@@ -4,7 +4,12 @@
 
 export const environment = {
   production: false,
-  baseApiUrl: "http://localhost:5000"
+  baseApiUrl: "http://localhost:5000",
+  default_user: {
+    username: "user.name",
+    email : "user1@abc.com",
+    bucky_profile: "8919e40e-d588-42f2-a0a8-4afb9ad1589b"
+  }
 };
 
 /*

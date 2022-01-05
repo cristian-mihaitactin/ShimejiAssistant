@@ -26,6 +26,10 @@ namespace Barn.Services.BuckyProfile
 
             _buckyProfile = buckyProfile;
             Behaviours = new List<BuckyBehaviourDTO>();
+            if (_buckyProfile.Behaviours is null)
+            {
+                return;
+            }
             foreach (var buckyBehaviour in _buckyProfile.Behaviours)
             {
                 Behaviours.Add(new BuckyBehaviourDTO(buckyBehaviour));

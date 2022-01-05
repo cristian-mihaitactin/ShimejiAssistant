@@ -36,5 +36,7 @@ namespace Barn.Services.BuckyProfile
 
             return profile;
         }
+
+        public IList<BuckyProfileDTO> GetAllProfiles() => _buckyProfileRepo.GetAll().Select(b => new BuckyProfileDTO(b)).ToList();
     }
 }
