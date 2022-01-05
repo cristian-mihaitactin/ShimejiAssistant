@@ -25,6 +25,12 @@ namespace Barn.API.Controllers
 
         }
 
+        [HttpGet("")]
+        public IList<BuckyProfileModel> GetAll()
+        {
+            return _profileService.GetAllProfiles().Select(b => _mapper.Map<BuckyProfileModel>(b)).ToList();
+        }
+
         [HttpGet("{id}")]
         public BuckyProfileModel Get(Guid id)
         {
