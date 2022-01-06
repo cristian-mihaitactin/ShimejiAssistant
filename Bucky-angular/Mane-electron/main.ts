@@ -2,10 +2,14 @@ import { app, ipcMain,shell } from "electron";
 import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
- import { AuthService } from './auth/auth.service'
+import { AuthService } from './auth/auth.service'
+import {BuckyProfileService} from './bucky_profile/bucky-profile.service';
 // import env from "env";
 
 import createWindow from "./helpers/window";
+const buckyProfileService = new BuckyProfileService();
+var buckyProfile = buckyProfileService.getLocalBuckyProfile("8919e40e-d588-42f2-a0a8-4afb9ad1589b");
+
 //const {createWindow} = require("./helpers/window");
 
 const authService = new AuthService();
@@ -94,8 +98,7 @@ app.on("ready", () => {
 // error => console.log( error ));
 //////
 
-
-  /*
+/*
   if (env.name === "development") {
     mainWindow.openDevTools();
     //buckyWindow.openDevTools();
