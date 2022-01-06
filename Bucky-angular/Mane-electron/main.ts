@@ -36,6 +36,10 @@ const initIpc = () => {
   ipcMain.on("open-external-link", (event, href) => {
     shell.openExternal(href);
   });
+
+  ipcMain.on("get-initial-bucky-profile", (event,arg) => {
+    event.reply("bucky-profile", buckyProfile);
+  });
 };
 
 app.on("ready", () => {
@@ -84,6 +88,7 @@ app.on("ready", () => {
       slashes: true
     })
   );
+  buckyWindow.openDevTools();
 
   //////////////////testing the auth///////////
 // authService.register(
