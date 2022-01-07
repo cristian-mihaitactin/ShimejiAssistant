@@ -88,7 +88,8 @@ app.on("ready", () => {
       slashes: true
     })
   );
-  buckyWindow.openDevTools();
+  //buckyWindow.openDevTools();
+  mainWindow.openDevTools();
 
   //////////////////testing the auth///////////
 // authService.register(

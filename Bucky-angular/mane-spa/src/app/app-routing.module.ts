@@ -1,10 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { SideviewComponent } from './sideview/sideview.component';
+import { OverviewComponent } from './components/overview/overview.component';
 
 const routes: Routes = [
-  { path: '', component: SideviewComponent }
-];
+  {
+    path: '',
+    component: OverviewComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    component: OverviewComponent
+  }];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
