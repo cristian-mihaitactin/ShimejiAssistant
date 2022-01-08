@@ -1,15 +1,15 @@
 {
-  "name": "mane-electron",
+  "name": "Bucky",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
     "start": "electron .",
-    "postbuild" : "npm run copy-files",
-    "copy-files" : "cp -R ./bucky_profile/profiles dist/bucky_profile/profiles",
-    "dev" : "electron -r dotenv/config ."
-
+    "postbuild": "npm run copy-files",
+    "copy-files": "robocopy bucky_profile/profiles/ dist/bucky_profile/profiles/ /s",
+    "dev-dotenv": "electron -r dotenv/config .",
+    "dev": "electron -r dotenv/config ."
   },
   "author": "",
   "license": "ISC",
@@ -22,7 +22,6 @@
     "rxjs-compat": "^6.6.7"
   },
   "devDependencies": {
-    "dotenv": "^10.0.0",
     "electron": "^16.0.4"
   }
 }

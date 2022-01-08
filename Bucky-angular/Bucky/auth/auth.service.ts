@@ -1,4 +1,4 @@
-import { environment } from './../environments/environment';
+import { environment } from 'environments/environment';
 import { Observable, first, throwError, catchError, interval, of } from 'rxjs';
 import { map, filter, scan, flatMap, tap} from 'rxjs/operators';
 import { Subscription } from 'rxjs';
