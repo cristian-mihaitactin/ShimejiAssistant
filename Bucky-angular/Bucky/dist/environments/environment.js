@@ -7,6 +7,7 @@ exports.environment = void 0;
 exports.environment = {
     production: false,
     baseApiUrl: "http://localhost:5000",
+    config: "development",
     default_user: {
         username: "user.name",
         email: "user1@abc.com",

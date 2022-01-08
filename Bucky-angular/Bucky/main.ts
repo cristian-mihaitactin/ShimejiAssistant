@@ -1,22 +1,22 @@
-import { environment } from "environments/environment";
+import { environment } from "./environments/environment";
 import { app, ipcMain,shell } from "electron";
 import * as path from "path";
 import * as url from "url";
 import * as fs from "fs";
 import { AuthService } from './auth/auth.service'
 import {BuckyProfileService} from './bucky_profile/bucky-profile.service';
-
+import { UserStore } from './helpers/user-store';
 import createWindow from "./helpers/window";
 
 //import { environment } from "environments/environment";
 const buckyProfileService = new BuckyProfileService();
 var buckyProfile = buckyProfileService.getLocalBuckyProfile("8919e40e-d588-42f2-a0a8-4afb9ad1589b");
 
-console.log("baseApiUrl" +  process.env.baseApiUrl);
-console.log(app.getPath("userData"));
-//const {createWindow} = require("./helpers/window");
-
 const authService = new AuthService();
+const userStore = new UserStore({
+  configName: environment.config,
+  defaults: environment.default_user
+});
 //////////////////////////////////////
 
 // Special module holding environment variables which you declared

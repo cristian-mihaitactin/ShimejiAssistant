@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Store = void 0;
+exports.UserStore = void 0;
 var electron_1 = require("electron");
 var path = require("path");
 var fs = require("fs");
-var Store = /** @class */ (function () {
-    function Store(opts) {
+var UserStore = /** @class */ (function () {
+    function UserStore(opts) {
         // Renderer process has to get `app` module via `remote`, whereas the main process can get it directly
         // app.getPath('userData') will return a string of the user's app data directory path.
         var userDataPath = electron_1.app.getPath('userData');
@@ -14,11 +14,11 @@ var Store = /** @class */ (function () {
         this.data = parseDataFile(this.path, opts.defaults);
     }
     // This will just return the property on the `data` object
-    Store.prototype.get = function (key) {
+    UserStore.prototype.get = function (key) {
         return this.data[key];
     };
     // ...and this will set it
-    Store.prototype.set = function (key, val) {
+    UserStore.prototype.set = function (key, val) {
         this.data[key] = val;
         // Wait, I thought using the node.js' synchronous APIs was bad form?
         // We're not writing a server so there's not nearly the same IO demand on the process
@@ -26,18 +26,30 @@ var Store = /** @class */ (function () {
         // we might lose that data. Note that in a real app, we would try/catch this.
         fs.writeFileSync(this.path, JSON.stringify(this.data));
     };
-    return Store;
+    return UserStore;
 }());
-exports.Store = Store;
+exports.UserStore = UserStore;
 function parseDataFile(filePath, defaults) {
     // We'll try/catch it in case the file doesn't exist yet, which will be the case on the first application run.
     // `fs.readFileSync` will return a JSON string which we then parse into a Javascript object
-    try {
-        return JSON.parse(fs.readFileSync(filePath).toString());
+    if (fs.existsSync(filePath)) {
+        try {
+            return JSON.parse(fs.readFileSync(filePath).toString());
+        }
+        catch (error) {
+            // if there was some kind of error, return the passed in defaults instead.
+            console.error(error);
+            return defaults;
+        }
     }
-    catch (error) {
-        // if there was some kind of error, return the passed in defaults instead.
-        return defaults;
+    else {
+        try {
+            fs.writeFileSync(filePath, JSON.stringify(defaults));
+        }
+        catch (error) {
+            console.error(error);
+            return defaults;
+        }
     }
 }
 //# sourceMappingURL=user-store.js.map

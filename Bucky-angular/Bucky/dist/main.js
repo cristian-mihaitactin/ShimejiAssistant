@@ -1,18 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var environment_1 = require("./environments/environment");
 var electron_1 = require("electron");
 var path = require("path");
 var url = require("url");
 var auth_service_1 = require("./auth/auth.service");
 var bucky_profile_service_1 = require("./bucky_profile/bucky-profile.service");
+var user_store_1 = require("./helpers/user-store");
 var window_1 = require("./helpers/window");
 //import { environment } from "environments/environment";
 var buckyProfileService = new bucky_profile_service_1.BuckyProfileService();
 var buckyProfile = buckyProfileService.getLocalBuckyProfile("8919e40e-d588-42f2-a0a8-4afb9ad1589b");
-console.log("baseApiUrl" + process.env.baseApiUrl);
-console.log(electron_1.app.getPath("userData"));
-//const {createWindow} = require("./helpers/window");
 var authService = new auth_service_1.AuthService();
+var userStore = new user_store_1.UserStore({
+    configName: environment_1.environment.config,
+    defaults: environment_1.environment.default_user
+});
 //////////////////////////////////////
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
-var environment_1 = require("environments/environment");
+var environment_1 = require("../environments/environment");
 var rxjs_1 = require("rxjs");
 var operators_1 = require("rxjs/operators");
 var rxjs_2 = require("rxjs");

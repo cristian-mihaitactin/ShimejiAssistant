@@ -2,7 +2,7 @@ import { app } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 
-export class Store {
+export class UserStore {
     private path: string;
     private data: string[][];
   constructor(opts) {
@@ -34,10 +34,21 @@ export class Store {
 function parseDataFile(filePath, defaults) {
   // We'll try/catch it in case the file doesn't exist yet, which will be the case on the first application run.
   // `fs.readFileSync` will return a JSON string which we then parse into a Javascript object
-  try {
-    return JSON.parse(fs.readFileSync(filePath).toString());
-  } catch(error) {
-    // if there was some kind of error, return the passed in defaults instead.
-    return defaults;
-  }
+    if (fs.existsSync(filePath)) { 
+      try {
+        return JSON.parse(fs.readFileSync(filePath).toString());
+      } catch(error) {
+        // if there was some kind of error, return the passed in defaults instead.
+        console.error(error);
+        return defaults;
+      }
+    } else {
+      try{
+        fs.writeFileSync(filePath, JSON.stringify(defaults));
+      } catch (error) {
+        console.error(error);
+        return defaults;
+      }
+    }
+    
 }
