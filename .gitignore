@@ -354,5 +354,4 @@ MigrationBackup/
 
 desktop.ini
 Bucky/credentials.json
-Bucky-angular/Mane-electron/dist/
-.env.*
+Bucky-angular/Bucky/dist/
