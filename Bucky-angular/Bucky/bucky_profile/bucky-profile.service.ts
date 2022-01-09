@@ -1,16 +1,31 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Observable, of, Subject} from 'rxjs';
-import {map, filter} from 'rxjs/operators';
+import { Observable, of, Subject, connectable} from 'rxjs';
+import {map, filter, take} from 'rxjs/operators';
 
 
 import {BuckyProfileModel} from "./bucky-profile-model";
 import {BuckyBehaviourModel} from "./bucky-behaviour-model";
+import { UserStore } from "helpers/user-store";
+import { UserService } from "user/user.service";
+import { BarnBuckyService } from "barn-service/barn-bucky-service";
 
 //const profileDirectoryPath = "./bucky_profile/profiles";
 const profileDirectoryPath = "profiles";
 
 export class BuckyProfileService {
+  private userStore: UserStore;
+  private barnService: BarnBuckyService;
+  constructor(userStore: UserStore, barnService: BarnBuckyService){
+    this.userStore = userStore;
+    this.barnService = barnService;
+  }
+    getUserBuckyProfile() : Observable<BuckyProfileModel> {
+      const buckyId = this.userStore.get('bucky_profile');
+
+      return this.barnService.getBuckyProfile(buckyId)
+    }
+  /*
     profileExists(id: string): boolean{
         try {
           var directoryPath = path.join(__dirname, profileDirectoryPath,id);
@@ -50,4 +65,5 @@ export class BuckyProfileService {
     private getFileContentByPath(imgPath: string) : string {
         return fs.readFileSync(imgPath, {encoding: 'base64'});
     }
+    */
 }

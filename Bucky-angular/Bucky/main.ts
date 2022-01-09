@@ -7,16 +7,23 @@ import { AuthService } from './auth/auth.service'
 import {BuckyProfileService} from './bucky_profile/bucky-profile.service';
 import { UserStore } from './helpers/user-store';
 import createWindow from "./helpers/window";
+import { UserService } from "./user/user.service";
+import { BarnBuckyService } from "./barn-service/barn-bucky-service";
 
 //import { environment } from "environments/environment";
-const buckyProfileService = new BuckyProfileService();
-var buckyProfile = buckyProfileService.getLocalBuckyProfile("8919e40e-d588-42f2-a0a8-4afb9ad1589b");
 
 const authService = new AuthService();
 const userStore = new UserStore({
   configName: environment.config,
   defaults: environment.default_user
 });
+
+const barnService = new BarnBuckyService();
+const userService = new UserService(userStore);
+const buckyProfileService = new BuckyProfileService(
+  userStore,  barnService
+);
+
 //////////////////////////////////////
 
 // Special module holding environment variables which you declared
@@ -42,7 +49,14 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    event.reply("bucky-profile", buckyProfile);
+    
+    event.reply("bucky-profile", "");
+    buckyProfileService.getUserBuckyProfile()
+      .subscribe(
+        (value) => {
+          event.reply("bucky-profile", value);
+        }
+    )
   });
 };
 

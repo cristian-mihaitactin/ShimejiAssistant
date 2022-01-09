@@ -4,7 +4,7 @@ import * as fs from "fs";
 
 export class UserStore {
     private path: string;
-    private data: string[][];
+    private data: string[];
   constructor(opts) {
     // Renderer process has to get `app` module via `remote`, whereas the main process can get it directly
     // app.getPath('userData') will return a string of the user's app data directory path.
