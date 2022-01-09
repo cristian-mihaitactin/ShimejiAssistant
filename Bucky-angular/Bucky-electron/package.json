@@ -1,0 +1,27 @@
+{
+  "name": "Bucky",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "electron .",
+    "postbuild": "",
+    "copy-files": "robocopy bucky_profile/profiles/ dist/bucky_profile/profiles/ /s",
+    "dev-dotenv": "electron -r dotenv/config .",
+    "dev": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "axios-observable": "^1.3.0",
+    "fs-jetpack": "^4.3.0",
+    "jwt-decode": "^3.1.2",
+    "rxjs": "^7.4.0",
+    "rxjs-compat": "^6.6.7"
+  },
+  "devDependencies": {
+    "electron": "^16.0.4"
+  }
+}
