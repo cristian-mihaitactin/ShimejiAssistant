@@ -7,17 +7,31 @@ import {AxiosResponse, AxiosResponseHeaders, Method } from 'axios'
 import {Axios} from 'axios-observable'
 
 export class BarnBuckyService {
+    
+    private profileUrl = '/api/Profile';
+
+
     getBuckyProfile(id: string): Observable<BuckyProfileModel> {
         /*
         const params = new URLSearchParams();
         params.append('id', id);
         */
-        var response = this.callBarn(`/api/Profile/${id}`, "GET" as Method , null);
+
+        var response = this.callBarn(`${this.profileUrl}/${id}`, "GET" as Method , null);
 
         return response.pipe(
             map(res => res.data as BuckyProfileModel)
         );
     }
+
+    getAllBuckyProfiles(): Observable<BuckyProfileModel[]> {
+        var response = this.callBarn(`${this.profileUrl}`, "GET" as Method , null);
+
+        return response.pipe(
+            map(res=> 
+                res.data as BuckyProfileModel[])
+        )
+      }
 
     private callBarn(endpoint: string, method: Method, params: URLSearchParams) : Observable<AxiosResponse> {
         const options = {

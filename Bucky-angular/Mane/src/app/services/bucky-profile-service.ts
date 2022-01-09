@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { BuckyBehaviourModel } from '../models/bucky-behaviour-model'
 import { BuckyProfileModel } from '../models/bucky-profile-model'
 const electron = (<any>window).require('electron');
@@ -14,12 +15,17 @@ export class BuckyProfileService {
 
   constructor() {
     electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
-    console.log("in here")
-    console.log(arg.id) // prints "pong"
     this.buckyProfile.next(arg);
-  })
+
+    });// end
 
     electron.ipcRenderer.send('get-initial-bucky-profile', '');
+
+    
+    /*
+  ipcMain.on("get-all-bucky-profiles", (event,arg) => {
+
+    */
 /*
     electron.ipcRenderer.on('getImagesResponse', (event, images) => {
       this.images.next(images);
@@ -33,5 +39,29 @@ export class BuckyProfileService {
     electron.ipcRenderer.send('navigateDirectory', path);
   }
   */
+  } // end of cotr
+
+  getBuckyProfiles() : BehaviorSubject<BuckyProfileModel[]>{
+
+    var buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
+    
+    electron.ipcRenderer.on('bucky-profiles', (_event: any, arg: BuckyProfileModel[]) => {
+      buckyProfiles.next(arg);
+    });
+
+    electron.ipcRenderer.send('get-all-bucky-profiles', '');
+
+    return buckyProfiles;
+  }
+
+  setBuckyProfile(id:string) : BehaviorSubject<BuckyProfileModel> {
+    electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
+      console.log('in setBuckyProfile' + arg.id)
+      this.buckyProfile.next(arg);
+    });
+
+    electron.ipcRenderer.send('get-bucky-profile-by-id', id);
+
+    return this.buckyProfile;
   }
 }

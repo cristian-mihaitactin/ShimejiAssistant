@@ -25,6 +25,15 @@ export class BuckyProfileService {
 
       return this.barnService.getBuckyProfile(buckyId)
     }
+
+    getBuckyProfileById(id: string): Observable<BuckyProfileModel> {
+      return this.barnService.getBuckyProfile(id)
+    }
+
+    getAllBuckyProfilesWithoutBehaviours(): Observable<BuckyProfileModel[]> {
+      return this.barnService.getAllBuckyProfiles();
+    }
+    
   /*
     profileExists(id: string): boolean{
         try {

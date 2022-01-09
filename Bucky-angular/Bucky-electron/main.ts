@@ -56,6 +56,26 @@ const initIpc = () => {
         }
     )
   });
+  ipcMain.on("get-all-bucky-profiles", (event,arg) => {
+    console.log("in get-all-bucky-profiles")
+    buckyProfileService.getAllBuckyProfilesWithoutBehaviours()
+      .subscribe(
+        (value) => {
+          console.log("bucky-profiles: " + value);
+          event.reply("bucky-profiles", value);
+        }
+    )
+  });
+
+  ipcMain.on("get-bucky-profile-by-id", (event,arg) => {
+    console.log('get-bucky-profile-by-id: ' + arg);
+    buckyProfileService.getBuckyProfileById(arg)
+      .subscribe(
+        (value) => {
+          event.reply("bucky-profile", value);
+        }
+    )
+  });
 };
 
 app.on("ready", () => {
