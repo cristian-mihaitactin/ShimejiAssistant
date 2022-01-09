@@ -49,8 +49,6 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    
-    event.reply("bucky-profile", "");
     buckyProfileService.getUserBuckyProfile()
       .subscribe(
         (value) => {
@@ -94,7 +92,7 @@ app.on("ready", () => {
 
   mainWindow.loadURL(
     url.format({
-      pathname: path.join(__dirname, `/../../mane-spa/dist/mane-spa/index.html`),
+      pathname: path.join(__dirname, `/../../Mane/dist/mane/index.html`),
       protocol: "file:",
       slashes: true
     })

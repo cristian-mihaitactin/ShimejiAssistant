@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "electron .",
-    "postbuild": "npm run copy-files",
+    "postbuild": "",
     "copy-files": "robocopy bucky_profile/profiles/ dist/bucky_profile/profiles/ /s",
     "dev-dotenv": "electron -r dotenv/config .",
     "dev": "electron ."
