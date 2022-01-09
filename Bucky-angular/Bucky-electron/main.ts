@@ -52,7 +52,7 @@ const initIpc = () => {
     buckyProfileService.getUserBuckyProfile()
       .subscribe(
         (value) => {
-          event.reply("bucky-profile", value);
+          event.reply("selected-bucky-profile", value);
         }
     )
   });

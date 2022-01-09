@@ -9,7 +9,14 @@
   </div>
 </div>
 
-<app-bucky-profile-sample  *ngIf="showBuckyProfileSample"
-    class="order-2 p-3 col-8"
-    [buckyProfileId]="testProfile"
+<div class="container-fluid flex-nowrap">
+  <div *ngFor="let buckyProfileSample of buckyProfileIds | keyvalue">
+    <app-bucky-profile-sample  
+    class="p-3"
+    [buckyProfileId]=buckyProfileSample.value
     ></app-bucky-profile-sample>
+  </div>
+  
+</div>
+
+
