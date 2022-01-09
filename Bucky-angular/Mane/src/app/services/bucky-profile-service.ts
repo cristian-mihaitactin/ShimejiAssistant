@@ -54,14 +54,18 @@ export class BuckyProfileService {
     return buckyProfiles;
   }
 
-  setBuckyProfile(id:string) : BehaviorSubject<BuckyProfileModel> {
+  getBuckyProfile(id:string) : BehaviorSubject<BuckyProfileModel> {
+    var recievedBuckyProfiles = new BehaviorSubject<BuckyProfileModel>(
+      {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
+    );
+
     electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
       console.log('in setBuckyProfile' + arg.id)
-      this.buckyProfile.next(arg);
+      recievedBuckyProfiles.next(arg);
     });
 
     electron.ipcRenderer.send('get-bucky-profile-by-id', id);
 
-    return this.buckyProfile;
+    return recievedBuckyProfiles;
   }
 }

@@ -10,7 +10,7 @@ import { BuckyProfileSampleComponent } from './components/bucky-profile-sample/b
     CommonModule,
     IvyCarouselModule
   ],
-  exports: [IntegratedServicesComponent, AssistantProfileComponent],
+  exports: [IntegratedServicesComponent, AssistantProfileComponent, BuckyProfileSampleComponent],
   declarations: [IntegratedServicesComponent, AssistantProfileComponent, BuckyProfileSampleComponent]
 })
 export class MainviewModule { }
