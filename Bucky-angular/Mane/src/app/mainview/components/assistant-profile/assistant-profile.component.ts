@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import {IvyCarouselModule} from 'angular-responsive-carousel';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyBehaviourModel } from '../../../models/bucky-behaviour-model';
 import { BuckyProfileModel } from '../../../models/bucky-profile-model';
 import { BuckyProfileService } from '../../../services/bucky-profile-service';
+import * as $ from "jquery";
 
 const electron = (<any>window).require('electron');
 
@@ -62,4 +62,8 @@ export class AssistantProfileComponent implements OnInit {
     electron.ipcRenderer.send('get-initial-bucky-profile', '');
   }
 
+  getSafeUrlFromBytes(bytes:string){
+    return this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+    + bytes);
+  }
 }
