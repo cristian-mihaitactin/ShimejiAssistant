@@ -8,7 +8,16 @@ namespace Barn.API.Models
 {
     public class BuckyBehaviourModel
     {
-        public ActionType ActionType { get; set; }
+        private ActionType _actionType;
+        public ActionType ActionType => _actionType;
+
+        public string ActionTypeString
+        {
+            get
+            {
+                return _actionType.ToString();
+            }
+        }
         public byte[] ImageBytes { get; set; }
     }
 }

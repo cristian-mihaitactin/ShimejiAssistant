@@ -1,0 +1,6 @@
+.carousel-indicator-btn {
+    color: lightblue !important;;
+}
+.carousel-indicator-btn.active{
+    color: blue !important;;
+}
