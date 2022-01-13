@@ -1,17 +1,19 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { BuckyProfileModel } from '../../models/bucky-profile-model';
+import { BuckyProfileModel } from  '../../models/bucky-profile-model';
 import { BuckyProfileService } from '../../services/bucky-profile-service';
 const electron = (<any>window).require('electron');
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.css']
+  styleUrls: ['./overview.component.css'],
+  encapsulation : ViewEncapsulation.None 
+
 })
 export class OverviewComponent implements OnInit {
 
-  buckyProfileIds = new Map<string, string>();
+  buckyProfileIds = new Map<string, boolean>();
   buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
 
   constructor(
@@ -31,13 +33,13 @@ export class OverviewComponent implements OnInit {
     .subscribe(profiles => {
       if(profiles !== undefined && Array.isArray(profiles) && profiles.length > 0) {
         profiles.forEach((profile,index) => {
-          console.log("profile.name")
-          console.log(profile.name)
-          this.buckyProfileIds.set(profile.id, profile.id);
+          console.log("profile.isMainProfile")
+          console.log(profile.isMainProfile)
+
+          this.buckyProfileIds.set(profile.id, profile.isMainProfile);
         })
         this.cdr.detectChanges();
       }
     })
   }
-
 }
