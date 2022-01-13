@@ -4,3 +4,8 @@
 .carousel-indicator-btn.active{
     color: blue !important;;
 }
+
+.carousel-item-image{
+    width: 250px;
+    height: 200px;
+}

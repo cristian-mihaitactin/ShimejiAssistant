@@ -38,7 +38,7 @@ if (env.name !== "production") {
   app.setPath("userData", `${userDataPath} (${env.name})`);
 }
 */
-
+var mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
 // We can communicate with our window (the renderer process) via messages.
 const initIpc = () => {
   ipcMain.on("need-app-path", (event, arg) => {
@@ -49,7 +49,7 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    buckyProfileService.getUserBuckyProfile()
+    mainBuckyProfile
       .subscribe(
         (value) => {
           event.reply("selected-bucky-profile", value);

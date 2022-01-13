@@ -3,20 +3,22 @@
     <app-sideview
     class="left-side order-1 p-3 col-4"
     ></app-sideview>
-    <app-assistant-profile
-    class="order-2 p-3 col-8"
-    ></app-assistant-profile>
+    <div class="order-2 col-8">
+      <app-assistant-profile
+      class="order-2 p-3 col-8"
+      ></app-assistant-profile>
+      <div class="d-flex flex-wrap">
+        <div *ngFor="let buckyProfileSample of buckyProfileIds | keyvalue">
+          <app-bucky-profile-sample
+          [buckyProfileId]=buckyProfileSample.key
+          class="app-bucky-profile-sample-instance" [ngClass] = "{ 'selected-bucky-profile': buckyProfileSample.value }"
+          ></app-bucky-profile-sample>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="container-fluid flex-nowrap">
-  <div *ngFor="let buckyProfileSample of buckyProfileIds | keyvalue">
-    <app-bucky-profile-sample  
-    class="p-3"
-    [buckyProfileId]=buckyProfileSample.value
-    ></app-bucky-profile-sample>
-  </div>
-  
-</div>
+
 
 

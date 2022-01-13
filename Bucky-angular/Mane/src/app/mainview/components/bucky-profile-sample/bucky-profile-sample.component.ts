@@ -14,10 +14,10 @@ const electron = (<any>window).require('electron');
 })
 export class BuckyProfileSampleComponent implements OnInit {
 
-  buckProfile: BuckyProfileModel = {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}; 
+  buckProfile: BuckyProfileModel = {id: "", isMainProfile: false, name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}; 
   imagePath!: SafeResourceUrl;
   recievedBuckyProfiles = new BehaviorSubject<BuckyProfileModel>(
-    {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
+    {id: "", isMainProfile: false, name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
   );
   
   @Input()

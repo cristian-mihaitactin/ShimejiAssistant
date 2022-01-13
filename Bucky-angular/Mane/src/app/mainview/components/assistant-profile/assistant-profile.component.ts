@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyBehaviourModel } from '../../../models/bucky-behaviour-model';
@@ -11,7 +11,8 @@ const electron = (<any>window).require('electron');
 @Component({
   selector: 'app-assistant-profile',
   templateUrl: './assistant-profile.component.html',
-  styleUrls: ['./assistant-profile.component.css']
+  styleUrls: ['./assistant-profile.component.css'],
+  encapsulation : ViewEncapsulation.None 
 })
 export class AssistantProfileComponent implements OnInit {
   // {path: 'D:/Licenta/GIT/Bucky-angular/mane-spa/src/app/mainview/components/assistant-profile/test/indexa.png'},
@@ -26,7 +27,7 @@ export class AssistantProfileComponent implements OnInit {
   buckyBehaviours: BuckyBehaviourModel[] = [];
 
   buckyProfile = new BehaviorSubject<BuckyProfileModel>(
-    {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
+    {id: "", isMainProfile : false, name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
   );
   
   constructor(private _sanitizer: DomSanitizer,
@@ -42,11 +43,11 @@ export class AssistantProfileComponent implements OnInit {
   ngOnInit() {
     this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;
-      console.log("ngOnInit");
-
       if (value.behaviours.length > 0){
-        console.log("In if");
         this.images = [];
+
+        console.log("value.isMainProfile");
+        console.log(value.isMainProfile);
 
         value.behaviours.forEach((behaviour, index) => {
           let imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'

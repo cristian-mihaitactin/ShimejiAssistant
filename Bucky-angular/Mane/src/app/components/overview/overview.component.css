@@ -1,0 +1,8 @@
+
+.app-bucky-profile-sample-instance > img {
+    border: 5px solid #555;
+}
+
+.app-bucky-profile-sample-instance.selected-bucky-profile > img {
+    border: 5px solid green;
+}
