@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { OverviewComponent } from './components/overview/overview.component';
 import { SideviewComponent } from './components/sideview/sideview.component';
 import { MainviewModule } from './mainview/mainview.module';
+
 @NgModule({
   declarations: [
     AppComponent,

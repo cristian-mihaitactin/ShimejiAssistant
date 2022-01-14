@@ -1,0 +1,19 @@
+
+.app-bucky-profile-sample-instance > img {
+    border: 5px solid #555;
+}
+
+.app-bucky-profile-sample-instance.selected-bucky-profile > img {
+    border: 5px solid green;
+}
+
+.choose-btn {
+    position: relative;
+    top: calc((250px / 3));
+    right: calc((200px / 1.15));
+    display: none;
+}
+
+.app-bucky-profile-sample-instance:hover + .choose-btn {
+    display: inline-block;
+  }

@@ -9,6 +9,13 @@ namespace Barn.Services.BuckyProfile
         public BuckyBehaviour BuckyBehaviour => _buckyBehaviour;
         public ActionType ActionType => _buckyBehaviour.ActionType;
 
+        public string ActionTypeString
+        {
+            get
+            {
+                return _buckyBehaviour.ActionType.ToString();
+            }
+        }
         public byte[] ImageBytes { get; set; }
 
         public BuckyBehaviourDTO(BuckyBehaviour buckyBehaviour)

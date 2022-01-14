@@ -13,7 +13,7 @@ export class BuckyProfileService {
   );
 
   constructor() {
-    electron.ipcRenderer.on('bucky-profile', (event, arg) => {
+    electron.ipcRenderer.on('selected-bucky-profile', (event, arg) => {
     console.log(arg.id) // prints "pong"
     this.buckyProfile.next(arg);
   })
