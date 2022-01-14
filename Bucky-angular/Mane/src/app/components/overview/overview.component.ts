@@ -59,6 +59,6 @@ export class OverviewComponent implements OnInit {
     electron.ipcRenderer.send('set-bucky-profile', buckyProfileId);
 
     console.log(this.mainBuckyProfileId);
-    this.cdr.detectChanges();
+    this.ngOnInit();
   }
 }
