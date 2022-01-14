@@ -77,7 +77,13 @@ const initIpc = () => {
     )
   });
 
-  
+  ipcMain.on('login-request', (event, arg: {username:string, password:string}) => {
+    authService.login(arg).subscribe(
+      value => {
+        console.log(value);
+      }
+    )
+  });
 };
 
 app.on("ready", () => {
@@ -151,16 +157,24 @@ app.on("ready", () => {
   });
 
   //////////////////testing the auth///////////
-// authService.register(
-//   {
-//     userName : "myNewUser",
-//     password : "123!@#qweQWE",
-//     confirmPassword: "123!@#qweQWE"
-//   }
-// ).subscribe(() => {
-//     console.log('Successfully registered');
-// },
-// error => console.log( error ));
+authService.register(
+  {
+    userName : "myNewUser",
+    password : "123!@#qweQWE",
+    confirmPassword: "123!@#qweQWE"
+  }
+).subscribe(() => {
+    console.log('Successfully registered');
+},
+error => console.log( error ));
+
+var x = authService.login({
+  username : "myNewUser",
+    password : "123!@#qweQWE"
+}).subscribe(val => {
+  console.log('in login');
+  console.log(val)
+})
 //////
 
 /*
