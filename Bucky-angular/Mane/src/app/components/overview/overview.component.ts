@@ -15,6 +15,7 @@ export class OverviewComponent implements OnInit {
 
   buckyProfileIds = new Map<string, boolean>();
   buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
+  mainBuckyProfileId = '';
 
   constructor(
     private cdr: ChangeDetectorRef
@@ -33,13 +34,31 @@ export class OverviewComponent implements OnInit {
     .subscribe(profiles => {
       if(profiles !== undefined && Array.isArray(profiles) && profiles.length > 0) {
         profiles.forEach((profile,index) => {
-          console.log("profile.isMainProfile")
-          console.log(profile.isMainProfile)
-
+          if (profile.isMainProfile){
+            this.mainBuckyProfileId = profile.id;
+          }
           this.buckyProfileIds.set(profile.id, profile.isMainProfile);
         })
         this.cdr.detectChanges();
       }
     })
+  }
+
+  changeAssistantProfile(event:MouseEvent, buckyProfileId:string){
+    event.stopPropagation();
+    this.mainBuckyProfileId = buckyProfileId;
+
+    this.cdr.detectChanges();
+  }
+
+  setAssistantProfile(event:MouseEvent, buckyProfileId:string){
+    event.stopPropagation();
+    this.mainBuckyProfileId = buckyProfileId;
+
+    console.log('setAssistantProfile');
+    electron.ipcRenderer.send('set-bucky-profile', buckyProfileId);
+
+    console.log(this.mainBuckyProfileId);
+    this.cdr.detectChanges();
   }
 }

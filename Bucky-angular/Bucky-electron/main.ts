@@ -76,6 +76,8 @@ const initIpc = () => {
         }
     )
   });
+
+  
 };
 
 app.on("ready", () => {
@@ -126,6 +128,27 @@ app.on("ready", () => {
   );
   //buckyWindow.openDevTools();
   mainWindow.openDevTools();
+
+  ipcMain.on("set-bucky-profile", (event,arg) => {
+    console.log('set-bucky-profile: ' + arg);
+    buckyProfileService.setBuckyProfileById(arg);
+    var mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
+    mainBuckyProfile
+    .subscribe(
+      (value) => {
+        console.log('set-bucky-profile sending ');
+        buckyWindow.webContents.send("selected-bucky-profile", value);
+      }
+  )
+
+    /*
+      .subscribe(
+        (value) => {
+          event.reply("bucky-profile", value);
+        }
+    )
+    */
+  });
 
   //////////////////testing the auth///////////
 // authService.register(

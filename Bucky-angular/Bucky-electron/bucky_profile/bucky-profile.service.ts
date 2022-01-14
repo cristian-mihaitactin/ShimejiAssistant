@@ -60,6 +60,10 @@ export class BuckyProfileService {
       ));
     }
     
+    setBuckyProfileById(buckyProfileId:string) {
+      this.userStore.set('bucky_profile', buckyProfileId);
+      //Call Barn?
+    }
   /*
     profileExists(id: string): boolean{
         try {

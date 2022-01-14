@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, Input } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyBehaviourModel } from '../../../models/bucky-behaviour-model';
@@ -14,6 +14,7 @@ const electron = (<any>window).require('electron');
   styleUrls: ['./assistant-profile.component.css'],
   encapsulation : ViewEncapsulation.None 
 })
+
 export class AssistantProfileComponent implements OnInit {
   // {path: 'D:/Licenta/GIT/Bucky-angular/mane-spa/src/app/mainview/components/assistant-profile/test/indexa.png'},
     // {path: 'D:/Licenta/GIT/Bucky-angular/mane-spa/src/app/mainview/components/assistant-profile/test/indexb.png'},
@@ -30,20 +31,29 @@ export class AssistantProfileComponent implements OnInit {
     {id: "", isMainProfile : false, name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
   );
   
+  @Input()
+    buckyProfileId!: string;
+  
   constructor(private _sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef) {
 
+      /*
       electron.ipcRenderer.on('selected-bucky-profile', (_event: any, arg: BuckyProfileModel) => {
         console.log("arg.id");
         console.log(arg.id);
         this.buckyProfile.next(arg);
       });// end
+      */
+      electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
+        console.log('in setBuckyProfile' + arg.id)
+        this.buckyProfile.next(arg);
+      });
   }
 
   ngOnInit() {
     this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;
-      if (value.behaviours.length > 0){
+      if (value.behaviours !== undefined && value.behaviours.length > 0){
         this.images = [];
 
         console.log("value.isMainProfile");
@@ -60,8 +70,19 @@ export class AssistantProfileComponent implements OnInit {
       }
     });
 
-    electron.ipcRenderer.send('get-initial-bucky-profile', '');
+    // electron.ipcRenderer.send('get-initial-bucky-profile', '');
+      electron.ipcRenderer.send('get-bucky-profile-by-id', this.buckyProfileId);
   }
+
+  ngOnChanges() {
+    /**********THIS FUNCTION WILL TRIGGER WHEN PARENT COMPONENT UPDATES 'someInput'**************/
+    //Write your code here
+     console.log('this.buckyProfileId');
+     console.log(this.buckyProfileId);
+
+     electron.ipcRenderer.send('get-bucky-profile-by-id', this.buckyProfileId);
+     this.cdr.detectChanges();
+    }   
 
   getSafeUrlFromBytes(bytes:string){
     return this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
