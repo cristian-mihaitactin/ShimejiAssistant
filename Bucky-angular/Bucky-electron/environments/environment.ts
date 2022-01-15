@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   
-  baseApiUrl: "http://localhost:5000",
+  baseApiUrl: "https://localhost:5001",
   config: "development",
   default_user: {
     username: "user.name",
