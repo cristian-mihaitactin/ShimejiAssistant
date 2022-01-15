@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RegisterFormComponent } from '../register-form/register-form.component';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -8,6 +9,7 @@ const electron = (<any>window).require('electron');
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
+
 export class LoginFormComponent implements OnInit {
     // loginForm = new FormGroup({
     //   username: new FormControl(''),
@@ -20,8 +22,10 @@ export class LoginFormComponent implements OnInit {
     returnUrl!: string;
     error!: string;
 
+    
     constructor(
         public activeModal: NgbActiveModal,
+        private modalService: NgbModal,
         private formBuilder: FormBuilder,
        // private route: ActivatedRoute,
         //private router: Router,
@@ -63,8 +67,8 @@ export class LoginFormComponent implements OnInit {
           error: Error
         }) => {
           if (arg.isError){
-            console.error(this.error);
             this.error = arg.result;
+            console.error(this.error);
           } else {
             console.log('Login successful');
           }
@@ -72,9 +76,14 @@ export class LoginFormComponent implements OnInit {
 
         });
 
-        electron.ipcRenderer.send('login-request', {
-          //username: this.username.value,
-          //password: this.password.value
-        });
+        electron.ipcRenderer.send('login-request', 
+          this.loginForm.value
+        );
+    }
+
+    registrationLinkClicked(){
+      const modalRegisterRef = this.modalService.open(RegisterFormComponent);
+      this.activeModal.close();
+      
     }
 }

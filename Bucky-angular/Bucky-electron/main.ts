@@ -85,6 +85,10 @@ const initIpc = () => {
       }
     )
   });
+
+  ipcMain.on('register-request', (event, arg) => {
+    console.log(arg);
+  });
 };
 
 if (!environment.production){
