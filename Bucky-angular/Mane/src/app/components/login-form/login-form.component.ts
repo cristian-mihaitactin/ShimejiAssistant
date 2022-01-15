@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -8,6 +9,11 @@ const electron = (<any>window).require('electron');
   styleUrls: ['./login-form.component.css']
 })
 export class LoginFormComponent implements OnInit {
+    // loginForm = new FormGroup({
+    //   username: new FormControl(''),
+    //   password: new FormControl(''),
+    // });
+
     loginForm!: FormGroup;
     loading = false;
     submitted = false;
@@ -15,6 +21,7 @@ export class LoginFormComponent implements OnInit {
     error!: string;
 
     constructor(
+        public activeModal: NgbActiveModal,
         private formBuilder: FormBuilder,
        // private route: ActivatedRoute,
         //private router: Router,
@@ -66,8 +73,8 @@ export class LoginFormComponent implements OnInit {
         });
 
         electron.ipcRenderer.send('login-request', {
-          //username: this.f.username.value,
-          //password: this.f.password.value
+          //username: this.username.value,
+          //password: this.password.value
         });
     }
 }

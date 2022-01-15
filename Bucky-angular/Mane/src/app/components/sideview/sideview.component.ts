@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LoginFormComponent } from '../login-form/login-form.component'
 
 @Component({
   selector: 'app-sideview',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SideviewComponent implements OnInit {
 
-  constructor() { }
+  constructor(private modalService: NgbModal) {}
 
   ngOnInit() {
+  }
+
+  openLoginModal() {
+    const modalRef = this.modalService.open(LoginFormComponent);
+    modalRef.componentInstance.name = 'World';
   }
 
 }
