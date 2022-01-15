@@ -13,6 +13,7 @@ import { LoginModel } from './models/login-model';
 import {AxiosResponse, AxiosRequestHeaders, AxiosResponseHeaders, AxiosRequestConfig, Method} from 'axios'
 import {Axios} from 'axios-observable'
 import jwt_decode  from 'jwt-decode'
+import { UserStore } from 'helpers/user-store';
 
 export class AuthService {
 
@@ -26,6 +27,7 @@ export class AuthService {
     profile$: Observable<ProfileModel>;
     loggedIn$: Observable<boolean>;
     constructor(
+        private localStorage:UserStore
     ) {
         this.state = new BehaviorSubject<AuthStateModel>(this.initalState);
         this.state$ = this.state.asObservable();
@@ -56,13 +58,16 @@ export class AuthService {
         .pipe(
                 catchError (res => throwError(() => {
                     console.log(res);
+                    // new Error(res.json())
                     new Error(res.json())
                 })));
     }
 
     login(user: LoginModel): Observable<any> {
+        // return this.getTokens(user, 'client_credentials').pipe(
         return this.getTokens(user, 'password').pipe(
-            catchError(res => throwError(res.json())),
+            // catchError(res => throwError(res.json())),
+            catchError(res => throwError(res)),
             tap(res => this.scheduleRefresh()));
     }
 
@@ -81,7 +86,8 @@ export class AuthService {
             flatMap(tokens => this.getTokens({ refresh_token: tokens.refresh_token }, 'refresh_token').pipe(
                 catchError(error => throwError('Session Expired')))
             ),
-            map(res => res.data.json()));
+            // map(res => res.data.json()));
+            map(res => res.data));
     }
 
     private storeToken(tokens: AuthTokenModel): void {
@@ -90,17 +96,17 @@ export class AuthService {
             tokens.refresh_token = previousTokens.refresh_token;
         }
 
-        localStorage.setItem('auth-tokens', JSON.stringify(tokens));
+        this.localStorage.set('auth-tokens', JSON.stringify(tokens));
     }
 
     private retrieveTokens(): AuthTokenModel {
-        const tokensString = localStorage.getItem('auth-tokens');
+        const tokensString = this.localStorage.get('auth-tokens');
         const tokensModel: AuthTokenModel = tokensString == null ? null : JSON.parse(tokensString);
         return tokensModel;
     }
 
     private removeToken(): void {
-        localStorage.removeItem('auth-tokens');
+        this.localStorage.remove('auth-tokens');
     }
 
     private updateState(newState: AuthStateModel): void {
@@ -116,7 +122,10 @@ export class AuthService {
 
         const params = new URLSearchParams();
         Object.keys(data)
-            .forEach(key => params.append(key, data[key]));
+            .forEach(key => {
+                params.append(key, data[key])
+                console.log('key, data[key]:' + key, data[key]);
+            });
 
         
         const options = {
@@ -124,14 +133,15 @@ export class AuthService {
             url: '/connect/token',
             method: "POST" as Method,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            params: params,
+            data: params
+            // params: params,
         }
         
         // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
         return Axios.request(options)
         .pipe(
                 tap(res  => {
-                    const tokens: AuthTokenModel = res.data.json();
+                    const tokens: AuthTokenModel = res.data;//res.data.json();
                     const now = new Date();
                     tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
     

@@ -29,6 +29,14 @@ export class UserStore {
     // we might lose that data. Note that in a real app, we would try/catch this.
     fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
+  public remove(key) {
+    const index = this.data.indexOf(key, 0);
+    if (index > -1) {
+      this.data.splice(index, 1);
+    }
+
+    fs.writeFileSync(this.path, JSON.stringify(this.data));
+  }
 }
 
 function parseDataFile(filePath, defaults) {

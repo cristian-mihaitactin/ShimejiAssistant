@@ -12,11 +12,12 @@ import { BarnBuckyService } from "./barn-service/barn-bucky-service";
 
 //import { environment } from "environments/environment";
 
-const authService = new AuthService();
 const userStore = new UserStore({
   configName: environment.config,
   defaults: environment.default_user
 });
+
+const authService = new AuthService(userStore);
 
 const barnService = new BarnBuckyService();
 const userService = new UserService(userStore);
@@ -77,8 +78,22 @@ const initIpc = () => {
     )
   });
 
-  
+  ipcMain.on('login-request', (event, arg: {username:string, password:string}) => {
+    authService.login(arg).subscribe(
+      value => {
+        console.log(value);
+      }
+    )
+  });
+
+  ipcMain.on('register-request', (event, arg) => {
+    console.log(arg);
+  });
 };
+
+if (!environment.production){
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+}
 
 app.on("ready", () => {
   initIpc();
@@ -151,16 +166,29 @@ app.on("ready", () => {
   });
 
   //////////////////testing the auth///////////
-// authService.register(
-//   {
-//     userName : "myNewUser",
-//     password : "123!@#qweQWE",
-//     confirmPassword: "123!@#qweQWE"
-//   }
-// ).subscribe(() => {
-//     console.log('Successfully registered');
-// },
-// error => console.log( error ));
+  /*
+authService.register(
+  {
+    userName : "myNewUser",
+    password : "123!@#qweQWE",
+    confirmPassword: "123!@#qweQWE"
+  }
+).subscribe(() => {
+    console.log('Successfully registered');
+},
+error => console.log( error ));
+*/
+/*
+var x = authService.login({
+  username : "myNewUser",
+    password : "123!@#qweQWE"
+}).subscribe(val => {
+  console.log('in login');
+  console.log(val)
+})
+*/
+
+//console.log('login:' + x);
 //////
 
 /*
