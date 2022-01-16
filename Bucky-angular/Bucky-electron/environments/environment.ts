@@ -8,8 +8,8 @@ export const environment = {
   baseApiUrl: "https://localhost:5001",
   config: "development",
   default_user: {
-    username: "user.name",
-    email : "user1@abc.com",
+    username: "anonymous",
+    email : "",
     bucky_profile: "8919e40e-d588-42f2-a0a8-4afb9ad1589b"
   }
 };
