@@ -16,6 +16,8 @@ export class SideviewComponent implements OnInit {
 
   loggedIn = false;
 
+  userName!:string;
+
   constructor(
     private modalService: NgbModal,
     private cdr: ChangeDetectorRef
@@ -23,12 +25,19 @@ export class SideviewComponent implements OnInit {
 
   ngOnInit() {
     electron.ipcRenderer.on('logged-in', (_event: any, arg:boolean) => {
-      this.loggedIn = arg; 
       console.log('logged-in:' + arg)  
       this.cdr.detectChanges();
     });
 
+    electron.ipcRenderer.on('user-info-reply', (_event: any, arg: any) => {
+      console.log('user-info-reply:',arg);
+      this.userName = arg.username; 
+      this.cdr.detectChanges();
+    });
+
     electron.ipcRenderer.send('is-logged-in', ''); 
+    electron.ipcRenderer.send('user-info-request', '');
+
   }
 
   openLoginModal() {

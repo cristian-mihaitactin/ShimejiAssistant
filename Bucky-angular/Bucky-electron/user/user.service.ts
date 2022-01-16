@@ -2,20 +2,20 @@ import { UserStore } from "helpers/user-store";
 import { UserModel } from "./models/user-model";
 
 export class UserService{
-    private userStore: UserStore;
-    user: UserModel;
-
-    constructor(userStore:UserStore){
-        this.userStore = userStore;
-
-        this.user = {
-            username: userStore.get('username'),
-            email: userStore.get('email')
-        }
+    constructor(private userStore:UserStore){
     }
 
     userIsLoggedIn():boolean {
         var authtokens = this.userStore.get('auth-tokens');
         return !(authtokens === undefined || authtokens === null);
+    }
+
+    getCurrentUser() {
+        var user:UserModel = {
+            username: this.userStore.get('username'),
+            email: this.userStore.get('email'),
+        }
+
+        return user;
     }
 }

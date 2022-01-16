@@ -77,6 +77,10 @@ const initIpc = () => {
         }
     )
   });
+
+  ipcMain.on("user-info-request", (event,arg) => {
+    event.reply('user-info-reply', userService.getCurrentUser())
+  });
 }
 
 if (!environment.production){
