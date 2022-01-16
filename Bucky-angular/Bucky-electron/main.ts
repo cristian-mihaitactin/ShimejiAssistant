@@ -217,6 +217,7 @@ app.on("ready", () => {
 
   ipcMain.on('logout-request', (event, arg) => {
     authService.logout();
+    userService.logout();
     mainWindow.webContents.send("logged-in", false);
   });
   //////////////////testing the auth///////////
