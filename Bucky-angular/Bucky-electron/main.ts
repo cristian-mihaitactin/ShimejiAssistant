@@ -78,18 +78,8 @@ const initIpc = () => {
     )
   });
 
-  ipcMain.on('login-request', (event, arg: {username:string, password:string}) => {
-    authService.login(arg).subscribe(
-      value => {
-        console.log(value);
-      }
-    )
-  });
-
-  ipcMain.on('register-request', (event, arg) => {
-    console.log(arg);
-  });
-};
+  
+}
 
 if (!environment.production){
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -154,7 +144,8 @@ app.on("ready", () => {
         console.log('set-bucky-profile sending ');
         buckyWindow.webContents.send("selected-bucky-profile", value);
       }
-  )
+  );
+
 
     /*
       .subscribe(
@@ -164,7 +155,69 @@ app.on("ready", () => {
     )
     */
   });
+  
+  ipcMain.on('login-request', (event, arg) => {
+    console.log('register-request');
+    console.log(arg);
+    authService.login(arg).subscribe(
+      {
+        next: (value) => {
+          console.log("login-reply");
+          console.log(value);
+          event.reply("login-reply", 
+          {
+            result: 'Logged In',
+            isError: false,
+            error: null 
+          });
+          mainWindow.webContents.send("logged-in", true);
+        },
+        error: (error) => {
+          event.reply("login-reply", 
+          {
+            result: '',
+            isError: true,
+            error: error 
+          });
+        }
+      }
+    )
+  });
 
+  ipcMain.on('register-request', (event, arg) => {
+    console.log('register-request');
+    console.log(arg);
+    authService.register(arg).subscribe(
+      {
+        next: (value) => {
+          console.log("register-reply");
+          event.reply("register-reply", 
+          {
+            result: 'Registered',
+            isError: false,
+            error: null 
+          });
+          mainWindow.webContents.send("logged-in", true);
+        },
+        error: (error) => {
+          console.error("register-reply error");
+          console.error(error);
+          event.reply("register-reply", 
+          {
+            result: '',
+            isError: true,
+            error: error 
+          });
+
+        }
+      });
+    });
+
+  ipcMain.on('logout-request', (event, arg) => {
+    console.log('logout-request');
+    authService.logout();
+    mainWindow.webContents.send("logged-in", false);
+  });
   //////////////////testing the auth///////////
   /*
 authService.register(

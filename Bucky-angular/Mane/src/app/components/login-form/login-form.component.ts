@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RegisterFormComponent } from '../register-form/register-form.component';
@@ -22,11 +22,11 @@ export class LoginFormComponent implements OnInit {
     returnUrl!: string;
     error!: string;
 
-    
     constructor(
         public activeModal: NgbActiveModal,
         private modalService: NgbModal,
         private formBuilder: FormBuilder,
+        private cdr: ChangeDetectorRef
        // private route: ActivatedRoute,
         //private router: Router,
         //private authenticationService: AuthenticationService
@@ -47,14 +47,13 @@ export class LoginFormComponent implements OnInit {
         //this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     }
 
-    // convenience getter for easy access to form fields
-    get f() { return this.loginForm.controls; }
-
     onSubmit() {
         this.submitted = true;
 
         // stop here if form is invalid
         if (this.loginForm.invalid) {
+            console.log("this.loginForm.invalid")
+            console.log(this.loginForm.invalid)
             return;
         }
 
@@ -67,13 +66,17 @@ export class LoginFormComponent implements OnInit {
           error: Error
         }) => {
           if (arg.isError){
-            this.error = arg.result;
+            console.log('login-repy error')
+            console.log(arg);
+            this.error = arg.error.message;
             console.error(this.error);
           } else {
             console.log('Login successful');
+            console.log(arg);
+            this.activeModal.dismiss('Logged In - closing modal')
           }
           this.loading = false;
-
+          this.cdr.detectChanges();
         });
 
         electron.ipcRenderer.send('login-request', 

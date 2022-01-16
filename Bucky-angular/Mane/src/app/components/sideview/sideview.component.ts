@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { tap } from 'rxjs';
 import { LoginFormComponent } from '../login-form/login-form.component'
 import { RegisterFormComponent } from '../register-form/register-form.component';
+const electron = (<any>window).require('electron');
 
 @Component({
   selector: 'app-sideview',
@@ -13,26 +14,31 @@ export class SideviewComponent implements OnInit {
   modalLoginRef!:NgbModalRef;
   modalRegisterRef!:NgbModalRef;
 
-  constructor(private modalService: NgbModal) {}
+  loggedIn = false;
+
+  constructor(
+    private modalService: NgbModal,
+    private cdr: ChangeDetectorRef
+    ) {}
 
   ngOnInit() {
+    electron.ipcRenderer.on('logged-in', (_event: any, arg:boolean) => {
+      this.loggedIn = arg; 
+      console.log('logged-in:' + arg)  
+      this.cdr.detectChanges();
+    });
   }
 
   openLoginModal() {
     this.modalLoginRef = this.modalService.open(LoginFormComponent);
   }
 
-  openRegisterModal() {
-    if(this.modalLoginRef?.shown) {
-      this.modalLoginRef.close('Changed to register');
-    }
-    this.modalRegisterRef = this.modalService.open(RegisterFormComponent);
-  }
-  /*
   logout() {
-        this.authenticationService.logout();
-        this.router.navigate(['/login']);
+    electron.ipcRenderer.send('logout-request',
+          'Logout'
+        );
+        // this.authenticationService.logout();
+        // this.router.navigate(['/login']);
     }
-  */
 
 }

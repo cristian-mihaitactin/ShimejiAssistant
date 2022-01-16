@@ -35,7 +35,12 @@ namespace Barn.API.Controllers
             EnsureDatabaseCreated(_applicationDbContext);
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = model.UserName, Email = model.UserName };
+                var user = new User {
+                    UserName = model.UserName,
+                    Email = model.UserName,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName
+                };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

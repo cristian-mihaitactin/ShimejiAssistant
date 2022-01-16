@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoginFormComponent } from '../login-form/login-form.component';
 const electron = (<any>window).require('electron');
@@ -20,6 +20,7 @@ export class RegisterFormComponent implements OnInit {
         public activeModal: NgbActiveModal,
         private modalService: NgbModal,
         private formBuilder: FormBuilder,
+        private cdr: ChangeDetectorRef
         //private router: Router,
         //private authenticationService: AuthenticationService,
         //private userService: UserService
@@ -31,24 +32,36 @@ export class RegisterFormComponent implements OnInit {
         }
         */
     }
+    
+    
 
     ngOnInit() {
         this.registerForm = this.formBuilder.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             username: ['', Validators.required],
-            password: ['', [Validators.required, Validators.minLength(6)]]
-        });
+            email: ['', Validators.required, Validators.email],
+            password: ['', [Validators.required, Validators.minLength(6), Validators.pattern('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$')]],
+            confirmPassword: ['', [Validators.required]]
+        }, { validators: this.checkPasswords });
     }
 
-    // convenience getter for easy access to form fields
-    get f() { return this.registerForm.controls; }
+    checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
+      let pass = group.get('password')!.value;
+      let confirmPass = group.get('confirmPassword')!.value;
+
+      return pass === confirmPass ? null : { notSame: true };
+    }
 
     onSubmit() {
         this.submitted = true;
 
         // stop here if form is invalid
         if (this.registerForm.invalid) {
+          console.log(this.registerForm.valid)
+          console.log(this.registerForm.invalid)
+          console.log(this.registerForm.errors)
+          console.log('regiteredForm invalid')
             return;
         }
 
@@ -57,24 +70,30 @@ export class RegisterFormComponent implements OnInit {
           lastName: string, 
           username: string, 
           password: string, 
+          email: string, 
           isError: boolean,
           error: Error
         }) => {
           if (arg.isError){
+            console.log('register-repy error')
+            console.log(arg);
             this.error = arg.error.message;
             console.error(this.error);
-
           } else {
             console.log('Register successful');
+            console.log(arg);
+            this.activeModal.dismiss('Registered In - closing modal')
+
           }
           this.loading = false;
 
+          this.cdr.detectChanges();
         });
 
         this.loading = true;
 
         electron.ipcRenderer.send('register-request',
-          this.registerForm .value
+          this.registerForm.value
         );
     }
     loginLinkClicked(){
