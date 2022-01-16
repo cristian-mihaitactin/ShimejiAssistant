@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoginFormComponent } from '../login-form/login-form.component';
 const electron = (<any>window).require('electron');
@@ -31,18 +31,26 @@ export class RegisterFormComponent implements OnInit {
         }
         */
     }
+    
+    
 
     ngOnInit() {
         this.registerForm = this.formBuilder.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             username: ['', Validators.required],
-            password: ['', [Validators.required, Validators.minLength(6)]]
-        });
+            emailForm: ['', Validators.required, Validators.email],
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', [Validators.required]]
+        }, { validators: this.checkPasswords });
     }
 
-    // convenience getter for easy access to form fields
-    get f() { return this.registerForm.controls; }
+    checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
+      let pass = group.get('password')!.value;
+      let confirmPass = group.get('confirmPassword')!.value;
+
+      return pass === confirmPass ? null : { notSame: true };
+    }
 
     onSubmit() {
         this.submitted = true;
@@ -57,13 +65,13 @@ export class RegisterFormComponent implements OnInit {
           lastName: string, 
           username: string, 
           password: string, 
+          email: string, 
           isError: boolean,
           error: Error
         }) => {
           if (arg.isError){
             this.error = arg.error.message;
             console.error(this.error);
-
           } else {
             console.log('Register successful');
           }
@@ -74,7 +82,7 @@ export class RegisterFormComponent implements OnInit {
         this.loading = true;
 
         electron.ipcRenderer.send('register-request',
-          this.registerForm .value
+          this.registerForm.value
         );
     }
     loginLinkClicked(){
