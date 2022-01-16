@@ -12,6 +12,10 @@ export class UserService{
             username: userStore.get('username'),
             email: userStore.get('email')
         }
-        
+    }
+
+    userIsLoggedIn():boolean {
+        var authtokens = this.userStore.get('auth-tokens');
+        return !(authtokens === undefined || authtokens === null);
     }
 }

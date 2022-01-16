@@ -77,8 +77,6 @@ const initIpc = () => {
         }
     )
   });
-
-  
 }
 
 if (!environment.production){
@@ -134,6 +132,14 @@ app.on("ready", () => {
   //buckyWindow.openDevTools();
   mainWindow.openDevTools();
 
+  ipcMain.on("is-logged-in", (event,arg) => {
+    if (userService.userIsLoggedIn()){
+      event.reply("logged-in", true);
+    } else {
+      event.reply("logged-in", false);
+    }
+  });
+
   ipcMain.on("set-bucky-profile", (event,arg) => {
     console.log('set-bucky-profile: ' + arg);
     buckyProfileService.setBuckyProfileById(arg);
@@ -157,19 +163,16 @@ app.on("ready", () => {
   });
   
   ipcMain.on('login-request', (event, arg) => {
-    console.log('register-request');
-    console.log(arg);
     authService.login(arg).subscribe(
       {
         next: (value) => {
-          console.log("login-reply");
-          console.log(value);
           event.reply("login-reply", 
           {
             result: 'Logged In',
             isError: false,
             error: null 
           });
+          userService.userIsLoggedIn();
           mainWindow.webContents.send("logged-in", true);
         },
         error: (error) => {
@@ -185,12 +188,9 @@ app.on("ready", () => {
   });
 
   ipcMain.on('register-request', (event, arg) => {
-    console.log('register-request');
-    console.log(arg);
     authService.register(arg).subscribe(
       {
         next: (value) => {
-          console.log("register-reply");
           event.reply("register-reply", 
           {
             result: 'Registered',
@@ -200,8 +200,6 @@ app.on("ready", () => {
           mainWindow.webContents.send("logged-in", true);
         },
         error: (error) => {
-          console.error("register-reply error");
-          console.error(error);
           event.reply("register-reply", 
           {
             result: '',
@@ -214,7 +212,6 @@ app.on("ready", () => {
     });
 
   ipcMain.on('logout-request', (event, arg) => {
-    console.log('logout-request');
     authService.logout();
     mainWindow.webContents.send("logged-in", false);
   });
