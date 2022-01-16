@@ -23,11 +23,11 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="emailForm">Email</label>
-            <input type="email" formControlName="emailForm" class="form-control" email="true" [ngClass]="{ 'is-invalid': submitted && registerForm.get('emailForm')!.errors }" />
-            <div *ngIf="submitted && registerForm.get('emailForm')!.errors" class="invalid-feedback">
-                <div *ngIf="registerForm.get('emailForm')!.hasError('required')">Email is required</div>
-                <div *ngIf="registerForm.get('emailForm')!.hasError('email')">Email not valid.</div>
+            <label for="email">Email</label>
+            <input type="email" formControlName="email" class="form-control" email="true" [ngClass]="{ 'is-invalid': submitted && registerForm.get('email')!.errors }" />
+            <div *ngIf="submitted && registerForm.get('email')!.errors" class="invalid-feedback">
+                <div *ngIf="registerForm.get('email')!.hasError('required')">Email is required</div>
+                <div *ngIf="registerForm.get('email')!.hasError('email')">Email not valid.</div>
             </div>
         </div>
         <div class="form-group">
@@ -43,6 +43,7 @@
             <div *ngIf="submitted && registerForm.get('password')!.errors" class="invalid-feedback">
                 <div *ngIf="registerForm.get('password')!.hasError('required')">Password is required</div>
                 <div *ngIf="registerForm.get('password')!.hasError('minlength')">Password must be at least 6 characters</div>
+                <div *ngIf="registerForm.get('password')!.hasError('pattern')">Password must have at least one number, one non alphanumeric characte, one uppercase character and one lowercase character.</div>
             </div>
         </div>
         <div class="form-group">

@@ -57,9 +57,8 @@ export class AuthService {
         return Axios.request(config)
         .pipe(
                 catchError (res => throwError(() => {
-                    console.log(res);
-                    // new Error(res.json())
-                    new Error(res.json())
+                    console.error('Register error')
+                    return new Error(res.response.data['']);
                 })));
     }
 
@@ -67,7 +66,10 @@ export class AuthService {
         // return this.getTokens(user, 'client_credentials').pipe(
         return this.getTokens(user, 'password').pipe(
             // catchError(res => throwError(res.json())),
-            catchError(res => throwError(res)),
+            catchError(res => throwError(() => {
+                console.error('Login error')
+                return new Error(res.response.data.error_description);
+            })),
             tap(res => this.scheduleRefresh()));
     }
 

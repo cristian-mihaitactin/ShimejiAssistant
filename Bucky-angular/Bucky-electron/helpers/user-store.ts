@@ -30,11 +30,10 @@ export class UserStore {
     fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
   public remove(key) {
-    const index = this.data.indexOf(key, 0);
-    if (index > -1) {
-      this.data.splice(index, 1);
-    }
+    delete this.data[key];
 
+    console.log(key)
+    console.log(this.data)
     fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
 }
