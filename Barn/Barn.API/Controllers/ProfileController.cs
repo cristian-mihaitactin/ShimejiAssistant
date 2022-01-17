@@ -33,7 +33,6 @@ namespace Barn.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public BuckyProfileModel Get(Guid id)
         {
             var profile = _profileService.GetProfile(id);
