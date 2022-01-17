@@ -26,6 +26,7 @@ export class SideviewComponent implements OnInit {
   ngOnInit() {
     electron.ipcRenderer.on('logged-in', (_event: any, arg:boolean) => {
       console.log('logged-in:' + arg)  
+      this.loggedIn = arg;
       this.cdr.detectChanges();
     });
 
@@ -37,7 +38,6 @@ export class SideviewComponent implements OnInit {
 
     electron.ipcRenderer.send('is-logged-in', ''); 
     electron.ipcRenderer.send('user-info-request', '');
-
   }
 
   openLoginModal() {
@@ -48,8 +48,6 @@ export class SideviewComponent implements OnInit {
     electron.ipcRenderer.send('logout-request',
           'Logout'
         );
-        // this.authenticationService.logout();
-        // this.router.navigate(['/login']);
     }
 
 }

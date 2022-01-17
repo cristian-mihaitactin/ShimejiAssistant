@@ -77,10 +77,6 @@ const initIpc = () => {
         }
     )
   });
-
-  ipcMain.on("user-info-request", (event,arg) => {
-    event.reply('user-info-reply', userService.getCurrentUser())
-  });
 }
 
 if (!environment.production){
@@ -156,6 +152,15 @@ app.on("ready", () => {
       }
   );
 
+  /*
+  ipcMain.on("user-info-request", (event,arg) => {
+    event.reply('user-info-reply', userService.getCurrentUser())
+  });
+}
+  */
+
+
+    
 
     /*
       .subscribe(
@@ -166,11 +171,25 @@ app.on("ready", () => {
     */
   });
   
+  
+  ipcMain.on("user-info-request", (event,arg) => {
+    console.log('user-info');
+    console.log(authService.userBehaviour.getValue())
+    event.reply('user-info-reply', authService.userBehaviour.getValue())
+  });
+  
+  authService.userBehaviour.subscribe({
+    next: (value) => {
+      console.log('user-info - subscribed');
+      console.log(value)
+      mainWindow.webContents.send('user-info-reply', value)
+    }
+  });
+
   ipcMain.on('login-request', (event, arg) => {
     authService.login(arg).subscribe(
       {
         next: (value) => {
-          console.log(value);
           event.reply("login-reply", 
           {
             result: 'Logged In',
@@ -218,7 +237,6 @@ app.on("ready", () => {
 
   ipcMain.on('logout-request', (event, arg) => {
     authService.logout();
-    userService.logout();
     mainWindow.webContents.send("logged-in", false);
   });
   //////////////////testing the auth///////////
@@ -263,5 +281,4 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 });
-
 
