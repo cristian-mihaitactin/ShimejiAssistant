@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Barn.API.Models;
 using Barn.Services.BuckyProfile;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Barn.API.Controllers
 {

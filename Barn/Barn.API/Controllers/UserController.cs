@@ -1,6 +1,12 @@
 ﻿using Barn.API.Models;
+using Barn.Entities.Users;
 using Barn.Services.User;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Validation.AspNetCore;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +21,14 @@ namespace Barn.API.Controllers
     public class UserController : ControllerBase
     {
         IUserService _userService; 
-        
-        public UserController(IUserService userService)
+        private readonly UserManager<User> _userManager;
+
+        public UserController(IUserService userService, 
+            UserManager<User> userManager
+            )
         {
             _userService = userService;
+            _userManager = userManager;
         }
 
         // GET: api/<UserController>
@@ -29,10 +39,18 @@ namespace Barn.API.Controllers
         //}
 
         // GET api/<UserController>/5
-        [HttpGet("{id}")]
-        public UserModel Get(Guid id)
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+        [SwaggerResponse(500, "Error retrieving User")]
+        [SwaggerResponse(404, "User not found")]
+        public async Task<IActionResult> GetAsync()
         {
-            return new UserModel(_userService.GetUserById(id));
+            var user = await GetUser();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(new UserModel(user));
         }
 
         // POST api/<UserController>
@@ -43,17 +61,26 @@ namespace Barn.API.Controllers
         }
 
         // PUT api/<UserController>/5
-        [HttpPut("{id}")]
-        public void Put(Guid id, [FromBody] UserModel value)
+        [HttpPut]
+        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+        public void Put([FromBody] UserModel value)
         {
             _userService.UpdateUser(value.ToEntity());
         }
 
         // DELETE api/<UserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        [HttpDelete]
+        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+        public async Task Delete()
         {
-            _userService.DeleteUser(id);
+            var user = await GetUser();
+            _userService.DeleteUser(user.Id);
+        }
+
+        private async Task<User> GetUser()
+        {
+            return await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+
         }
     }
 }

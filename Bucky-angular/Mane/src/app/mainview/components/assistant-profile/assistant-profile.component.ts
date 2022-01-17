@@ -45,7 +45,6 @@ export class AssistantProfileComponent implements OnInit {
       });// end
       */
       electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
-        console.log('in setBuckyProfile' + arg.id)
         this.buckyProfile.next(arg);
       });
   }

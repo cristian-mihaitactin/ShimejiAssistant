@@ -14,6 +14,7 @@ import {AxiosResponse, AxiosRequestHeaders, AxiosResponseHeaders, AxiosRequestCo
 import {Axios} from 'axios-observable'
 import jwt_decode  from 'jwt-decode'
 import { UserStore } from 'helpers/user-store';
+import { UserModel } from '../user/models/user-model';
 
 export class AuthService {
 
@@ -21,6 +22,9 @@ export class AuthService {
     private authReady$ = new BehaviorSubject<boolean>(false);
     private state: BehaviorSubject<AuthStateModel>;
     private refreshSubscription$: Subscription;
+
+    private userEndpoint = '/api/User'
+    public userBehaviour: BehaviorSubject<UserModel>;
 
     state$: Observable<AuthStateModel>;
     tokens$: Observable<AuthTokenModel>;
@@ -39,6 +43,8 @@ export class AuthService {
             map(state => state.profile));
 
         this.loggedIn$ = this.tokens$.pipe(map(tokens => !!tokens));
+
+        this.userBehaviour = new BehaviorSubject<UserModel>(this.getDefaultUser())
     }
     init(): Observable<AuthTokenModel> {
         return this.startupTokenRefresh().pipe(
@@ -58,7 +64,8 @@ export class AuthService {
         .pipe(
                 catchError (res => throwError(() => {
                     console.error('Register error')
-                    return new Error(res.response.data['']);
+                    console.error(res);
+                    return new Error(res.response.data);
                 })));
     }
 
@@ -67,7 +74,9 @@ export class AuthService {
         return this.getTokens(user, 'password').pipe(
             // catchError(res => throwError(res.json())),
             catchError(res => throwError(() => {
-                console.error('Login error')
+                console.error('Login error');
+                console.error(res);
+
                 return new Error(res.response.data.error_description);
             })),
             tap(res => this.scheduleRefresh()));
@@ -79,6 +88,9 @@ export class AuthService {
             this.refreshSubscription$.unsubscribe();
         }
         this.removeToken();
+        this.userBehaviour.next(this.getDefaultUser());
+        this.storeUserData(this.userBehaviour.getValue())
+        console.log('end logout')
     }
 
     refreshTokens(): Observable<AuthTokenModel> {
@@ -126,7 +138,6 @@ export class AuthService {
         Object.keys(data)
             .forEach(key => {
                 params.append(key, data[key])
-                console.log('key, data[key]:' + key, data[key]);
             });
 
         
@@ -150,6 +161,7 @@ export class AuthService {
                     const profile: ProfileModel = jwt_decode(tokens.id_token);
     
                     this.storeToken(tokens);
+                    this.storeUserInfo(tokens.access_token);
                     this.updateState({ authReady: true, tokens, profile });
                 }));
         //});
@@ -185,6 +197,48 @@ export class AuthService {
             flatMap(tokens => interval(tokens.expires_in / 2 * 1000)),
             flatMap(() => this.refreshTokens()))
             .subscribe();
+    }
+
+    private storeUserData(userData: UserModel) {
+        this.localStorage.set('username',userData.username);
+        this.localStorage.set('email',userData.email);
+    }
+    private getDefaultUser() : UserModel{
+        return {
+            username: environment.default_user.username,
+            email: environment.default_user.username
+        }
+    }
+
+    private storeUserInfo(accessToken){
+        this.callGetBarnUser(accessToken).subscribe({
+            next: (barnValue) => {
+                var newUserData: UserModel = {
+                    username: barnValue.data.userName,
+                    email: barnValue.data.email
+                }
+
+                this.storeUserData(newUserData);
+
+                this.userBehaviour.next(newUserData);
+            }
+        });
+    }
+
+    private callGetBarnUser(accessToken) {
+
+        console.log('calling barn')
+        const options = {
+            baseURL: `${environment.baseApiUrl}`,
+            url: this.userEndpoint,
+            method: "GET" as Method,
+            // headers: { 'Authorization': `Bearer ${this.userStore.get('auth-tokens')}` },
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+            // params: params,
+        }
+        
+        // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
+        return Axios.request(options)
     }
 }
 
