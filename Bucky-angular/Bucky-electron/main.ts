@@ -170,6 +170,7 @@ app.on("ready", () => {
     authService.login(arg).subscribe(
       {
         next: (value) => {
+          console.log(value);
           event.reply("login-reply", 
           {
             result: 'Logged In',

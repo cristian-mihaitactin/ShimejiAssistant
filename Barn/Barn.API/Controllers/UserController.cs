@@ -1,6 +1,10 @@
 ﻿using Barn.API.Models;
+using Barn.Entities.Users;
 using Barn.Services.User;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Validation.AspNetCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +19,14 @@ namespace Barn.API.Controllers
     public class UserController : ControllerBase
     {
         IUserService _userService; 
-        
-        public UserController(IUserService userService)
+        private readonly UserManager<User> _userManager;
+
+        public UserController(IUserService userService, 
+            UserManager<User> userManager
+            )
         {
             _userService = userService;
+            _userManager = userManager;
         }
 
         // GET: api/<UserController>
@@ -30,6 +38,7 @@ namespace Barn.API.Controllers
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
         public UserModel Get(Guid id)
         {
             return new UserModel(_userService.GetUserById(id));

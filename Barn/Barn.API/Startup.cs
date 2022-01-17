@@ -13,6 +13,7 @@ using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
 using Barn.Services.User;
 using Barn.Services.UserPreferences;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -42,6 +43,13 @@ namespace Barn.API
 
             // services.AddCors();
             services.AddControllers();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = Configuration["Authorization:Issuer"];
+                    options.Audience = Configuration["Authorization:Audience"];
+                });
+            services.AddAuthorization();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();

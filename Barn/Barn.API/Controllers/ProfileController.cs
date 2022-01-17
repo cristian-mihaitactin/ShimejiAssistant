@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Barn.API.Models;
 using Barn.Services.BuckyProfile;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Barn.API.Controllers
 {
@@ -32,6 +33,7 @@ namespace Barn.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public BuckyProfileModel Get(Guid id)
         {
             var profile = _profileService.GetProfile(id);
