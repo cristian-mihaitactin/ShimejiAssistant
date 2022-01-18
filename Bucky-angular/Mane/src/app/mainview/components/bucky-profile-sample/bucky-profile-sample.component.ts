@@ -27,7 +27,7 @@ export class BuckyProfileSampleComponent implements OnInit {
     private _sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef
     ) {
-      electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
+      electron.ipcRenderer.on('bucky-profile-by-id', (_event: any, arg: BuckyProfileModel) => {
         console.log('in setBuckyProfile' + arg.id)
         this.recievedBuckyProfiles.next(arg);
         // recievedBuckyProfiles = new BehaviorSubject<BuckyProfileModel>(
@@ -38,6 +38,8 @@ export class BuckyProfileSampleComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('this.buckyProfileId')
+    console.log('|' + this.buckyProfileId + '|')
     electron.ipcRenderer.send('get-bucky-profile-by-id', this.buckyProfileId);
     console.log("id recieved: " + this.buckyProfileId);
     this.recievedBuckyProfiles

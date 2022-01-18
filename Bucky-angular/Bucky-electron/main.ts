@@ -73,7 +73,17 @@ const initIpc = () => {
     buckyProfileService.getBuckyProfileById(arg)
       .subscribe(
         (value) => {
-          event.reply("bucky-profile", value);
+          event.reply("bucky-profile-by-id", value);
+        }
+    )
+  });
+
+  ipcMain.on("get-bucky-assitant-profile-by-id", (event,arg) => {
+    console.log('get-bucky-assitant-profile-by-id', arg);
+    buckyProfileService.getBuckyProfileById(arg)
+      .subscribe(
+        (value) => {
+          event.reply("bucky-assistant-profile-by-id", value);
         }
     )
   });
