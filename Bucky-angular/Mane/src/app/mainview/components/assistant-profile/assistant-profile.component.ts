@@ -36,15 +36,11 @@ export class AssistantProfileComponent implements OnInit {
   
   constructor(private _sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef) {
-
-      /*
       electron.ipcRenderer.on('selected-bucky-profile', (_event: any, arg: BuckyProfileModel) => {
-        console.log("arg.id");
-        console.log(arg.id);
         this.buckyProfile.next(arg);
       });// end
-      */
-      electron.ipcRenderer.on('bucky-profile', (_event: any, arg: BuckyProfileModel) => {
+      
+      electron.ipcRenderer.on('bucky-assistant-profile-by-id', (_event: any, arg: BuckyProfileModel) => {
         this.buckyProfile.next(arg);
       });
   }
@@ -54,9 +50,6 @@ export class AssistantProfileComponent implements OnInit {
       this.buckyBehaviours = value.behaviours;
       if (value.behaviours !== undefined && value.behaviours.length > 0){
         this.images = [];
-
-        console.log("value.isMainProfile");
-        console.log(value.isMainProfile);
 
         value.behaviours.forEach((behaviour, index) => {
           let imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
@@ -69,19 +62,20 @@ export class AssistantProfileComponent implements OnInit {
       }
     });
 
-    // electron.ipcRenderer.send('get-initial-bucky-profile', '');
-      electron.ipcRenderer.send('get-bucky-profile-by-id', this.buckyProfileId);
+      electron.ipcRenderer.send('get-initial-bucky-profile', '');
+      //electron.ipcRenderer.send('get-bucky-profile-by-id', this.buckyProfileId);
   }
 
   ngOnChanges() {
     /**********THIS FUNCTION WILL TRIGGER WHEN PARENT COMPONENT UPDATES 'someInput'**************/
     //Write your code here
-     console.log('this.buckyProfileId');
-     console.log(this.buckyProfileId);
-
-     electron.ipcRenderer.send('get-bucky-profile-by-id', this.buckyProfileId);
-     this.cdr.detectChanges();
-    }   
+    if (this.buckyProfileId !== undefined && this.buckyProfileId !== null && (this.buckyProfileId + '').split(' ').join('') !== ''){
+      console.log('here: |', this.buckyProfileId, '|');
+      console.log('here: |', this.buckyProfileId, '|');
+      electron.ipcRenderer.send('get-bucky-assitant-profile-by-id', this.buckyProfileId);
+      this.cdr.detectChanges();
+    }
+  }   
 
   getSafeUrlFromBytes(bytes:string){
     return this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'

@@ -34,9 +34,14 @@ export class OverviewComponent implements OnInit {
     .subscribe(profiles => {
       if(profiles !== undefined && Array.isArray(profiles) && profiles.length > 0) {
         profiles.forEach((profile,index) => {
-          if (profile.isMainProfile){
-            this.mainBuckyProfileId = profile.id;
-          }
+          // if (profile.isMainProfile !== undefined && profile.isMainProfile === true){
+          //   console.log('profile.isMainProfile !== undefined && profile.isMainProfile === true');
+          //   console.log(profile.isMainProfile !== undefined && profile.isMainProfile === true);
+          //   console.log('profile.id, profile.isMainProfile')
+          //   console.log(profile.id, profile.isMainProfile)
+          //   this.mainBuckyProfileId = profile.id;
+          // }
+          
           this.buckyProfileIds.set(profile.id, profile.isMainProfile);
         })
         this.cdr.detectChanges();
@@ -46,6 +51,7 @@ export class OverviewComponent implements OnInit {
 
   changeAssistantProfile(event:MouseEvent, buckyProfileId:string){
     event.stopPropagation();
+
     this.mainBuckyProfileId = buckyProfileId;
 
     this.cdr.detectChanges();
@@ -55,10 +61,7 @@ export class OverviewComponent implements OnInit {
     event.stopPropagation();
     this.mainBuckyProfileId = buckyProfileId;
 
-    console.log('setAssistantProfile');
     electron.ipcRenderer.send('set-bucky-profile', buckyProfileId);
-
-    console.log(this.mainBuckyProfileId);
-    this.ngOnInit();
+    this.cdr.detectChanges();
   }
 }
