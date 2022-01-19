@@ -25,7 +25,7 @@ export class BuckyProfileService {
     this.barnService = barnService;
   }
     getUserBuckyProfile() : Observable<BuckyProfileModel> {
-      const buckyId = this.userStore.get('bucky_profile');
+      const buckyId = this.userStore.get('buckyProfile');
 
       return this.barnService.getBuckyProfile(buckyId).pipe(
         tap((v) => v.isMainProfile = true)
@@ -33,7 +33,7 @@ export class BuckyProfileService {
     }
 
     getBuckyProfileById(id: string): Observable<BuckyProfileModel> {
-      const buckyId = this.userStore.get('bucky_profile');
+      const buckyId = this.userStore.get('buckyProfile');
 
       return this.barnService.getBuckyProfile(id).pipe(
         tap((v) => {
@@ -47,7 +47,7 @@ export class BuckyProfileService {
     }
 
     getAllBuckyProfilesWithoutBehaviours(): Observable<BuckyProfileModel[]> {
-      const buckyId = this.userStore.get('bucky_profile');
+      const buckyId = this.userStore.get('buckyProfile');
 
       return this.barnService.getAllBuckyProfiles().pipe(
         map((v) =>v.map(value => {
@@ -61,7 +61,7 @@ export class BuckyProfileService {
     }
     
     setBuckyProfileById(buckyProfileId:string) {
-      this.userStore.set('bucky_profile', buckyProfileId);
+      this.userStore.set('buckyProfile', buckyProfileId);
       //Call Barn?
     }
   /*
