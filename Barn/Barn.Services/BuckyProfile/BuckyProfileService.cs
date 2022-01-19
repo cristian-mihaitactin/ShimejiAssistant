@@ -11,6 +11,7 @@ namespace Barn.Services.BuckyProfile
 {
     public class BuckyProfileService: IBuckyProfileService
     {
+        private Guid DEFAULT_BUCKY_PROFILE = new Guid("8919E40E-D588-42F2-A0A8-4AFB9AD1589B");
         private BehaviourClient _behaviourClient;
         private IGenericRepo<Guid, Entities.Bucky.BuckyProfile> _buckyProfileRepo;
 
@@ -38,5 +39,12 @@ namespace Barn.Services.BuckyProfile
         }
 
         public IList<BuckyProfileDTO> GetAllProfiles() => _buckyProfileRepo.GetAll().Select(b => new BuckyProfileDTO(b)).ToList();
+        public BuckyProfileDTO GetDefaultProfile()
+        {
+            return new BuckyProfileDTO()
+            {
+                Id = DEFAULT_BUCKY_PROFILE
+            };
+        }
     }
 }

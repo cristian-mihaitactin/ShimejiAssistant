@@ -5,6 +5,7 @@ namespace Barn.Services.BuckyProfile
 {
     public interface IBuckyProfileService
     {
+        BuckyProfileDTO GetDefaultProfile();
         BuckyProfileDTO GetProfile(Guid id);
         IList<BuckyProfileDTO> GetAllProfiles();
     }

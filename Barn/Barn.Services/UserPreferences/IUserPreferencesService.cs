@@ -10,5 +10,6 @@ namespace Barn.Services.UserPreferences
         bool CreateUserPreference(Entities.Users.UserPreferences userPref);
         bool UpdateUserPreference(Entities.Users.UserPreferences userPref);
         void DeleteUserPreference(Guid id);
+        void CreateDefaultUserPreference(Entities.Users.User user);
     }
 }
