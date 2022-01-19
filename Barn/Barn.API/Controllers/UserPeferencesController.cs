@@ -47,11 +47,14 @@ namespace Barn.API.Controllers
         }
 
         // PUT api/<UserPeferencesController>/5
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-        public void Put(Guid id, [FromBody] UserPreferencesModel value)
+        public async Task Put([FromBody] UserPreferencesModel value)
         {
-            _userPrefService.UpdateUserPreference(value.ToEntity());
+            var user = await GetUser();
+            var found = _userPrefService.GetUserPreferenceByUserId(user.Id);
+            found.BuckyProfileID = value.BuckyProfileID;
+            _userPrefService.UpdateUserPreference(found);
         }
 
         // DELETE api/<UserPeferencesController>/5

@@ -1,6 +1,7 @@
 import { app } from "electron";
 import * as path from "path";
 import * as fs from "fs";
+import { AuthTokenModel } from "../auth/models/auth-tokens-model";
 
 export class UserStore {
     
@@ -43,6 +44,15 @@ export class UserStore {
 
   resetToDefault() {
     this.data = parseDataFile(this.path, this.defaults);
+  }
+
+  getAuthTokens(): AuthTokenModel {
+    var authString = this.get('auth-tokens');
+    if (authString !== undefined && authString !== ''){
+      return JSON.parse(authString);
+    }
+
+    return null;
   }
 }
 

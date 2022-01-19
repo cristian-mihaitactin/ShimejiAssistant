@@ -15,6 +15,7 @@ import {Axios} from 'axios-observable'
 import jwt_decode  from 'jwt-decode'
 import { UserStore } from 'helpers/user-store';
 import { UserModel } from '../user/models/user-model';
+import { fstat } from 'original-fs';
 
 export class AuthService {
 
@@ -112,6 +113,7 @@ export class AuthService {
         }
 
         this.localStorage.set('auth-tokens', JSON.stringify(tokens));
+        // this.localStorage.set('auth-tokens', tokens);
     }
 
     private retrieveTokens(): AuthTokenModel {
@@ -230,8 +232,6 @@ export class AuthService {
             }
         });
     }
-
-
 
     private callCallBarn(accessToken, url:string, method: Method) {
 
