@@ -1,6 +1,7 @@
 ﻿using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
 using System;
+using System.Linq;
 
 namespace Barn.Services.UserPreferences
 {
@@ -35,7 +36,7 @@ namespace Barn.Services.UserPreferences
 
         public Entities.Users.UserPreferences GetUserPreferenceByUserId(Guid userId)
         {
-            throw new NotImplementedException();
+            return _userPrefRepo.GetAll().Where(up => up.UserId == userId).FirstOrDefault();
         }
 
         public bool UpdateUserPreference(Entities.Users.UserPreferences userPref)

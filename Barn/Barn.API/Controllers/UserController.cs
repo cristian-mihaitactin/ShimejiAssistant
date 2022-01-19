@@ -79,7 +79,6 @@ namespace Barn.API.Controllers
         private async Task<User> GetUser()
         {
             return await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-
         }
     }
 }
