@@ -164,7 +164,13 @@ app.on("ready", () => {
   });
 
   ipcMain.on("setPosition", (event,arg) => {
-    buckyWindow.setPosition(arg.x, arg.y);
+    // buckyWindow.setPosition(arg.x, arg.y);
+    buckyWindow.setBounds({
+      width: buckyWindow.getSize()[0],
+      height: buckyWindow.getSize()[1],
+      x: arg.x,
+      y: arg.y
+  });
   });
 
   ipcMain.on("set-bucky-profile", (event,arg) => {

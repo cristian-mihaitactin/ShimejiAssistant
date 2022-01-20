@@ -4,6 +4,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BuckyBehaviourModel } from './models/bucky-behaviour-model';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyProfileModel } from './models/bucky-profile-model';
+import { delay } from 'rxjs-compat/operator/delay';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -16,7 +17,7 @@ export class AppComponent implements OnInit {
   title = 'app';
   imagePath: SafeResourceUrl;
   //image: string;
-  buckyBehaviours: BuckyBehaviourModel[];
+  buckyBehaviours: BuckyBehaviourModel[] = new Array<BuckyBehaviourModel>();
   buckyProfile = new BehaviorSubject<BuckyProfileModel>(
     {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
   );
@@ -48,6 +49,9 @@ export class AppComponent implements OnInit {
     this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
                  + this.buckyProfileService.buckyProfile.behaviours[0].imageBytes);
     */
+
+    electron.ipcRenderer.send('get-initial-bucky-profile', '');
+
     this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;
 
@@ -59,21 +63,29 @@ export class AppComponent implements OnInit {
       }
 
     });
-    electron.ipcRenderer.send('get-initial-bucky-profile', '');
 //////////////////////////////////////////////////////////
-let wX;
-  let wY;
-  let dragging = false;
+    
 
-  document.getElementById('systembar').addEventListener('mousedown',(function (e) {
-      console.log('asynchronous-message', 'down')
+    let wX;
+    let wY;
+    let dragging = false;
+
+    const mouseDownCallback = (e) => {
+      console.log('callback asynchronous-message', 'down')
       dragging = true;
       wX = e.pageX;
       wY = e.pageY;
-      
-  }));
 
-  window.addEventListener('mousemove',(function (e) {
+      /*
+      const draggedBehaviour = this.buckyBehaviours.find(bb=> bb.actionTypeString === 'Dragged');
+      this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+        + draggedBehaviour.imageBytes);
+      this.cdr.detectChanges();
+      */
+      this.setBuckyBehaviour('Dragged');
+    };
+
+    const windowMouseUpCallback = (e) => {
       e.stopPropagation();
       e.preventDefault();
       if (dragging) {
@@ -86,13 +98,20 @@ let wX;
           } catch (err) {
               console.log(err);
           }
-      }
-  }));
+        }
 
-  document.getElementById('systembar').addEventListener('mouseup',(function () {
+      };
+    const mouseUpCallback = () => {
       dragging = false;
+      
+      this.setBuckyBehaviour('Standby');
       console.log('asynchronous-message', 'up')
-  }));
+    };
+    document.getElementById('systembar').addEventListener('mousedown',(mouseDownCallback));
+
+    window.addEventListener('mousemove',(windowMouseUpCallback));
+
+    document.getElementById('systembar').addEventListener('mouseup',mouseUpCallback);
 
 
 
@@ -102,5 +121,10 @@ let wX;
 
   }
   
-  
+  private setBuckyBehaviour(bahaviourString: string) {
+    const behaviour = this.buckyBehaviours.find(bb=> bb.actionTypeString === bahaviourString);
+      this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+        + behaviour.imageBytes);
+      this.cdr.detectChanges();
+  }
 }
