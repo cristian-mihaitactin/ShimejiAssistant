@@ -18,6 +18,9 @@ namespace Barn.Services.BuckyProfile
         }
         public byte[] ImageBytes { get; set; }
 
+        public BuckyBehaviourDTO()
+        {
+        }
         public BuckyBehaviourDTO(BuckyBehaviour buckyBehaviour)
         {
             _buckyBehaviour = buckyBehaviour;

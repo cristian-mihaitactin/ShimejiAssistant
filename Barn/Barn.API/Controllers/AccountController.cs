@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Threading.Tasks;
 using Barn.Entities.Users;
+using Barn.Services.UserPreferences;
 
 namespace Barn.API.Controllers
 {
@@ -16,14 +17,17 @@ namespace Barn.API.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IUserPreferencesService _userPreferencesService;
         private static bool _databaseChecked;
 
         public AccountController(
             UserManager<User> userManager,
-            ApplicationDbContext applicationDbContext)
+            ApplicationDbContext applicationDbContext,
+            IUserPreferencesService userPreferencesService)
         {
             _userManager = userManager;
             _applicationDbContext = applicationDbContext;
+            _userPreferencesService = userPreferencesService;
         }
 
         //
@@ -42,6 +46,7 @@ namespace Barn.API.Controllers
                     LastName = model.LastName
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
+                _userPreferencesService.CreateDefaultUserPreference(user);
                 if (result.Succeeded)
                 {
                     return Ok();

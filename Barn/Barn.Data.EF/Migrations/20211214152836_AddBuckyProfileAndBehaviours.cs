@@ -62,7 +62,7 @@ namespace Barn.Data.EF.Migrations
                 name: "IX_UserPreferences_BuckyProfileID",
                 table: "UserPreferences",
                 column: "BuckyProfileID",
-                unique: true);
+                unique: false);
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuckyBehaviour_BuckyProfileId",

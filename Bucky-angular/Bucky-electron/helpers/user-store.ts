@@ -1,18 +1,26 @@
 import { app } from "electron";
 import * as path from "path";
 import * as fs from "fs";
+import { AuthTokenModel } from "../auth/models/auth-tokens-model";
+import { BuckyProfileModel } from "bucky_profile/bucky-profile-model";
+import { BuckyBehaviourModel } from "../bucky_profile/bucky-behaviour-model";
 
+const profilePath = 'buckyProfile'
 export class UserStore {
+  
+    
     private path: string;
     private data: string[];
+    private defaults: string[];
   constructor(opts) {
     // Renderer process has to get `app` module via `remote`, whereas the main process can get it directly
     // app.getPath('userData') will return a string of the user's app data directory path.
     const userDataPath = app.getPath('userData');
     // We'll use the `configName` property to set the file name and path.join to bring it all together as a string
     this.path = path.join(userDataPath, opts.configName + '.json');
-    
+    this.defaults = opts.defaults;
     this.data = parseDataFile(this.path, opts.defaults);
+    console.log('this is data: ', this.data);
   }
   
   // This will just return the property on the `data` object
@@ -22,6 +30,7 @@ export class UserStore {
   
   // ...and this will set it
   public set(key, val) {
+    console.log('key,val', key,val);
     this.data[key] = val;
     // Wait, I thought using the node.js' synchronous APIs was bad form?
     // We're not writing a server so there's not nearly the same IO demand on the process
@@ -32,9 +41,33 @@ export class UserStore {
   public remove(key) {
     delete this.data[key];
 
-    console.log(key)
-    console.log(this.data)
+    console.log('remove key: ', key)
     fs.writeFileSync(this.path, JSON.stringify(this.data));
+  }
+
+  resetToDefault() {
+    this.data = parseDataFile(this.path, this.defaults);
+  }
+
+  getAuthTokens(): AuthTokenModel {
+    var authString = this.get('auth-tokens');
+    if (authString !== undefined && authString !== ''){
+      return JSON.parse(authString);
+    }
+
+    return null;
+  }
+
+  setBuckyProfile(buckyProfile: BuckyProfileModel) {
+    const buckyPath = path.join(app.getPath('userData'), profilePath);
+
+    if (!fs.existsSync(buckyPath)){
+      fs.mkdirSync(buckyPath, { recursive: true });
+  }
+
+    buckyProfile.behaviours.forEach(element => {
+      fs.writeFileSync(path.join(buckyPath, element.actionTypeString) + '.png', element.imageBytes, 'base64');
+    });
   }
 }
 

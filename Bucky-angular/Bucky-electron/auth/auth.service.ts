@@ -15,6 +15,7 @@ import {Axios} from 'axios-observable'
 import jwt_decode  from 'jwt-decode'
 import { UserStore } from 'helpers/user-store';
 import { UserModel } from '../user/models/user-model';
+import { fstat } from 'original-fs';
 
 export class AuthService {
 
@@ -24,6 +25,7 @@ export class AuthService {
     private refreshSubscription$: Subscription;
 
     private userEndpoint = '/api/User'
+    private userPreferencesEndpoint = '/api/UserPeferences'
     public userBehaviour: BehaviorSubject<UserModel>;
 
     state$: Observable<AuthStateModel>;
@@ -89,7 +91,7 @@ export class AuthService {
         }
         this.removeToken();
         this.userBehaviour.next(this.getDefaultUser());
-        this.storeUserData(this.userBehaviour.getValue())
+        this.localStorage.resetToDefault();
         console.log('end logout')
     }
 
@@ -111,6 +113,7 @@ export class AuthService {
         }
 
         this.localStorage.set('auth-tokens', JSON.stringify(tokens));
+        // this.localStorage.set('auth-tokens', tokens);
     }
 
     private retrieveTokens(): AuthTokenModel {
@@ -211,7 +214,7 @@ export class AuthService {
     }
 
     private storeUserInfo(accessToken){
-        this.callGetBarnUser(accessToken).subscribe({
+        this.callCallBarn(accessToken, this.userEndpoint, "GET" as Method).subscribe({
             next: (barnValue) => {
                 var newUserData: UserModel = {
                     username: barnValue.data.userName,
@@ -223,15 +226,20 @@ export class AuthService {
                 this.userBehaviour.next(newUserData);
             }
         });
+        this.callCallBarn(accessToken, this.userPreferencesEndpoint, "GET" as Method).subscribe({
+            next: (barnValue: any) => {
+                this.localStorage.set('buckyProfile',barnValue.buckyProfile);
+            }
+        });
     }
 
-    private callGetBarnUser(accessToken) {
+    private callCallBarn(accessToken, url:string, method: Method) {
 
         console.log('calling barn')
         const options = {
             baseURL: `${environment.baseApiUrl}`,
-            url: this.userEndpoint,
-            method: "GET" as Method,
+            url: url,
+            method: method, // "GET" as Method,
             // headers: { 'Authorization': `Bearer ${this.userStore.get('auth-tokens')}` },
             headers: { 'Authorization': `Bearer ${accessToken}` },
             // params: params,

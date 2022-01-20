@@ -53,19 +53,18 @@ namespace Barn.API.Controllers
             return Ok(new UserModel(user));
         }
 
-        // POST api/<UserController>
-        [HttpPost]
-        public void Post([FromBody] UserModel value)
-        {
-            _userService.CreateUser(value.ToEntity());
-        }
-
         // PUT api/<UserController>/5
         [HttpPut]
         [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-        public void Put([FromBody] UserModel value)
+        public async void Put([FromBody] UserModel value)
         {
-            _userService.UpdateUser(value.ToEntity());
+            var userValue = await GetUser();
+            userValue.Email = value.Email;
+            userValue.FirstName = value.FirstName;
+            userValue.LastName = value.LastName;
+
+            await _userManager.UpdateAsync(userValue);
+            // _userService.UpdateUser(value.ToEntity());
         }
 
         // DELETE api/<UserController>/5
@@ -74,13 +73,12 @@ namespace Barn.API.Controllers
         public async Task Delete()
         {
             var user = await GetUser();
-            _userService.DeleteUser(user.Id);
+            await _userManager.DeleteAsync(user);
         }
 
         private async Task<User> GetUser()
         {
             return await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-
         }
     }
 }

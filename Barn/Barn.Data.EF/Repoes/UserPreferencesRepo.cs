@@ -34,6 +34,7 @@ namespace Barn.Data.Mock
             if (!_dbContext.UsersPreferences.Contains(entity))
             {
                 _dbContext.UsersPreferences.Add(entity);
+                _dbContext.SaveChanges();
             }
             else
             {
@@ -58,6 +59,7 @@ namespace Barn.Data.Mock
             }
 
             _dbContext.UsersPreferences.Update(entity);
+            _dbContext.SaveChanges();
 
             return true;
         }
@@ -71,6 +73,7 @@ namespace Barn.Data.Mock
             }
 
             _dbContext.UsersPreferences.Remove(usPref);
+            _dbContext.SaveChanges();
         }
     }
 }
