@@ -69,9 +69,7 @@ export class BuckyProfileService {
       //Call Barn?
       //var accessToken = this.userStore.getAuthTokens().access_token.replace(/(\r\n|\n|\r)/gm, "");
       var accessToken = this.userStore.getAuthTokens().access_token;
-      console.log({ buckyProfileId: buckyProfileId })
       var jsonBody = JSON.stringify({ BuckyProfileID: buckyProfileId, Id: '00000000-0000-0000-0000-000000000000', UserId: '00000000-0000-0000-0000-000000000000' })
-      console.log('after stringify')
       this.callBarn(accessToken, this.userPreferencesEndpoint ,
         "PUT" as Method, jsonBody).subscribe(
           {
@@ -80,6 +78,13 @@ export class BuckyProfileService {
             }
           }
         );
+      
+        //Store new behaviour
+        this.barnService.getBuckyProfile(buckyProfileId).subscribe({
+          next: (value) => {
+            this.userStore.setBuckyProfile(value);
+          }
+        });
     }
 
     private callBarn(accessToken, url:string, method: Method, body: string) {

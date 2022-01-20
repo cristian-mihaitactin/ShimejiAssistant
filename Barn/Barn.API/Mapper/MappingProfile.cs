@@ -19,8 +19,12 @@ namespace Barn.API.Mapper
 
             CreateMap<Barn.Services.BuckyProfile.BuckyProfileDTO, BuckyProfileModel>();
             CreateMap<BuckyProfileModel, Barn.Services.BuckyProfile.BuckyProfileDTO>();
-            CreateMap<BuckyBehaviourDTO, BuckyBehaviourModel>();//.
-            CreateMap<BuckyBehaviourModel, BuckyBehaviourDTO>();
+            CreateMap<BuckyBehaviourDTO, BuckyBehaviourModel>()
+                .ForMember(dest => dest.ActionType, act => act.MapFrom(src => src.ActionType))
+                .ForMember(dest => dest.ImageBytes, act => act.MapFrom(src => src.ImageBytes));
+            CreateMap<BuckyBehaviourModel, BuckyBehaviourDTO>()
+                .ForMember(dest => dest.ActionType, act => act.MapFrom(src => src.ActionType))
+                .ForMember(dest => dest.ImageBytes, act => act.MapFrom(src => src.ImageBytes));
         }
     }
 }

@@ -2,13 +2,16 @@ import { app } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import { AuthTokenModel } from "../auth/models/auth-tokens-model";
+import { BuckyProfileModel } from "bucky_profile/bucky-profile-model";
+import { BuckyBehaviourModel } from "../bucky_profile/bucky-behaviour-model";
 
+const profilePath = 'buckyProfile'
 export class UserStore {
+  
     
     private path: string;
     private data: string[];
     private defaults: string[];
-
   constructor(opts) {
     // Renderer process has to get `app` module via `remote`, whereas the main process can get it directly
     // app.getPath('userData') will return a string of the user's app data directory path.
@@ -53,6 +56,18 @@ export class UserStore {
     }
 
     return null;
+  }
+
+  setBuckyProfile(buckyProfile: BuckyProfileModel) {
+    const buckyPath = path.join(app.getPath('userData'), profilePath);
+
+    if (!fs.existsSync(buckyPath)){
+      fs.mkdirSync(buckyPath, { recursive: true });
+  }
+
+    buckyProfile.behaviours.forEach(element => {
+      fs.writeFileSync(path.join(buckyPath, element.actionTypeString) + '.png', element.imageBytes, 'base64');
+    });
   }
 }
 
