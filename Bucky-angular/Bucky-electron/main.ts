@@ -51,41 +51,53 @@ const initIpc = () => {
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
     mainBuckyProfile
-      .subscribe(
-        (value) => {
+      .subscribe({
+        next: (value) => {
           event.reply("selected-bucky-profile", value);
+        },
+        error: (error) => {
+          console.error(error);
         }
-    )
+      })
   });
   ipcMain.on("get-all-bucky-profiles", (event,arg) => {
     console.log("in get-all-bucky-profiles")
     buckyProfileService.getAllBuckyProfilesWithoutBehaviours()
-      .subscribe(
-        (value) => {
+      .subscribe({
+        next: (value) => {
           console.log("bucky-profiles: " + value);
           event.reply("bucky-profiles", value);
+        },
+        error: (error) => {
+          console.error(error);
         }
-    )
+      })
   });
 
   ipcMain.on("get-bucky-profile-by-id", (event,arg) => {
     console.log('get-bucky-profile-by-id: ' + arg);
     buckyProfileService.getBuckyProfileById(arg)
-      .subscribe(
-        (value) => {
+      .subscribe({
+        next: (value) => {
           event.reply("bucky-profile-by-id", value);
+        },
+        error: (error) => {
+          console.error(error);
         }
-    )
+      })
   });
 
   ipcMain.on("get-bucky-assitant-profile-by-id", (event,arg) => {
     console.log('get-bucky-assitant-profile-by-id', arg);
     buckyProfileService.getBuckyProfileById(arg)
-      .subscribe(
-        (value) => {
+      .subscribe({
+        next: (value) => {
           event.reply("bucky-assistant-profile-by-id", value);
+        },
+        error: (error) => {
+          console.error(error);
         }
-    )
+      })
   });
 }
 
@@ -155,30 +167,15 @@ app.on("ready", () => {
     buckyProfileService.setBuckyProfileById(arg);
     var mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
     mainBuckyProfile
-    .subscribe(
-      (value) => {
+    .subscribe({
+      next: (value) => {
         console.log('set-bucky-profile sending ');
         buckyWindow.webContents.send("selected-bucky-profile", value);
+      },
+      error: (error) => {
+        console.error(error);
       }
-  );
-
-  /*
-  ipcMain.on("user-info-request", (event,arg) => {
-    event.reply('user-info-reply', userService.getCurrentUser())
-  });
-}
-  */
-
-
-    
-
-    /*
-      .subscribe(
-        (value) => {
-          event.reply("bucky-profile", value);
-        }
-    )
-    */
+    });
   });
   
   
@@ -193,6 +190,9 @@ app.on("ready", () => {
       console.log('user-info - subscribed');
       console.log(value)
       mainWindow.webContents.send('user-info-reply', value)
+    },
+    error: (error) => {
+      console.error(error);
     }
   });
 
