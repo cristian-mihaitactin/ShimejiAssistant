@@ -1,11 +1,15 @@
 .carousel-indicator-btn {
-    color: lightblue !important;;
+    background-color: lightblue !important;;
 }
 .carousel-indicator-btn.active{
-    color: blue !important;;
+    background-color: blue !important;;
 }
 
 .carousel-item-image{
     width: 250px;
     height: 200px;
+}
+
+.carousel-control-btn {
+    background-color: rgb(14, 189, 58) !important;;
 }
