@@ -132,6 +132,7 @@ app.on("ready", () => {
       // in your production app.
       nodeIntegration: true,
       contextIsolation: false,
+      enableRemoteModule: true
       // Spectron needs access to remote module
       //enableRemoteModule: env.name === "test"
     }
@@ -151,7 +152,7 @@ app.on("ready", () => {
       slashes: true
     })
   );
-  //buckyWindow.openDevTools();
+  buckyWindow.openDevTools();
   mainWindow.openDevTools();
 
   ipcMain.on("is-logged-in", (event,arg) => {
@@ -160,6 +161,10 @@ app.on("ready", () => {
     } else {
       event.reply("logged-in", false);
     }
+  });
+
+  ipcMain.on("setPosition", (event,arg) => {
+    buckyWindow.setPosition(arg.x, arg.y);
   });
 
   ipcMain.on("set-bucky-profile", (event,arg) => {

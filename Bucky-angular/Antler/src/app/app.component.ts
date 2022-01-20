@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BuckyProfileService } from './services/bucky-profile-service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BuckyBehaviourModel } from './models/bucky-behaviour-model';
+const electron = (<any>window).require('electron');
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
 
+    // Make the DIV element draggable:
+    //this.dragElement(document.getElementById("mydiv"));
+
+    console.log('AppComponent-ngOnInit');
     /*
     console.log(this.buckyProfileService.buckyProfile);
     this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
@@ -38,13 +43,46 @@ export class AppComponent implements OnInit {
 
       this.cdr.detectChanges();
     });
+//////////////////////////////////////////////////////////
+let wX;
+  let wY;
+  let dragging = false;
 
-                 /*
+  document.getElementById('systembar').addEventListener('mousedown',(function (e) {
+      console.log('asynchronous-message', 'down')
+      dragging = true;
+      wX = e.pageX;
+      wY = e.pageY;
+  }));
 
-    this.imageService.directory.subscribe((value) => {
-      this.directory = value;
-      this.cdr.detectChanges();
-    });
-    */
+  window.addEventListener('mousemove',(function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (dragging) {
+          var xLoc = e.screenX - wX;
+          var yLoc = e.screenY - wY;
+
+          try {
+            // remote.getFocusedWindow().setPosition(xLoc, yLoc);
+            electron.ipcRenderer.send('setPosition', {x: xLoc, y: yLoc});
+          } catch (err) {
+              console.log(err);
+          }
+      }
+  }));
+
+  document.getElementById('systembar').addEventListener('mouseup',(function () {
+      dragging = false;
+      console.log('asynchronous-message', 'up')
+  }));
+
+
+
+
+
+
+
   }
+  
+  
 }
