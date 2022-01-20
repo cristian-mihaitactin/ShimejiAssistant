@@ -152,6 +152,9 @@ app.on("ready", () => {
       slashes: true
     })
   );
+
+  buckyWindow.setAlwaysOnTop(true, 'screen');
+
   buckyWindow.openDevTools();
   mainWindow.openDevTools();
 
