@@ -8,17 +8,17 @@ const electron = (<any>window).require('electron');
   providedIn: 'root'
 })
 export class BuckyProfileService {
-  buckyProfile = new BehaviorSubject<BuckyProfileModel>(
-    {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
-  );
+  // buckyProfile = new BehaviorSubject<BuckyProfileModel>(
+  //   {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
+  // );
 
   constructor() {
-    electron.ipcRenderer.on('selected-bucky-profile', (event, arg) => {
-    console.log(arg.id) // prints "pong"
-    this.buckyProfile.next(arg);
-  })
+  //   electron.ipcRenderer.on('selected-bucky-profile', (event, arg) => {
+  //   console.log(arg) // prints "pong"
+  //   this.buckyProfile.next(arg);
+  // })
 
-    electron.ipcRenderer.send('get-initial-bucky-profile', '');
+  //   electron.ipcRenderer.send('get-initial-bucky-profile', '');
 /*
     electron.ipcRenderer.on('getImagesResponse', (event, images) => {
       this.images.next(images);

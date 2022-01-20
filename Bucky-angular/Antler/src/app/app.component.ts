@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BuckyProfileService } from './services/bucky-profile-service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BuckyBehaviourModel } from './models/bucky-behaviour-model';
+import { BehaviorSubject } from 'rxjs';
+import { BuckyProfileModel } from './models/bucky-profile-model';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -15,13 +17,28 @@ export class AppComponent implements OnInit {
   imagePath: SafeResourceUrl;
   //image: string;
   buckyBehaviours: BuckyBehaviourModel[];
+  buckyProfile = new BehaviorSubject<BuckyProfileModel>(
+    {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
+  );
 
   constructor(private _sanitizer: DomSanitizer,
-    private buckyProfileService: BuckyProfileService,
-    private cdr: ChangeDetectorRef) { }
+    // private buckyProfileService: BuckyProfileService,
+    private cdr: ChangeDetectorRef) { 
+      electron.ipcRenderer.on('selected-bucky-profile', (event, arg) => {
+        console.log('arg: ', arg);
+        if (arg === undefined || arg === null) {
+          console.log('arg is not ok. Try again')
+          //electron.ipcRenderer.send('get-initial-bucky-profile', '');
+      }else {
+        console.log(arg) // prints "pong"
+        this.buckyProfile.next(arg);
+      }
+      this.cdr.detectChanges();
+  
+      });
+     }
 
   ngOnInit() {
-
     // Make the DIV element draggable:
     //this.dragElement(document.getElementById("mydiv"));
 
@@ -31,7 +48,7 @@ export class AppComponent implements OnInit {
     this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
                  + this.buckyProfileService.buckyProfile.behaviours[0].imageBytes);
     */
-    this.buckyProfileService.buckyProfile.subscribe((value) => {
+    this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;
 
       if (value.behaviours.length > 0){
@@ -41,8 +58,8 @@ export class AppComponent implements OnInit {
         //this.image = value.behaviours[0].imageBytes;
       }
 
-      this.cdr.detectChanges();
     });
+    electron.ipcRenderer.send('get-initial-bucky-profile', '');
 //////////////////////////////////////////////////////////
 let wX;
   let wY;
@@ -53,6 +70,7 @@ let wX;
       dragging = true;
       wX = e.pageX;
       wY = e.pageY;
+      
   }));
 
   window.addEventListener('mousemove',(function (e) {

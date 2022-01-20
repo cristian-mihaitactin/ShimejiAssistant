@@ -170,7 +170,7 @@ app.on("ready", () => {
   ipcMain.on("set-bucky-profile", (event,arg) => {
     console.log('set-bucky-profile: ' + arg);
     buckyProfileService.setBuckyProfileById(arg);
-    var mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
+    mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
     mainBuckyProfile
     .subscribe({
       next: (value) => {
