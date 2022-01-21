@@ -24,7 +24,7 @@ namespace Barn.Data.EF.Repoes
 
         public IEnumerable<Plugin> GetAll()
         {
-            throw new NotImplementedException();
+            return _dbContext.Plugins;
         }
 
         public Plugin GetById(Guid id)

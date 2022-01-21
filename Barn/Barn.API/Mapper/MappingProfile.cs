@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Barn.API.Models;
+using Barn.Entities.Plugins;
 using Barn.Entities.Users;
 using Barn.Services.BuckyProfile;
 using Profile = AutoMapper.Profile;
@@ -25,6 +26,9 @@ namespace Barn.API.Mapper
             CreateMap<BuckyBehaviourModel, BuckyBehaviourDTO>()
                 .ForMember(dest => dest.ActionType, act => act.MapFrom(src => src.ActionType))
                 .ForMember(dest => dest.ImageBytes, act => act.MapFrom(src => src.ImageBytes));
+            CreateMap<PluginModel, Plugin>();
+            CreateMap<Plugin, PluginModel>();
+
         }
     }
 }

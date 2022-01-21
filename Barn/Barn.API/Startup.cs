@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ using Barn.Entities;
 using Barn.Entities.Users;
 using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
+using Barn.Services.Plugins;
 using Barn.Services.User;
 using Barn.Services.UserPreferences;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -58,6 +60,7 @@ namespace Barn.API
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             services.AddScoped<IBuckyProfileService, BuckyProfileService>();
+            services.AddScoped<IPluginService, PluginService>();
 
 
             // --------------------------------- OpenId ---------------------------------//
@@ -155,6 +158,8 @@ namespace Barn.API
             services.AddScoped<IGenericRepo<Guid, User>, UserRepo>();
             services.AddScoped<IGenericRepo<Guid, UserPreferences>, UserPreferencesRepo>();
             services.AddScoped<IGenericRepo<Guid, Entities.Bucky.BuckyProfile>, BuckyProfileRepo>();
+            services.AddScoped<IGenericRepo<Guid, Entities.Plugins.Plugin>, PluginRepo>();
+            services.AddScoped<IGenericRepo<Guid, Entities.Plugins.PluginNotification>, PluginNotificationRepo>();
             // Auto Mapper Configurations
 
             var mapperConfig = new MapperConfiguration(mc =>
