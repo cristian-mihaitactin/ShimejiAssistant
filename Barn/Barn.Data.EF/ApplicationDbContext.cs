@@ -94,9 +94,6 @@ namespace Barn.Data.EF
                 .Property(a => a.Id)
                 .HasColumnType("uniqueidentifier");
 
-            modelBuilder.Entity<UserPreferences>()
-                .HasMany(up => up.Plugins);
-
             modelBuilder.Entity<Plugin>().ToTable("Plugin");
 
             // [PluginNotification]
@@ -112,7 +109,18 @@ namespace Barn.Data.EF
                 .WithMany(plugin => plugin.PluginNotifications)
                 .HasForeignKey(a => a.PluginId);
 
-            modelBuilder.Entity<BuckyBehaviour>().ToTable("PluginNotification");
+            //UserPreferencesPlugins
+            modelBuilder.Entity<UserPreferencesPlugins>().HasKey(sc => new { sc.UserPreferenceId, sc.PluginId});
+            modelBuilder.Entity<UserPreferencesPlugins>()
+            .HasOne<Plugin>(sc => sc.Plugin)
+            .WithMany(s => s.UserPreferencesPlugins)
+            .HasForeignKey(sc => sc.PluginId);
+
+
+            modelBuilder.Entity<UserPreferencesPlugins>()
+                .HasOne<UserPreferences>(sc => sc.UserPreference)
+                .WithMany(s => s.UserPreferencesPlugins)
+                .HasForeignKey(sc => sc.UserPreferenceId);
 
             // Seeding
             //Seed(modelBuilder);

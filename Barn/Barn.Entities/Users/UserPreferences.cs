@@ -14,6 +14,6 @@ namespace Barn.Entities.Users
         public Guid UserId { get; set; }
         public BuckyProfile BuckyProfile { get; set; }
         public Guid BuckyProfileID { get; set; }
-        public IList<Plugin> Plugins { get; set; }
+        public IList<UserPreferencesPlugins> UserPreferencesPlugins { get; set; }
     }
 }

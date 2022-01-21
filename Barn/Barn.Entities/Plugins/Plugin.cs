@@ -11,5 +11,7 @@ namespace Barn.Entities.Plugins
         public string Name { get; set; }
         public string Description { get; set; }
         public string Version { get; set; }
+
+        public IList<UserPreferencesPlugins> UserPreferencesPlugins { get; set; }
     }
 }
