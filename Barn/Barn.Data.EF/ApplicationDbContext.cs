@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using Barn.Entities.Bucky;
 using Barn.Entities.Users;
+using Barn.Entities.Plugins;
 
 namespace Barn.Data.EF
 {
@@ -15,6 +16,8 @@ namespace Barn.Data.EF
         public DbSet<UserPreferences> UsersPreferences { get; set; }
         public DbSet<BuckyProfile> BuckyProfiles { get; set; }
         public DbSet<BuckyBehaviour> BuckyBehaviours{ get; set; }
+        public DbSet<Plugin> Plugins { get; set; }
+        public DbSet<PluginNotification> PluginNotifications { get; set; }
 
         // This is the run time configuration of 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -83,8 +86,44 @@ namespace Barn.Data.EF
 
             modelBuilder.Entity<BuckyBehaviour>().ToTable("BuckyBehaviour");
 
+            // [Plugin]
+            modelBuilder.Entity<Plugin>()
+                .Property(a => a.RowVersion)
+                .IsRowVersion();
+            modelBuilder.Entity<Plugin>()
+                .Property(a => a.Id)
+                .HasColumnType("uniqueidentifier");
+
+            modelBuilder.Entity<Plugin>().ToTable("Plugin");
+
+            // [PluginNotification]
+            modelBuilder.Entity<PluginNotification>()
+                .Property(a => a.RowVersion)
+                .IsRowVersion();
+            modelBuilder.Entity<PluginNotification>()
+                .Property(a => a.Id)
+                .HasColumnType("uniqueidentifier");
+
+            modelBuilder.Entity<PluginNotification>()
+                .HasOne(b => b.Plugin)
+                .WithMany(plugin => plugin.PluginNotifications)
+                .HasForeignKey(a => a.PluginId);
+
+            //UserPreferencesPlugins
+            modelBuilder.Entity<UserPreferencesPlugins>().HasKey(sc => new { sc.UserPreferenceId, sc.PluginId});
+            modelBuilder.Entity<UserPreferencesPlugins>()
+            .HasOne<Plugin>(sc => sc.Plugin)
+            .WithMany(s => s.UserPreferencesPlugins)
+            .HasForeignKey(sc => sc.PluginId);
+
+
+            modelBuilder.Entity<UserPreferencesPlugins>()
+                .HasOne<UserPreferences>(sc => sc.UserPreference)
+                .WithMany(s => s.UserPreferencesPlugins)
+                .HasForeignKey(sc => sc.UserPreferenceId);
+
             // Seeding
-            Seed(modelBuilder);
+            //Seed(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -4,14 +4,16 @@ using Barn.Data.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Barn.Data.EF.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220121113901_AddPlugins")]
+    partial class AddPlugins
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +51,7 @@ namespace Barn.Data.EF.Migrations
 
                     b.HasIndex("BuckyProfileId");
 
-                    b.ToTable("BuckyBehaviour");
+                    b.ToTable("PluginNotification");
                 });
 
             modelBuilder.Entity("Barn.Entities.Bucky.BuckyProfile", b =>
@@ -91,10 +93,15 @@ namespace Barn.Data.EF.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<Guid?>("UserPreferencesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Version")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserPreferencesId");
 
                     b.ToTable("Plugin");
                 });
@@ -124,21 +131,6 @@ namespace Barn.Data.EF.Migrations
                     b.HasIndex("PluginId");
 
                     b.ToTable("PluginNotifications");
-                });
-
-            modelBuilder.Entity("Barn.Entities.Plugins.UserPreferencesPlugins", b =>
-                {
-                    b.Property<Guid>("UserPreferenceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PluginId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserPreferenceId", "PluginId");
-
-                    b.HasIndex("PluginId");
-
-                    b.ToTable("UserPreferencesPlugins");
                 });
 
             modelBuilder.Entity("Barn.Entities.Users.User", b =>
@@ -590,6 +582,13 @@ namespace Barn.Data.EF.Migrations
                     b.Navigation("BuckyProfile");
                 });
 
+            modelBuilder.Entity("Barn.Entities.Plugins.Plugin", b =>
+                {
+                    b.HasOne("Barn.Entities.Users.UserPreferences", null)
+                        .WithMany("Plugins")
+                        .HasForeignKey("UserPreferencesId");
+                });
+
             modelBuilder.Entity("Barn.Entities.Plugins.PluginNotification", b =>
                 {
                     b.HasOne("Barn.Entities.Plugins.Plugin", "Plugin")
@@ -599,25 +598,6 @@ namespace Barn.Data.EF.Migrations
                         .IsRequired();
 
                     b.Navigation("Plugin");
-                });
-
-            modelBuilder.Entity("Barn.Entities.Plugins.UserPreferencesPlugins", b =>
-                {
-                    b.HasOne("Barn.Entities.Plugins.Plugin", "Plugin")
-                        .WithMany("UserPreferencesPlugins")
-                        .HasForeignKey("PluginId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Barn.Entities.Users.UserPreferences", "UserPreference")
-                        .WithMany("UserPreferencesPlugins")
-                        .HasForeignKey("UserPreferenceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Plugin");
-
-                    b.Navigation("UserPreference");
                 });
 
             modelBuilder.Entity("Barn.Entities.Users.UserPreferences", b =>
@@ -720,8 +700,6 @@ namespace Barn.Data.EF.Migrations
             modelBuilder.Entity("Barn.Entities.Plugins.Plugin", b =>
                 {
                     b.Navigation("PluginNotifications");
-
-                    b.Navigation("UserPreferencesPlugins");
                 });
 
             modelBuilder.Entity("Barn.Entities.Users.User", b =>
@@ -731,7 +709,7 @@ namespace Barn.Data.EF.Migrations
 
             modelBuilder.Entity("Barn.Entities.Users.UserPreferences", b =>
                 {
-                    b.Navigation("UserPreferencesPlugins");
+                    b.Navigation("Plugins");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", b =>
