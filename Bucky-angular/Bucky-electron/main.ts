@@ -271,7 +271,7 @@ import(x).then((a) => {
   // `a` is imported and can be used here
   var subject = new Subject<{notificationMessage: string;
     actionType: number}>();
-  a.Plugin(subject, "18", "00");
+  a.Plugin(subject, "18", "41");
   subject.subscribe({
     next: (val) => {
       console.log(val);
