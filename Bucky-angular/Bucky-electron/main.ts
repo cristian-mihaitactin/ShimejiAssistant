@@ -9,6 +9,7 @@ import { UserStore } from './helpers/user-store';
 import createWindow from "./helpers/window";
 import { UserService } from "./user/user.service";
 import { BarnBuckyService } from "./barn-service/barn-bucky-service";
+import { Subject } from "rxjs";
 
 //import { environment } from "environments/environment";
 
@@ -263,38 +264,23 @@ app.on("ready", () => {
     authService.logout();
     mainWindow.webContents.send("logged-in", false);
   });
-  //////////////////testing the auth///////////
-  /*
-authService.register(
-  {
-    userName : "myNewUser",
-    password : "123!@#qweQWE",
-    confirmPassword: "123!@#qweQWE"
-  }
-).subscribe(() => {
-    console.log('Successfully registered');
-},
-error => console.log( error ));
-*/
-/*
-var x = authService.login({
-  username : "myNewUser",
-    password : "123!@#qweQWE"
-}).subscribe(val => {
-  console.log('in login');
-  console.log(val)
-})
-*/
 
-//console.log('login:' + x);
-//////
-
-/*
-  if (env.name === "development") {
-    mainWindow.openDevTools();
-    //buckyWindow.openDevTools();
-  }
-  */
+//////////////////
+var x = './Plugin/main.js';
+import(x).then((a) => {
+  // `a` is imported and can be used here
+  var subject = new Subject<{notificationMessage: string;
+    actionType: number}>();
+  a.Plugin(subject, "18", "00");
+  subject.subscribe({
+    next: (val) => {
+      console.log(val);
+    },
+    error: (val) => {
+      console.log(val);
+    }
+  })
+});
 });
 
 // Quit when all windows are closed.
