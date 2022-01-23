@@ -29,7 +29,7 @@ namespace Barn.Data.EF.Repoes
 
         public Plugin GetById(Guid id)
         {
-            throw new NotImplementedException();
+            return (Plugin)_dbContext.Plugins.FirstOrDefault(p => p.Id == id);
         }
 
         public bool Insert(Plugin entity)

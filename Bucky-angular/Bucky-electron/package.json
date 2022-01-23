@@ -19,9 +19,11 @@
     "fs-jetpack": "^4.3.0",
     "jwt-decode": "^3.1.2",
     "rxjs": "^7.4.0",
-    "rxjs-compat": "^6.6.7"
+    "rxjs-compat": "^6.6.7",
+    "unzip-stream": "^0.3.1"
   },
   "devDependencies": {
+    "@types/unzip-stream": "^0.3.1",
     "electron": "^16.0.4"
   }
 }

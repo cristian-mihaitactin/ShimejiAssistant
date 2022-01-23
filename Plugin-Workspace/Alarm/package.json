@@ -1,0 +1,15 @@
+{
+  "name": "alarm",
+  "version": "1.0.0",
+  "description": "Set alarms using your Assistant",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rxjs": "^7.4.0",
+    "rxjs-compat": "^6.6.7"
+  }
+}

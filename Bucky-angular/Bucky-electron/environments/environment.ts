@@ -10,7 +10,8 @@ export const environment = {
   default_user: {
     username: "anonymous",
     email : "",
-    buckyProfile: "8919e40e-d588-42f2-a0a8-4afb9ad1589b"
+    buckyProfile: "8919e40e-d588-42f2-a0a8-4afb9ad1589b",
+    pluginsInstalled: "[]"
   }
 };
 

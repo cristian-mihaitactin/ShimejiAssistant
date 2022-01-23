@@ -9,8 +9,14 @@ import { UserStore } from './helpers/user-store';
 import createWindow from "./helpers/window";
 import { UserService } from "./user/user.service";
 import { BarnBuckyService } from "./barn-service/barn-bucky-service";
+import { Subject } from "rxjs";
+import { PluginService } from "./plugin-service/plugin.service";
 
 //import { environment } from "environments/environment";
+
+if (!environment.production){
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+}
 
 const userStore = new UserStore({
   configName: environment.config,
@@ -24,6 +30,9 @@ const userService = new UserService(userStore);
 const buckyProfileService = new BuckyProfileService(
   userStore,  barnService
 );
+
+const pluginService = new PluginService(userStore);
+
 
 //////////////////////////////////////
 
@@ -101,9 +110,7 @@ const initIpc = () => {
   });
 }
 
-if (!environment.production){
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-}
+
 
 app.on("ready", () => {
   initIpc();
@@ -263,38 +270,32 @@ app.on("ready", () => {
     authService.logout();
     mainWindow.webContents.send("logged-in", false);
   });
-  //////////////////testing the auth///////////
-  /*
-authService.register(
-  {
-    userName : "myNewUser",
-    password : "123!@#qweQWE",
-    confirmPassword: "123!@#qweQWE"
-  }
-).subscribe(() => {
-    console.log('Successfully registered');
-},
-error => console.log( error ));
-*/
-/*
-var x = authService.login({
-  username : "myNewUser",
-    password : "123!@#qweQWE"
-}).subscribe(val => {
-  console.log('in login');
-  console.log(val)
-})
-*/
 
-//console.log('login:' + x);
-//////
+//////////////////
 
-/*
-  if (env.name === "development") {
-    mainWindow.openDevTools();
-    //buckyWindow.openDevTools();
+pluginService.registeredPlugins.subscribe({
+  next: (value) => {
+    console.log(value);
+  },
+  error: (err) => {
+    console.error(err);
   }
-  */
+});
+var x = './Plugin/main.js';
+import(x).then((a) => {
+  // `a` is imported and can be used here
+  var subject = new Subject<{notificationMessage: string;
+    actionType: number}>();
+  a.Plugin(subject, "18", "41");
+  subject.subscribe({
+    next: (val) => {
+      console.log(val);
+    },
+    error: (val) => {
+      console.log(val);
+    }
+  })
+});
 });
 
 // Quit when all windows are closed.
