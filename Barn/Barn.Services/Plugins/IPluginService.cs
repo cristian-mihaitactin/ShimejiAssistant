@@ -11,6 +11,7 @@ namespace Barn.Services.Plugins
     {
         IList<Plugin> GetPlugins();
         Plugin GetPlugin(Guid id);
+        Task<PluginPackageDTO> GetPluginPackageAsync(Guid id);
         void UpdatePlugin(Plugin plugin);
         void DeletePlugin(Guid id);
     }

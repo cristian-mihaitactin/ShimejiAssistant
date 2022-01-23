@@ -1,4 +1,5 @@
-﻿using Barn.Entities.Plugins;
+﻿using Barn.AzIntegration.Plugin;
+using Barn.Entities.Plugins;
 using Barn.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,16 +14,32 @@ namespace Barn.Services.Plugins
         private IGenericRepo<Guid, Plugin> _pluginRepo;
         private IGenericRepo<Guid, PluginNotification> _pluginNotificationRepo;
 
+        private PluginClient _pluginClient;
+
+
         public PluginService(IGenericRepo<Guid, Plugin> pluginRepo,
             IGenericRepo<Guid, PluginNotification> pluginNotificationRepo)
         {
             _pluginRepo = pluginRepo;
             _pluginNotificationRepo = pluginNotificationRepo;
+
+            _pluginClient = new PluginClient("UseDevelopmentStorage=true");
         }
 
         public Plugin GetPlugin(Guid id)
         {
             return _pluginRepo.GetById(id);
+        }
+        public async Task<PluginPackageDTO> GetPluginPackageAsync(Guid id)
+        {
+            var plugin = _pluginRepo.GetById(id);
+            var pluginBytes = await _pluginClient.GetPluginPackageBlob(plugin);
+
+            return new PluginPackageDTO
+            {
+                FileName = plugin.Name + ".zip",
+                ZipBytes = pluginBytes.ZipBytes
+            };
         }
 
         public IList<Plugin> GetPlugins()
@@ -39,5 +56,6 @@ namespace Barn.Services.Plugins
         {
             throw new NotImplementedException();
         }
+
     }
 }
