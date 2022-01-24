@@ -17,7 +17,9 @@ export class BarnBuckyService {
         params.append('id', id);
         */
 
-        var response = this.callBarn(`${this.profileUrl}/${id}`, "GET" as Method , null);
+        console.log('getBuckyProfile(id)')
+        console.log(id)
+        var response = this.callBarn(`${this.profileUrl}/${id}`, "GET" as Method);
 
         return response.pipe(
             map(res => res.data as BuckyProfileModel)
@@ -25,7 +27,7 @@ export class BarnBuckyService {
     }
 
     getAllBuckyProfiles(): Observable<BuckyProfileModel[]> {
-        var response = this.callBarn(`${this.profileUrl}`, "GET" as Method , null);
+        var response = this.callBarn(`${this.profileUrl}`, "GET" as Method);
 
         return response.pipe(
             map(res=> 
@@ -33,13 +35,12 @@ export class BarnBuckyService {
         )
       }
 
-    private callBarn(endpoint: string, method: Method, params: URLSearchParams) : Observable<AxiosResponse> {
+    private callBarn(endpoint: string, method: Method) : Observable<AxiosResponse> {
         const options = {
             baseURL: `${environment.baseApiUrl}`,
             url: endpoint,
-            method: method, //"POST" as Method,
+            method: method //"POST" as Method,
             // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            params: params,
         }
         
         // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(

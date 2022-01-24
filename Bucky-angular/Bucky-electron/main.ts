@@ -59,7 +59,8 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    mainBuckyProfile
+    //mainBuckyProfile
+    buckyProfileService.getUserBuckyProfile()
       .subscribe({
         next: (value) => {
           event.reply("selected-bucky-profile", value);
@@ -85,31 +86,35 @@ const initIpc = () => {
 
   ipcMain.on("get-bucky-profile-by-id", (event,arg) => {
     console.log('get-bucky-profile-by-id: ' + arg);
-    buckyProfileService.getBuckyProfileById(arg)
-      .subscribe({
-        next: (value) => {
-          event.reply("bucky-profile-by-id", value);
-        },
-        error: (error) => {
-          console.error(error);
-        }
-      })
+    if(arg !== undefined && arg !== null) {
+      buckyProfileService.getBuckyProfileById(arg)
+        .subscribe({
+          next: (value) => {
+            event.reply("bucky-profile-by-id", value);
+          },
+          error: (error) => {
+            console.error(error);
+          }
+        })
+
+    }
   });
 
   ipcMain.on("get-bucky-assitant-profile-by-id", (event,arg) => {
     console.log('get-bucky-assitant-profile-by-id', arg);
-    buckyProfileService.getBuckyProfileById(arg)
-      .subscribe({
-        next: (value) => {
-          event.reply("bucky-assistant-profile-by-id", value);
-        },
-        error: (error) => {
-          console.error(error);
-        }
-      })
+    if(arg !== undefined && arg !== null) {
+      buckyProfileService.getBuckyProfileById(arg)
+        .subscribe({
+          next: (value) => {
+            event.reply("bucky-assistant-profile-by-id", value);
+          },
+          error: (error) => {
+            console.error(error);
+          }
+        })
+    }
   });
 
-  
   ipcMain.on("get-all-plugins", (event,arg) => {
     pluginService.getAllPlugins()
       .subscribe({
@@ -150,8 +155,6 @@ const initIpc = () => {
     pluginService.installPluginById(arg);
   });
 }
-
-
 
 app.on("ready", () => {
   initIpc();

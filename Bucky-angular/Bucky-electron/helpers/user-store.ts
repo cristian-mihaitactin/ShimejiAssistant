@@ -46,7 +46,11 @@ export class UserStore {
   }
 
   resetToDefault() {
-    this.data = parseDataFile(this.path, this.defaults);
+    console.log('before this.data');
+    console.log(this.data);
+    this.data = parseDataFile(this.path, this.defaults, true);
+    console.log('after this.data');
+    console.log(this.data);
   }
 
   getAuthTokens(): AuthTokenModel {
@@ -71,10 +75,11 @@ export class UserStore {
   }
 }
 
-function parseDataFile(filePath, defaults) {
+function parseDataFile(filePath, defaults, force = false) {
   // We'll try/catch it in case the file doesn't exist yet, which will be the case on the first application run.
   // `fs.readFileSync` will return a JSON string which we then parse into a Javascript object
-    if (fs.existsSync(filePath)) { 
+
+    if (fs.existsSync(filePath) && !force) { 
       try {
         return JSON.parse(fs.readFileSync(filePath).toString());
       } catch(error) {
