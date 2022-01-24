@@ -133,6 +133,18 @@ const initIpc = () => {
         }
       })
   });
+  
+  ipcMain.on("get-plugin-sample", (event,arg) => {
+    pluginService.getPluginDetails(arg)
+      .subscribe({
+        next: (value) => {
+          event.reply("plugin-sample-response", value);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      })
+  });
 }
 
 

@@ -33,9 +33,23 @@ export class PluginDetailsComponent implements OnInit {
       });// end
     }
   ngOnInit(): void {
+    console.log('this.pluginId')
+      console.log(this.pluginId)
     if (this.pluginId !== undefined && this.pluginId !== null && this.pluginId !== ''){
-
+      electron.ipcRenderer.send('get-plugin-details', this.pluginId);
     }
   }
 
+  ngOnChanges() {
+    /**********THIS FUNCTION WILL TRIGGER WHEN PARENT COMPONENT UPDATES 'someInput'**************/
+    //Write your code here
+    if (this.pluginId !== undefined && this.pluginId !== null && (this.pluginId + '').split(' ').join('') !== ''){
+      electron.ipcRenderer.send('get-plugin-details', this.pluginId);
+      this.cdr.detectChanges();
+    }
+  }   
+
+  installPlugin(event: Event) {
+    
+  }
 }

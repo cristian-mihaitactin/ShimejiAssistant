@@ -21,7 +21,7 @@ export class PluginSampleComponent implements OnInit {
 
   constructor(private _sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef) {
-      electron.ipcRenderer.on('plugin-details-response', (_event: any, arg: PluginDetailsModel) => {
+      electron.ipcRenderer.on('plugin-sample-response', (_event: any, arg: PluginDetailsModel) => {
         this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
         + arg.pluginImageBlob.pngBytes);
         this.pluginName = arg.name;
@@ -33,8 +33,9 @@ export class PluginSampleComponent implements OnInit {
 
   ngOnInit() {
     //plugin-details-response
-    if (this.pluginId !== undefined && this.pluginId !== null)
-    electron.ipcRenderer.send('get-plugin-details', this.pluginId);
+    
+    if (this.pluginId !== undefined && this.pluginId !== null && this.pluginId !== '')
+      electron.ipcRenderer.send('get-plugin-sample', this.pluginId);
 
   }
 
