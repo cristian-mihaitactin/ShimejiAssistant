@@ -64,7 +64,6 @@ export class PluginService {
     }
 
     clean() {
-        console.log('in clean')
         const fsExtra = require('fs-extra')
 
         fsExtra.emptyDirSync(this.pluginDirectory);
