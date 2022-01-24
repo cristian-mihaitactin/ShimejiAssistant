@@ -2,6 +2,8 @@ import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angula
 import { BehaviorSubject } from 'rxjs';
 import { BuckyProfileModel } from  '../../models/bucky-profile-model';
 import { BuckyProfileService } from '../../services/bucky-profile-service';
+import * as $ from 'jquery';
+
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -49,6 +51,23 @@ export class OverviewComponent implements OnInit {
     })
   }
 
+  newAreaSelected(event: string){
+    switch(event) {
+      case "assistant-profile": {
+        $("#overview-section-group .overview-section-group-item").hide();
+        $("#assistant-section").show();
+        break;
+      }
+      case "manage-plugins": {
+        $("#overview-section-group .overview-section-group-item").hide();
+        $("#plugin-section").show();
+        break;
+      }
+      default: {
+
+      }
+    }
+  }
   changeAssistantProfile(event:MouseEvent, buckyProfileId:string){
     event.stopPropagation();
 

@@ -1,18 +1,28 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Output, EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { tap } from 'rxjs';
 import { LoginFormComponent } from '../login-form/login-form.component'
 import { RegisterFormComponent } from '../register-form/register-form.component';
 import * as $ from 'jquery';
+import { createImportSpecifier } from 'typescript';
+import { data } from 'jquery';
 
 const electron = (<any>window).require('electron');
+
 
 @Component({
   selector: 'app-sideview',
   templateUrl: './sideview.component.html',
   styleUrls: ['./sideview.component.css']
 })
+
+
 export class SideviewComponent implements OnInit {
+
+  @Output() 
+  selectedAreaEvent = new EventEmitter<string>();
+
   modalLoginRef!:NgbModalRef;
   modalRegisterRef!:NgbModalRef;
 
@@ -44,9 +54,14 @@ export class SideviewComponent implements OnInit {
 
   itemClicked(event: Event) {
     event.preventDefault();
-      $(".list-group .list-group-item").removeClass("active");
-      (event.target as Element).classList.add("active");
+    
+    $(".list-group .list-group-item").removeClass("active");
+    (event.target as Element).classList.add("active");
 
+    var dataToggled = (event.target as Element).attributes.getNamedItem('data-toggle');
+    if (dataToggled !== undefined && dataToggled !== null) {
+      this.selectedAreaEvent.emit(dataToggled.value);
+    }
   }
 
   openLoginModal() {
