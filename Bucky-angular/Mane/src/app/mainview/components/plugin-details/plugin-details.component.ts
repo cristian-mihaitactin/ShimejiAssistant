@@ -50,6 +50,6 @@ export class PluginDetailsComponent implements OnInit {
   }   
 
   installPlugin(event: Event) {
-    
+    electron.ipcRenderer.send("install-plugin-request", this.pluginId);
   }
 }

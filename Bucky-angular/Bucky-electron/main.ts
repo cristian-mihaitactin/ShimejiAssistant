@@ -145,6 +145,10 @@ const initIpc = () => {
         }
       })
   });
+
+  ipcMain.on("install-plugin-request", (event, arg) => {
+    pluginService.installPluginById(arg);
+  });
 }
 
 
@@ -319,6 +323,7 @@ pluginService.registeredPlugins.subscribe({
     console.error(err);
   }
 });
+/*
 var x = './Plugin/main.js';
 import(x).then((a) => {
   // `a` is imported and can be used here
@@ -334,6 +339,7 @@ import(x).then((a) => {
     }
   })
 });
+*/
 });
 
 // Quit when all windows are closed.

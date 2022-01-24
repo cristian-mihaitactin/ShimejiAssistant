@@ -29,6 +29,15 @@ export class PluginService {
         const userDataPath = app.getPath('userData');
         this.registeredPlugins = new BehaviorSubject<PluginModel[]>([]);
 
+        this.registeredPlugins.subscribe({
+            //store all registered plugins in userstore
+            next: (value) => {
+                userStore.set('pluginsInstalled', value);
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
         this.pluginDirectory = path.join(userDataPath,pluginRelativePath);
 
         const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
@@ -57,7 +66,7 @@ export class PluginService {
     }
 
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
-        return this.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method, null)
+        return this.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method, null)
             .pipe(
                 map(res => res.data as PluginDetailsModel)
             );
@@ -68,6 +77,22 @@ export class PluginService {
 
         fsExtra.emptyDirSync(this.pluginDirectory);
     }
+
+    installPluginById(id:string) {
+        return this.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method, null)
+            .pipe(
+                map(res => res.data as PluginModel)
+            )
+            .subscribe({
+                next: (value) => {
+                    this.installPlugin(value);
+                },
+                error: (err) => {
+                    console.error(err);
+                }
+            });
+    }
+
     private installPlugin(plugin:PluginModel) {
         // Check if plugin already installed
         var pluginPackageDirPath = path.join(this.pluginDirectory, plugin.name);

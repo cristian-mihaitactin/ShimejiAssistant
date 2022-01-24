@@ -32,6 +32,20 @@ namespace Barn.API.Controllers
         }
 
 
+
+        [SwaggerResponse((int)HttpStatusCode.Accepted, "", typeof(PluginModel))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Please review your request and try again")]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Please login and try again")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Plugin not found. Please check the request")]
+        [HttpGet("{id}")]
+        public IActionResult GetPlugin(Guid id)
+        {
+            var plugin = _pluginService.GetPlugin(id);
+            var pluginModel = _mapper.Map<PluginModel>(plugin);
+
+            return Ok(pluginModel);
+        }
+
         [SwaggerResponse((int)HttpStatusCode.Accepted, "", typeof(PluginPackageDTO))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Please review your request and try again")]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Please login and try again")]
@@ -48,8 +62,8 @@ namespace Barn.API.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Please review your request and try again")]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Please login and try again")]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Plugin not found. Please check the request")]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetPlugin(Guid id)
+        [HttpGet("{id}/Details")]
+        public async Task<IActionResult> GetPluginDetails(Guid id)
         {
             var plugin = await _pluginService.GetPluginWithImagesAsync(id);
 
