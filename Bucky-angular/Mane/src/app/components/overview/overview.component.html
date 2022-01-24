@@ -1,22 +1,38 @@
 <div class="container-fluid">
   <div class="row flex-nowrap">
-    <app-sideview
+    <app-sideview (selectedAreaEvent) = 'this.newAreaSelected($event)'
     class="left-side order-1 p-3 col-4"
     ></app-sideview>
-    <div class="order-2 col-8">
-      <app-assistant-profile
-      [buckyProfileId]=mainBuckyProfileId
-      class="order-2 p-3 col-8"
-      ></app-assistant-profile>
-      <div class="d-flex flex-wrap">
-        <div class="app-bucky-profile-sample-wrapper" *ngFor="let buckyProfileSample of buckyProfileIds | keyvalue">
-          <app-bucky-profile-sample (click)=changeAssistantProfile($event,buckyProfileSample.key)
-          [buckyProfileId]=buckyProfileSample.key
-          class="app-bucky-profile-sample-instance" [ngClass] = "{ 'selected-bucky-profile': buckyProfileSample.value }"
-          ></app-bucky-profile-sample>
-          <button class="choose-btn" (click)=setAssistantProfile($event,buckyProfileSample.key)>Choose me</button>
+    <div class="order-2 col-8" id="overview-section-group">
+      <div id="assistant-section" class="overview-section-group-item">
+        <app-assistant-profile
+        [buckyProfileId]=mainBuckyProfileId
+        class="order-2 p-3 col-8"
+        ></app-assistant-profile>
+        <div class="d-flex flex-wrap">
+          <div class="app-bucky-profile-sample-wrapper" *ngFor="let buckyProfileSample of buckyProfileIds | keyvalue">
+            <app-bucky-profile-sample (click)=changeAssistantProfile($event,buckyProfileSample.key)
+            [buckyProfileId]=buckyProfileSample.key
+            class="app-bucky-profile-sample-instance" [ngClass] = "{ 'selected-bucky-profile': buckyProfileSample.value }"
+            ></app-bucky-profile-sample>
+            <button class="choose-btn" (click)=setAssistantProfile($event,buckyProfileSample.key)>Choose me</button>
+          </div>
         </div>
       </div>
+      
+      <div id="plugin-section" class="overview-section-group-item" style="display: none;">
+        <app-plugin-details
+        [pluginId]=focusedPlugin
+        class="order-2 p-3 col-8"
+        ></app-plugin-details>
+        <div class="d-flex flex-wrap">
+          <div class="app-plugins-wrapper" *ngFor="let pluginSample of pluginIds | keyvalue">
+              <app-plugin-sample (click)=focusOnPlugin($event,pluginSample.key)
+              [pluginId]=pluginSample.key></app-plugin-sample>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

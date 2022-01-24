@@ -108,6 +108,31 @@ const initIpc = () => {
         }
       })
   });
+
+  
+  ipcMain.on("get-all-plugins", (event,arg) => {
+    pluginService.getAllPlugins()
+      .subscribe({
+        next: (value) => {
+          event.reply("all-plugins-response", value);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      })
+  });
+
+  ipcMain.on("get-plugin-details", (event,arg) => {
+    pluginService.getPluginDetails(arg)
+      .subscribe({
+        next: (value) => {
+          event.reply("plugin-details-response", value);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      })
+  });
 }
 
 

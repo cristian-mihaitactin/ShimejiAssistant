@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IntegratedServicesComponent } from './integrated-services.component';
+import { PluginSampleComponent } from './plugin-sample.component';
 
 describe('IntegratedServicesComponent', () => {
-  let component: IntegratedServicesComponent;
-  let fixture: ComponentFixture<IntegratedServicesComponent>;
+  let component: PluginSampleComponent;
+  let fixture: ComponentFixture<PluginSampleComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ IntegratedServicesComponent ]
+      declarations: [ PluginSampleComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(IntegratedServicesComponent);
+    fixture = TestBed.createComponent(PluginSampleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

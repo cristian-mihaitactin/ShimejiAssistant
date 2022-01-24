@@ -11,6 +11,7 @@ import { Extract } from 'unzip-stream'
 import { UserStore } from "../helpers/user-store";
 import { PluginModel } from "../models/plugin.model";
 import { PluginPackageModel } from "../models/plugin.package.model";
+import { PluginDetailsModel } from "../models/plugin.details.model";
 import { read } from "fs-jetpack";
 
 const pluginRelativePath = "Plugins";
@@ -48,6 +49,20 @@ export class PluginService {
         
     }
 
+    getAllPlugins() : Observable<PluginModel[]> {
+        return this.callBarn(`${pluginPackageEndpoint}/`, "GET" as Method, null)
+            .pipe(
+                map(res => res.data as PluginModel[])
+            );
+    }
+
+    getPluginDetails (id:string) : Observable<PluginDetailsModel> {
+        return this.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method, null)
+            .pipe(
+                map(res => res.data as PluginDetailsModel)
+            );
+    }
+
     private installPlugin(plugin:PluginModel) {
         // Check if plugin already installed
         var pluginPackageDirPath = path.join(this.pluginDirectory, plugin.name);
@@ -66,7 +81,7 @@ export class PluginService {
     private installPluginPackageBinaries(plugin: PluginModel) {
         console.log('installing package')
 
-        this.callBarn(`${pluginPackageEndpoint}/${plugin.id}`, "GET" as Method, null)
+        this.callBarn(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method, null)
             .pipe(
                 map(res => res.data as PluginPackageModel)
             ).subscribe({
