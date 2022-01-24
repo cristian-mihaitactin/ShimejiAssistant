@@ -22,12 +22,14 @@
       
       <div id="plugin-section" class="overview-section-group-item" style="display: none;">
         <app-plugin-details
+        id="plugin-details"
+        style="display: none;"
         [pluginId]=focusedPlugin
         class="order-2 p-3 col-8"
         ></app-plugin-details>
         <div class="d-flex flex-wrap">
           <div class="app-plugins-wrapper" *ngFor="let pluginSample of pluginIds | keyvalue">
-              <app-plugin-sample (click)=focusOnPlugin($event,pluginSample.key)
+              <app-plugin-sample (click)=this.focusOnPlugin($event,pluginSample.key)
               [pluginId]=pluginSample.key></app-plugin-sample>
           </div>
         </div>

@@ -133,6 +133,22 @@ const initIpc = () => {
         }
       })
   });
+  
+  ipcMain.on("get-plugin-sample", (event,arg) => {
+    pluginService.getPluginDetails(arg)
+      .subscribe({
+        next: (value) => {
+          event.reply("plugin-sample-response", value);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      })
+  });
+
+  ipcMain.on("install-plugin-request", (event, arg) => {
+    pluginService.installPluginById(arg);
+  });
 }
 
 
@@ -293,6 +309,7 @@ app.on("ready", () => {
 
   ipcMain.on('logout-request', (event, arg) => {
     authService.logout();
+    pluginService.clean();
     mainWindow.webContents.send("logged-in", false);
   });
 
@@ -306,6 +323,7 @@ pluginService.registeredPlugins.subscribe({
     console.error(err);
   }
 });
+/*
 var x = './Plugin/main.js';
 import(x).then((a) => {
   // `a` is imported and can be used here
@@ -321,6 +339,7 @@ import(x).then((a) => {
     }
   })
 });
+*/
 });
 
 // Quit when all windows are closed.

@@ -102,8 +102,9 @@ export class OverviewComponent implements OnInit {
   
   focusOnPlugin(event:MouseEvent, pluginId:string){
     event.stopPropagation();
-
     this.focusedPlugin = pluginId;
+
+    $("#plugin-details").show();
 
     this.cdr.detectChanges();
   }
