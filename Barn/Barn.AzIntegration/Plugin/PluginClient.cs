@@ -17,7 +17,8 @@ namespace Barn.AzIntegration.Plugin
 
         public async Task<PluginBlob> GetPluginPackageBlob(Barn.Entities.Plugins.Plugin plugin)
         {
-            var blobZipbytes = await _blobService.GetBlobAsync(CONTAINER_NAME, plugin.Name.ToLowerInvariant() + ".zip");
+            var blobZipbytes = await _blobService.GetBlobAsync(CONTAINER_NAME, 
+                plugin.Name.ToLowerInvariant() + "/" + plugin.Version + ".zip");
 
             return new PluginBlob()
             {

@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IntegratedServicesComponent } from './integrated-services.component';
+import { IntegratedServicesComponent } from './plugins.component';
 
 describe('IntegratedServicesComponent', () => {
   let component: IntegratedServicesComponent;
