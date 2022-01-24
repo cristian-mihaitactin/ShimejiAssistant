@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { BuckyProfileModel } from  '../../models/bucky-profile-model';
+import { PluginModel } from  '../../models/plugin.model';
 import { BuckyProfileService } from '../../services/bucky-profile-service';
 import * as $ from 'jquery';
 
@@ -16,8 +17,11 @@ const electron = (<any>window).require('electron');
 export class OverviewComponent implements OnInit {
 
   buckyProfileIds = new Map<string, boolean>();
-  buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
+  pluginIds = new Map<string, boolean>();
+  buckyProfiles = new Subject<BuckyProfileModel[]>();
+  plugins = new Subject<PluginModel[]>();
   mainBuckyProfileId = '';
+  focusedPlugin:string = '';
 
   constructor(
     private cdr: ChangeDetectorRef
@@ -27,28 +31,39 @@ export class OverviewComponent implements OnInit {
       // buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
       //buckyProfiles.complete();
     });
+
+    
+    electron.ipcRenderer.on("all-plugins-response", (_event: any, arg: PluginModel[]) => {
+      this.plugins.next(arg);
+      // buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
+      //buckyProfiles.complete();
+    });
   }
 
   ngOnInit(): void {
     electron.ipcRenderer.send('get-all-bucky-profiles', '');
+    electron.ipcRenderer.send("get-all-plugins", '');
 
     this.buckyProfiles
-    .subscribe(profiles => {
-      if(profiles !== undefined && Array.isArray(profiles) && profiles.length > 0) {
-        profiles.forEach((profile,index) => {
-          // if (profile.isMainProfile !== undefined && profile.isMainProfile === true){
-          //   console.log('profile.isMainProfile !== undefined && profile.isMainProfile === true');
-          //   console.log(profile.isMainProfile !== undefined && profile.isMainProfile === true);
-          //   console.log('profile.id, profile.isMainProfile')
-          //   console.log(profile.id, profile.isMainProfile)
-          //   this.mainBuckyProfileId = profile.id;
-          // }
-          
-          this.buckyProfileIds.set(profile.id, profile.isMainProfile);
-        })
-        this.cdr.detectChanges();
-      }
-    })
+      .subscribe(profiles => {
+        if(profiles !== undefined && Array.isArray(profiles) && profiles.length > 0) {
+          profiles.forEach((profile,index) => {
+            this.buckyProfileIds.set(profile.id, profile.isMainProfile);
+          })
+          this.cdr.detectChanges();
+        }
+      })
+    this.plugins
+      .subscribe(plugins => {
+        if(plugins !== undefined && Array.isArray(plugins) && plugins.length > 0) {
+          plugins.forEach((plugin,index) => {
+            
+            this.pluginIds.set(plugin.id, true);
+          })
+          this.cdr.detectChanges();
+        }
+      })
+
   }
 
   newAreaSelected(event: string){
@@ -81,6 +96,15 @@ export class OverviewComponent implements OnInit {
     this.mainBuckyProfileId = buckyProfileId;
 
     electron.ipcRenderer.send('set-bucky-profile', buckyProfileId);
+    this.cdr.detectChanges();
+  }
+
+  
+  focusOnPlugin(event:MouseEvent, pluginId:string){
+    event.stopPropagation();
+
+    this.focusedPlugin = pluginId;
+
     this.cdr.detectChanges();
   }
 }

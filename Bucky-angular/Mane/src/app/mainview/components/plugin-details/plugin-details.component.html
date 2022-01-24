@@ -1,8 +1,11 @@
 <div class="d-flex flex-row">
-  <div class="p-2">Image</div>
+  <div class="p-2">
+  <img [src]="imagePath" width="100" height="100"/>
+  </div>
   <div class="p-6">
-      <h2>Plugin Name</h2>
-      <<p>Plugin Description</p>
+      <h2>{{ pluginName }}</h2>
+      <h4>({{ pluginVersion }})</h4>
+      <p>{{ pluginDescription }}</p>
   </div>
 </div>
 <div class="d-flex flex-row-reverse">

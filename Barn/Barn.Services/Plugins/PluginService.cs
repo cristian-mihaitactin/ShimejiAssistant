@@ -42,6 +42,22 @@ namespace Barn.Services.Plugins
             };
         }
 
+        public async Task<PluginDTO> GetPluginWithImagesAsync(Guid id)
+        {
+            var plugin = _pluginRepo.GetById(id);
+            var pluginImageBlob = await _pluginClient.GetPluginImagesBlob(plugin);
+
+            return new PluginDTO
+            {
+                Id = plugin.Id,
+                Description = plugin.Description,
+                Name = plugin.Name,
+                Version = plugin.Version,
+                PluginImageBlob = pluginImageBlob
+            };
+        }
+
+
         public IList<Plugin> GetPlugins()
         {
             return _pluginRepo.GetAll().ToList();

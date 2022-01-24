@@ -36,12 +36,24 @@ namespace Barn.API.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Please review your request and try again")]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Please login and try again")]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Plugin not found. Please check the request")]
-        [HttpGet("{id}")]
+        [HttpGet("{id}/PluginPackage")]
         public async Task<IActionResult> GetPluginPackage(Guid id)
         {
             var package = await _pluginService.GetPluginPackageAsync(id);
 
             return Ok(package);
+        }
+
+        [SwaggerResponse((int)HttpStatusCode.Accepted, "", typeof(PluginDTO))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Please review your request and try again")]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Please login and try again")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Plugin not found. Please check the request")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPlugin(Guid id)
+        {
+            var plugin = await _pluginService.GetPluginWithImagesAsync(id);
+
+            return Ok(plugin);
         }
     }
 }
