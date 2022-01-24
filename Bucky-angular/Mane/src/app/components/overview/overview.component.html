@@ -20,8 +20,15 @@
         </div>
       </div>
       
-      <div id="plugin-section" class="overview-section-group-item" [hidden]>
-        Hello
+      <div id="plugin-section" class="overview-section-group-item" style="display: none;">
+        <app-plugin-details
+        class="order-2 p-3 col-8"
+        ></app-plugin-details>
+        <div class="d-flex flex-wrap">
+          <div class="app-plugins-wrapper" *ngFor="let buckyProfileSample of buckyProfileIds | keyvalue">
+              <app-plugin-sample></app-plugin-sample>
+          </div>
+        </div>
       </div>
 
     </div>
