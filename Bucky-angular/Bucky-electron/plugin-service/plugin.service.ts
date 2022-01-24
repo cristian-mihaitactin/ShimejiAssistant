@@ -1,7 +1,7 @@
 import { app } from "electron";
 import { environment } from "../environments/environment";
 
-import { BehaviorSubject, from, map, Observable, of } from "rxjs";
+import { BehaviorSubject, from, fromEventPattern, map, Observable, of } from "rxjs";
 import { AxiosResponse, Method } from "axios";
 import Axios from "axios-observable";
 import * as path from "path";
@@ -63,6 +63,12 @@ export class PluginService {
             );
     }
 
+    clean() {
+        console.log('in clean')
+        const fsExtra = require('fs-extra')
+
+        fsExtra.emptyDirSync(this.pluginDirectory);
+    }
     private installPlugin(plugin:PluginModel) {
         // Check if plugin already installed
         var pluginPackageDirPath = path.join(this.pluginDirectory, plugin.name);

@@ -293,6 +293,7 @@ app.on("ready", () => {
 
   ipcMain.on('logout-request', (event, arg) => {
     authService.logout();
+    pluginService.clean();
     mainWindow.webContents.send("logged-in", false);
   });
 
