@@ -2,7 +2,7 @@
   <!-- Sidebar-->
   <div class="border-end bg-white" id="sidebar-wrapper">
       <div id="userLabel" class="sidebar-heading border-bottom bg-light">Welcome {{ this.userName }}</div>
-      <div class="list-group list-group-flush">
+      <div class="list-group list-group-flush" (click) = this.itemClicked($event)>
         <a class="list-group-item list-group-item-action list-group-item-light active p-3" href="#!">Assistant Profile</a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Integrated Services</a>
         <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#!">Account Profile</a>
@@ -12,3 +12,4 @@
       </div>
   </div>
 </div>
+

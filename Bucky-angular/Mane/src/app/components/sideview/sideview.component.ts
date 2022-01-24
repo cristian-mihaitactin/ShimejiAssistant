@@ -3,6 +3,8 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { tap } from 'rxjs';
 import { LoginFormComponent } from '../login-form/login-form.component'
 import { RegisterFormComponent } from '../register-form/register-form.component';
+import * as $ from 'jquery';
+
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -38,6 +40,13 @@ export class SideviewComponent implements OnInit {
 
     electron.ipcRenderer.send('is-logged-in', ''); 
     electron.ipcRenderer.send('user-info-request', '');
+  }
+
+  itemClicked(event: Event) {
+    event.preventDefault();
+      $(".list-group .list-group-item").removeClass("active");
+      (event.target as Element).classList.add("active");
+
   }
 
   openLoginModal() {
