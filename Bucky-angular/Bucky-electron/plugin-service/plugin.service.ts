@@ -64,7 +64,6 @@ export class PluginService {
                     }
                 })
                 userStore.set('pluginsInstalled', existingPlugins);
-
             },
             error: (err) => {
                 console.error(err);

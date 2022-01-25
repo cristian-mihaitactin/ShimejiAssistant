@@ -5,6 +5,8 @@ import { BuckyBehaviourModel } from './models/bucky-behaviour-model';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyProfileModel } from './models/bucky-profile-model';
 import { delay } from 'rxjs-compat/operator/delay';
+import { PluginModel } from './models/plugin.model';
+import { PluginDetailsModel } from './models/plugin.details.model';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -21,43 +23,47 @@ export class AppComponent implements OnInit {
   buckyProfile = new BehaviorSubject<BuckyProfileModel>(
     {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
   );
+  displayedPlugins:PluginDetailsModel[] = [];
+  plugins:BehaviorSubject<PluginModel[]> = new BehaviorSubject<PluginModel[]>([]);
 
   constructor(private _sanitizer: DomSanitizer,
     // private buckyProfileService: BuckyProfileService,
     private cdr: ChangeDetectorRef) { 
+      this.initElectronIpc();
+
+     }
+
+     private initElectronIpc(){
       electron.ipcRenderer.on('selected-bucky-profile', (event, arg) => {
         console.log('arg: ', arg);
         if (arg === undefined || arg === null) {
           console.log('arg is not ok. Try again')
           //electron.ipcRenderer.send('get-initial-bucky-profile', '');
-      }else {
-        console.log(arg) // prints "pong"
-        this.buckyProfile.next(arg);
-      }
-      this.cdr.detectChanges();
-  
+        }else {
+          console.log(arg) // prints "pong"
+          this.buckyProfile.next(arg);
+        }
+        this.cdr.detectChanges();
       });
 
-      electron.ipcRenderer.on('user-plugins-response', (event, arg) => {
-        console.log('arg');
+      electron.ipcRenderer.on('user-plugins-response', (event, arg: PluginModel[]) => {
+        console.log('user-plugins-response arg:');
         console.log(arg);
+        this.plugins.next(arg);        
+      });
+
+      electron.ipcRenderer.on('plugin-sample-response', (event, arg: PluginDetailsModel) => {
+        if (!this.displayedPlugins.includes(arg)){
+          arg.imgBytes = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+          + arg.pluginImageBlob.pngBytes);
+          this.displayedPlugins.push(arg);
+        }
+
+        this.cdr.detectChanges();
       });
      }
 
   ngOnInit() {
-    // Make the DIV element draggable:
-    //this.dragElement(document.getElementById("mydiv"));
-
-    console.log('AppComponent-ngOnInit');
-    /*
-    console.log(this.buckyProfileService.buckyProfile);
-    this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
-                 + this.buckyProfileService.buckyProfile.behaviours[0].imageBytes);
-    */
-
-    electron.ipcRenderer.send('get-initial-bucky-profile', '');
-    electron.ipcRenderer.send("get-user-plugins", '');
-
     this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;
 
@@ -69,6 +75,24 @@ export class AppComponent implements OnInit {
       }
 
     });
+    
+    this.plugins.subscribe({
+      next: (value) => {
+        console.log('plugins.subscribe(value):');
+        console.log(value);
+        if(value !== undefined && value !== null){
+          value.forEach((pluginModel,index) => {
+            electron.ipcRenderer.send('get-plugin-sample', pluginModel.id);
+          });
+        }
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+
+    electron.ipcRenderer.send('get-initial-bucky-profile', '');
+    electron.ipcRenderer.send("get-user-plugins", '');
 //////////////////////////////////////////////////////////
     
 
@@ -118,13 +142,6 @@ export class AppComponent implements OnInit {
     window.addEventListener('mousemove',(windowMouseUpCallback));
 
     document.getElementById('systembar').addEventListener('mouseup',mouseUpCallback);
-
-
-
-
-
-
-
   }
   
   private setBuckyBehaviour(bahaviourString: string) {

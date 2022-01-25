@@ -1,7 +1,9 @@
 <div id='systembar'>
   <img
   [src]="imagePath" width="250" height="200"/>
-  <div>
-    <button>Press</button>
+  <div style="  display:flex;">
+    <div *ngFor="let pluginModel of displayedPlugins">
+      <img [src]="pluginModel.imgBytes" width="30" height="30"/>
+    </div>
   </div>
 </div>
