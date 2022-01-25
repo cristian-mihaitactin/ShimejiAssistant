@@ -22,8 +22,9 @@ const userStore = new UserStore({
   configName: environment.config,
   defaults: environment.default_user
 });
+const pluginService = new PluginService(userStore);
 
-const authService = new AuthService(userStore);
+const authService = new AuthService(userStore, pluginService);
 
 const barnService = new BarnBuckyService();
 const userService = new UserService(userStore);
@@ -31,7 +32,6 @@ const buckyProfileService = new BuckyProfileService(
   userStore,  barnService
 );
 
-const pluginService = new PluginService(userStore);
 
 
 //////////////////////////////////////

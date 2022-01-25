@@ -42,23 +42,7 @@ export class PluginService {
                 console.log(userPlugins.length);
                 this.registeredPlugins.next(userPlugins);
             } else {
-                const authtokens = userStore.getAuthTokens();
-                if(authtokens !== undefined && authtokens !== null){
-                    this.callBarnWithAuth(userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
-                        .pipe(
-                            map(res => res.data),
-                            map(userpref => userpref.plugins as Array<PluginModel>)
-                        ).subscribe({
-                            next: (val) => {
-                                console.log('val for subscribe');
-                                console.log(val);
-                                this.registeredPlugins.next(val);
-                            },
-                            error: (err) => {
-                                console.error(err);
-                            }
-                        });
-                }
+                this.getUserPlugins();
             }
         }
 
@@ -69,7 +53,7 @@ export class PluginService {
                 var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
                     if (!existingPlugins.includes(plugin)){
-                        this.installPlugin(plugin);
+                        //this.installPlugin(plugin);
                         this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
                             + "/Plugin/" + plugin.id, "POST" as Method).subscribe({
                                 error: (err) => {
@@ -86,6 +70,26 @@ export class PluginService {
                 console.error(err);
             }
         });
+    }
+
+    getUserPlugins(){
+        const authtokens = this.userStore.getAuthTokens();
+                if(authtokens !== undefined && authtokens !== null){
+                    this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
+                        .pipe(
+                            map(res => res.data),
+                            map(userpref => userpref.plugins as Array<PluginModel>)
+                        ).subscribe({
+                            next: (val) => {
+                                console.log('val for subscribe');
+                                console.log(val);
+                                this.registeredPlugins.next(val);
+                            },
+                            error: (err) => {
+                                console.error(err);
+                            }
+                        });
+                }
     }
 
     getAllPlugins() : Observable<PluginModel[]> {
@@ -170,7 +174,6 @@ export class PluginService {
                             registeredPluginList.push(installedPlugin);
                             this.registeredPlugins.next(registeredPluginList);
                         }
-                        
                     }
                     else {
                         this.registeredPlugins.next([installedPlugin]);
