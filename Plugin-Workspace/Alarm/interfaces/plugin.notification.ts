@@ -1,4 +1,5 @@
 export interface PluginNotification {
     notificationMessage: string;
-    actionType: number
+    actionType: number,
+    data:any
 }
