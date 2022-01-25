@@ -17,6 +17,7 @@ namespace Barn.Data.EF
         public DbSet<BuckyProfile> BuckyProfiles { get; set; }
         public DbSet<BuckyBehaviour> BuckyBehaviours{ get; set; }
         public DbSet<Plugin> Plugins { get; set; }
+        public DbSet<UserPreferencesPlugins> UserPreferencesPlugins { get; set; }
         public DbSet<PluginNotification> PluginNotifications { get; set; }
 
         // This is the run time configuration of 

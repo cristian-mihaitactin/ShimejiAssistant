@@ -8,6 +8,10 @@ using AutoMapper;
 using Barn.API.Models;
 using Barn.Services.BuckyProfile;
 using Microsoft.AspNetCore.Authorization;
+using OpenIddict.Validation.AspNetCore;
+using Barn.Services.UserPreferences;
+using Barn.Entities.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Barn.API.Controllers
 {
@@ -16,14 +20,21 @@ namespace Barn.API.Controllers
     public class ProfileController : ControllerBase
     {
         private IBuckyProfileService _profileService;
+        private IUserPreferencesService _userPrefService;
+        UserManager<User> _userManager;
+
         // Create a field to store the mapper object
         private readonly IMapper _mapper;
 
-        public ProfileController(IMapper mapper, IBuckyProfileService profileService)
+        public ProfileController(IMapper mapper,
+            UserManager<User> userManager,
+            IBuckyProfileService profileService,
+            IUserPreferencesService userPrefService)
         {
             _profileService = profileService;
+            _userPrefService = userPrefService;
+            _userManager = userManager;
             _mapper = mapper;
-
         }
 
         [HttpGet("")]
@@ -40,6 +51,28 @@ namespace Barn.API.Controllers
             var profileModel =  _mapper.Map<BuckyProfileModel>(profile);
             profileModel.Behaviours = behaviourModels;
             return profileModel;
+        }
+
+
+        [HttpGet("/api/User/Profile")]
+        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+
+        public async Task<BuckyProfileModel> GetUserProfile()
+        {
+            var user = await GetUser();
+
+            var found = _userPrefService.GetUserPreferenceByUserId(user.Id);
+
+            var profile = _profileService.GetProfile(found.BuckyProfileID);
+            var behaviourModels = profile.Behaviours.Select(b => new BuckyBehaviourModel(b)/*_mapper.Map<BuckyBehaviourModel>(b)*/).ToList();
+            var profileModel = _mapper.Map<BuckyProfileModel>(profile);
+            profileModel.Behaviours = behaviourModels;
+            return profileModel;
+        }
+
+        private async Task<User> GetUser()
+        {
+            return await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
         }
     }
 }

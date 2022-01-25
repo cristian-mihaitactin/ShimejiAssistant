@@ -57,7 +57,6 @@ namespace Barn.Services.Plugins
             };
         }
 
-
         public IList<Plugin> GetPlugins()
         {
             return _pluginRepo.GetAll().ToList();

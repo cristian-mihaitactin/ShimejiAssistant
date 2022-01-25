@@ -37,6 +37,11 @@ export class AppComponent implements OnInit {
       this.cdr.detectChanges();
   
       });
+
+      electron.ipcRenderer.on('user-plugins-response', (event, arg) => {
+        console.log('arg');
+        console.log(arg);
+      });
      }
 
   ngOnInit() {
@@ -51,6 +56,7 @@ export class AppComponent implements OnInit {
     */
 
     electron.ipcRenderer.send('get-initial-bucky-profile', '');
+    electron.ipcRenderer.send("get-user-plugins", '');
 
     this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;

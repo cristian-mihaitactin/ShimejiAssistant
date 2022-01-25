@@ -95,5 +95,6 @@ function parseDataFile(filePath, defaults, force = false) {
         return defaults;
       }
     }
-    
+
+    return defaults;
 }

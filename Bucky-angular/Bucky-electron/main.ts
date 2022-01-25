@@ -115,6 +115,20 @@ const initIpc = () => {
     }
   });
 
+  
+  ipcMain.on("get-user-plugins", (event,arg) => {
+    pluginService.registeredPlugins
+      .subscribe({
+        next: (value) => {
+          console.log('in get-user-plugins');
+          event.reply("user-plugins-response", value);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+  });
+
   ipcMain.on("get-all-plugins", (event,arg) => {
     pluginService.getAllPlugins()
       .subscribe({

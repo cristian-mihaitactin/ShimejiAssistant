@@ -9,6 +9,7 @@ using Barn.Data.EF;
 using Barn.Data.EF.Repoes;
 using Barn.Data.Mock;
 using Barn.Entities;
+using Barn.Entities.Plugins;
 using Barn.Entities.Users;
 using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
@@ -160,6 +161,7 @@ namespace Barn.API
             services.AddScoped<IGenericRepo<Guid, Entities.Bucky.BuckyProfile>, BuckyProfileRepo>();
             services.AddScoped<IGenericRepo<Guid, Entities.Plugins.Plugin>, PluginRepo>();
             services.AddScoped<IGenericRepo<Guid, Entities.Plugins.PluginNotification>, PluginNotificationRepo>();
+            services.AddScoped<IGenericRepo<Tuple<Guid, Guid>, UserPreferencesPlugins>, UserPreferencesPluginsRepo>();
             // Auto Mapper Configurations
 
             var mapperConfig = new MapperConfiguration(mc =>

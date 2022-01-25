@@ -1,7 +1,7 @@
 import { app } from "electron";
 import { environment } from "../environments/environment";
 
-import { BehaviorSubject, from, fromEventPattern, map, Observable, of } from "rxjs";
+import { BehaviorSubject, from, fromEventPattern, map, Observable, of, Subject } from "rxjs";
 import { AxiosResponse, Method } from "axios";
 import Axios from "axios-observable";
 import * as path from "path";
@@ -16,57 +16,87 @@ import { read } from "fs-jetpack";
 
 const pluginRelativePath = "Plugins";
 const pluginPackageEndpoint = "/api/Plugin"
+const userPreferencesEndpoint = '/api/UserPeferences';
 
 export class PluginService {
     pluginDirectory:string;
 
     registeredPlugins: BehaviorSubject<PluginModel[]>;
-
     /**
      *
      */
     constructor(private userStore: UserStore) {
         const userDataPath = app.getPath('userData');
+
         this.registeredPlugins = new BehaviorSubject<PluginModel[]>([]);
+
+        this.pluginDirectory = path.join(userDataPath,pluginRelativePath);
+        
+        const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
+        if (userPlugins !== undefined && userPlugins !== null && Array.isArray(userPlugins)) {
+            console.log('userPlugins');
+            console.log(userPlugins.length);
+            if (userPlugins.length > 0)
+            {
+                console.log('userPlugins.length');
+                console.log(userPlugins.length);
+                this.registeredPlugins.next(userPlugins);
+            } else {
+                const authtokens = userStore.getAuthTokens();
+                if(authtokens !== undefined && authtokens !== null){
+                    this.callBarnWithAuth(userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
+                        .pipe(
+                            map(res => res.data),
+                            map(userpref => userpref.plugins as Array<PluginModel>)
+                        ).subscribe({
+                            next: (val) => {
+                                console.log('val for subscribe');
+                                console.log(val);
+                                this.registeredPlugins.next(val);
+                            },
+                            error: (err) => {
+                                console.error(err);
+                            }
+                        });
+                }
+            }
+        }
 
         this.registeredPlugins.subscribe({
             //store all registered plugins in userstore
             next: (value) => {
-                userStore.set('pluginsInstalled', value);
+                console.log('regitered plugins value')
+                var existingPlugins:PluginModel[] = [];
+                value?.forEach((plugin,index) => {
+                    if (!existingPlugins.includes(plugin)){
+                        this.installPlugin(plugin);
+                        this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
+                            + "/Plugin/" + plugin.id, "POST" as Method).subscribe({
+                                error: (err) => {
+                                    console.error(err);
+                                }
+                            })
+                        existingPlugins.push(plugin);
+                    }
+                })
+                userStore.set('pluginsInstalled', existingPlugins);
+
             },
             error: (err) => {
                 console.error(err);
             }
         });
-        this.pluginDirectory = path.join(userDataPath,pluginRelativePath);
-
-        const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
-        if (userPlugins !== undefined && userPlugins !== null) {
-            console.log('userPlugins', userPlugins);
-            console.log('userPlugins.length', userPlugins.length);
-            console.log('typeof userPlugins', typeof userPlugins);
-            if (userPlugins.length > 0)
-            {
-                // install plugin
-                userPlugins.forEach((plugin,index) => {
-                    console.log('plugin')
-                    console.log(plugin)
-                    this.installPlugin(plugin);
-                });
-            }
-        }
-        
     }
 
     getAllPlugins() : Observable<PluginModel[]> {
-        return this.callBarn(`${pluginPackageEndpoint}/`, "GET" as Method, null)
+        return this.callBarn(`${pluginPackageEndpoint}/`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel[])
             );
     }
 
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
-        return this.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method, null)
+        return this.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginDetailsModel)
             );
@@ -79,7 +109,7 @@ export class PluginService {
     }
 
     installPluginById(id:string) {
-        return this.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method, null)
+        return this.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel)
             )
@@ -111,7 +141,7 @@ export class PluginService {
     private installPluginPackageBinaries(plugin: PluginModel) {
         console.log('installing package')
 
-        this.callBarn(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method, null)
+        this.callBarn(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginPackageModel)
             ).subscribe({
@@ -127,14 +157,25 @@ export class PluginService {
                     fs.createReadStream(pluginZipPath + '.zip')
                         .pipe(Extract({ path: pluginZipPath }));
                     // register plugin
-                    const registeredPluginList = this.registeredPlugins.value;
-                    registeredPluginList.push({
+                    const installedPlugin = {
                         id: plugin.id,
                         name: plugin.name,
                         version: plugin.version,
                         path: pluginZipPath,
-                    });
-                    this.registeredPlugins.next(registeredPluginList);
+                    }
+                    const registeredPluginList = this.registeredPlugins.value;
+                    if (registeredPluginList !== undefined && registeredPluginList !== null){
+                        console.log('pushing to registeredPluginList')
+                        if(!registeredPluginList.includes(installedPlugin)){
+                            registeredPluginList.push(installedPlugin);
+                            this.registeredPlugins.next(registeredPluginList);
+                        }
+                        
+                    }
+                    else {
+                        this.registeredPlugins.next([installedPlugin]);
+                    }
+                    
                 }
             });
     }
@@ -143,12 +184,22 @@ export class PluginService {
         return `${plugin.name}/${plugin.version}`
     }
     
-    private callBarn(endpoint: string, method: Method, params: URLSearchParams) : Observable<AxiosResponse> {
+    private callBarn(endpoint: string, method: Method) : Observable<AxiosResponse> {
         const options = {
             baseURL: `${environment.baseApiUrl}`,
             url: endpoint,
             method: method, //"POST" as Method,
-            params: params,
+        }
+        
+        return Axios.request(options)
+    }
+
+    private callBarnWithAuth(accessToken,endpoint: string, method: Method) : Observable<AxiosResponse> {
+        const options = {
+            baseURL: `${environment.baseApiUrl}`,
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            url: endpoint,
+            method: method //"POST" as Method,
         }
         
         return Axios.request(options)

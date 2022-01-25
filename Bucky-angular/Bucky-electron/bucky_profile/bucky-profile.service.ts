@@ -28,12 +28,31 @@ export class BuckyProfileService {
     this.userStore = userStore;
     this.barnService = barnService;
   }
+
     getUserBuckyProfile() : Observable<BuckyProfileModel> {
       const buckyId = this.userStore.get('buckyProfile');
 
-      return this.barnService.getBuckyProfile(buckyId).pipe(
-        tap((v) => v.isMainProfile = true)
-      );
+      if( buckyId !== undefined && buckyId !== null && buckyId !== ''){
+        return this.barnService.getBuckyProfile(buckyId).pipe(
+          tap((v) => v.isMainProfile = true)
+        );
+      } else {
+        // call barn to set
+        var accessToken = this.userStore.getAuthTokens().access_token;
+        if (accessToken !== undefined && accessToken !== null && accessToken !== '' ){
+          console.log('fetching user profile')
+          return this.callBarn(accessToken, '/api/User/Profile', 'GET' as Method, '')
+            .pipe(
+              map(res => res.data as BuckyProfileModel)
+            );
+        } else {
+          // return default profile
+          console.log('returning default profile');
+          var defaultProfile = environment.default_user.buckyProfile;
+          return this.barnService.getBuckyProfile(defaultProfile) ;
+        }
+      }
+      
     }
 
     getBuckyProfileById(id: string): Observable<BuckyProfileModel> {
