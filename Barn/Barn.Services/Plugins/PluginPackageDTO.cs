@@ -10,5 +10,7 @@ namespace Barn.Services.Plugins
     {
         public string FileName { get; set; }
         public byte[] ZipBytes { get; set; }
+        public string Version { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -167,7 +167,7 @@ export class AuthService {
     
                     this.storeToken(tokens);
                     this.storeUserInfo(tokens.access_token);
-                    this.pluginService.getUserPlugins()
+                    this.pluginService.registerUserPlugins()
                     this.updateState({ authReady: true, tokens, profile });
                 }));
         //});

@@ -1,4 +1,6 @@
 export interface PluginPackageModel{
     fileName: string,
-    zipBytes: string
+    zipBytes: string,
+    name: string,
+    version: string,
 }

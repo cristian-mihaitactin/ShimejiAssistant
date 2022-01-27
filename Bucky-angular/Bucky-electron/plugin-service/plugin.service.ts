@@ -13,6 +13,9 @@ import { PluginModel } from "../models/plugin.model";
 import { PluginPackageModel } from "../models/plugin.package.model";
 import { PluginDetailsModel } from "../models/plugin.details.model";
 import { read } from "fs-jetpack";
+import { PluginNotification } from "../models/plugin.notification";
+import { IPlugin } from "../models/iplugin";
+import { RegisteredPlugin } from "../models/registered.plugin";
 
 const pluginRelativePath = "Plugins";
 const pluginPackageEndpoint = "/api/Plugin"
@@ -21,14 +24,40 @@ const userPreferencesEndpoint = '/api/UserPeferences';
 export class PluginService {
     pluginDirectory:string;
 
-    registeredPlugins: BehaviorSubject<PluginModel[]>;
+    //registeredPlugins: BehaviorSubject<PluginModel[]>;
     /**
      *
      */
+
+    registeredPlugins: BehaviorSubject<RegisteredPlugin[]>;
+
     constructor(private userStore: UserStore) {
         const userDataPath = app.getPath('userData');
 
-        this.registeredPlugins = new BehaviorSubject<PluginModel[]>([]);
+        this.registeredPlugins = new BehaviorSubject<RegisteredPlugin[]>([]);
+
+        this.registeredPlugins.subscribe({
+            //store all registered plugins in userstore
+            next: (value) => {
+                console.log('regitered plugins value')
+                var existingPlugins:RegisteredPlugin[] = [];
+                value?.forEach((plugin,index) => {
+                    if (!existingPlugins.includes(plugin)){
+                        this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
+                            + "/Plugin/" + plugin.pluginModel.id, "POST" as Method).subscribe({
+                                error: (err) => {
+                                    console.error(err);
+                                }
+                            });
+                        existingPlugins.push(plugin);
+                    }
+                }); 
+                userStore.set('pluginsInstalled', existingPlugins);
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
 
         this.pluginDirectory = path.join(userDataPath,pluginRelativePath);
         
@@ -38,68 +67,48 @@ export class PluginService {
             console.log(userPlugins.length);
             if (userPlugins.length > 0)
             {
+                userPlugins.forEach((userPlugin,index) => {
+                    this.downloadAndInstallPlugin(userPlugin);
+                });
+
                 console.log('userPlugins.length');
                 console.log(userPlugins.length);
-                this.registeredPlugins.next(userPlugins);
-            } else {
-                this.getUserPlugins();
+                // Obs: registerPlugin only after installation -> register in the installation
+                //this.registeredPlugins.next(userPlugins);
             }
         }
 
-        this.registeredPlugins.subscribe({
-            //store all registered plugins in userstore
-            next: (value) => {
-                console.log('regitered plugins value')
-                var existingPlugins:PluginModel[] = [];
-                value?.forEach((plugin,index) => {
-                    if (!existingPlugins.includes(plugin)){
-                        //this.installPlugin(plugin);
-                        this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
-                            + "/Plugin/" + plugin.id, "POST" as Method).subscribe({
-                                error: (err) => {
-                                    console.error(err);
-                                }
-                            })
-                        existingPlugins.push(plugin);
-                    }
-                })
-                userStore.set('pluginsInstalled', existingPlugins);
-            },
-            error: (err) => {
-                console.error(err);
-            }
-        });
-    }
+        //if logged in, get user plugins
+        var authTokens = this.userStore.getAuthTokens();
+        if (authTokens !== undefined && authTokens !== null) {
+            this.registerUserPlugins();
+        }
 
-    getUserPlugins(){
-        const authtokens = this.userStore.getAuthTokens();
-                if(authtokens !== undefined && authtokens !== null){
-                    this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
-                        .pipe(
-                            map(res => res.data),
-                            map(userpref => userpref.plugins as Array<PluginModel>)
-                        ).subscribe({
-                            next: (val) => {
-                                console.log('val for subscribe');
-                                console.log(val);
-                                this.registeredPlugins.next(val);
-                            },
-                            error: (err) => {
-                                console.error(err);
-                            }
-                        });
+
+        
+    }
+    
+    installPluginById(id:string) {
+        this.getPluginModelByIdFromBarn(id)
+            .subscribe({
+                next: (value) => {
+                    this.installPlugin(value);
+                },
+                error: (err) => {
+                    console.error(err);
                 }
+            });
     }
 
     getAllPlugins() : Observable<PluginModel[]> {
-        return this.callBarn(`${pluginPackageEndpoint}/`, "GET" as Method)
+        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel[])
             );
     }
 
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
-        return this.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
+        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginDetailsModel)
             );
@@ -111,19 +120,51 @@ export class PluginService {
         fsExtra.emptyDirSync(this.pluginDirectory);
     }
 
-    installPluginById(id:string) {
-        return this.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
+    registerUserPlugins(){
+        const authtokens = this.userStore.getAuthTokens();
+                if(authtokens !== undefined && authtokens !== null){
+                    this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
+                        .pipe(
+                            map(res => res.data),
+                            map(userpref => userpref.plugins as Array<PluginModel>)
+                        ).subscribe({
+                            next: (val) => {
+                                console.log('val for subscribe');
+                                console.log(val);
+                                if (val !== undefined && val !== null) {
+                                    val.forEach((plugin, index) => {
+                                        this.downloadAndInstallPlugin(plugin);
+                                    })
+                                }
+                            },
+                            error: (err) => {
+                                console.error(err);
+                            }
+                        });
+                }
+    }
+
+    private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
+        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel)
-            )
-            .subscribe({
-                next: (value) => {
-                    this.installPlugin(value);
-                },
-                error: (err) => {
-                    console.error(err);
-                }
-            });
+            );
+    }
+    
+    private downloadAndInstallPlugin(userPlugin: PluginModel){
+        if (fs.existsSync(userPlugin.path)){
+            return;
+        } else {
+            this.getPluginModelByIdFromBarn(userPlugin.id)
+                .subscribe({
+                    next: (value) => {
+                        this.installPlugin(value);
+                    },
+                    error: (err) => {
+                        console.error(err);
+                    }
+                });
+        }
     }
 
     private installPlugin(plugin:PluginModel) {
@@ -144,49 +185,77 @@ export class PluginService {
     private installPluginPackageBinaries(plugin: PluginModel) {
         console.log('installing package')
 
-        this.callBarn(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
+        this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginPackageModel)
             ).subscribe({
                 next: (value) => {
                     // copy to user storage
-                    if (!fs.existsSync(path.join(this.pluginDirectory, plugin.name))) {
-                        fs.mkdirSync(path.join(this.pluginDirectory, plugin.name))
+                    var pluginRelativePath = path.join(this.pluginDirectory, value.name);
+                    if (!fs.existsSync(pluginRelativePath)) {
+                        fs.mkdirSync(pluginRelativePath)
                     }
 
-                    const pluginZipPath = path.join(this.pluginDirectory, this.getPluginDirectoryName(plugin))
+                    const pluginZipPath = path.join(this.pluginDirectory, pluginRelativePath, value.fileName)
                     fs.writeFileSync(pluginZipPath  + '.zip', value.zipBytes, 'base64');
 
                     fs.createReadStream(pluginZipPath + '.zip')
                         .pipe(Extract({ path: pluginZipPath }));
-                    // register plugin
-                    const installedPlugin = {
-                        id: plugin.id,
-                        name: plugin.name,
-                        version: plugin.version,
-                        path: pluginZipPath,
-                    }
-                    const registeredPluginList = this.registeredPlugins.value;
-                    if (registeredPluginList !== undefined && registeredPluginList !== null){
-                        console.log('pushing to registeredPluginList')
-                        if(!registeredPluginList.includes(installedPlugin)){
-                            registeredPluginList.push(installedPlugin);
-                            this.registeredPlugins.next(registeredPluginList);
-                        }
-                    }
-                    else {
-                        this.registeredPlugins.next([installedPlugin]);
-                    }
                     
+                    // register plugin
+                    const installedPluginModel = {
+                        id: plugin.id,
+                        name: value.name,
+                        version: value.version,
+                        path: pluginZipPath,
+                    } as PluginModel;
+
+                    this.importPlugin(installedPluginModel);
                 }
             });
     }
 
-    private getPluginDirectoryName(plugin: PluginModel) {
-        return `${plugin.name}/${plugin.version}`
+    private importPlugin(pluginModel: PluginModel){
+
+        import(pluginModel.path + "/dist/main.js").then((a) => {
+        // `a` is imported and can be used here
+        var eventHandlerIn = new Subject<PluginNotification>();
+        var eventHandlerOut = new Subject<PluginNotification>();
+
+        const importedPlugin = new a.Plugin(eventHandlerIn,eventHandlerOut, pluginModel.id) as IPlugin;
+
+        eventHandlerIn.subscribe({
+        next: (val) => {
+            console.log(val);
+        },
+        error: (val) => {
+            console.log(val);
+        }
+        });
+
+        eventHandlerOut.subscribe({
+            next: (val) => {
+                console.log(val);
+            },
+            error: (val) => {
+                console.log(val);
+            }
+        });
+
+        const registeredPlugin = {
+            plugin: importedPlugin,
+            pluginModel: pluginModel
+        };
+        const existingPlugins = this.registeredPlugins.value;
+
+        if (!existingPlugins.includes(registeredPlugin)) {
+            existingPlugins.push(registeredPlugin);
+            this.registeredPlugins.next(existingPlugins);
+        };
+    });
     }
     
-    private callBarn(endpoint: string, method: Method) : Observable<AxiosResponse> {
+    private callBarnWithoutCreds(endpoint: string, method: Method) : Observable<AxiosResponse> {
         const options = {
             baseURL: `${environment.baseApiUrl}`,
             url: endpoint,

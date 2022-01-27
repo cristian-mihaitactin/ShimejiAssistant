@@ -1,5 +1,3 @@
-import { SafeResourceUrl } from "@angular/platform-browser";
-
 export interface PluginDetailsModel{
     id: string,
     name: string,
@@ -10,5 +8,4 @@ export interface PluginDetailsModel{
       svgBytes: string,
       pngBytes: string
     }
-    imgBytes: SafeResourceUrl
 }

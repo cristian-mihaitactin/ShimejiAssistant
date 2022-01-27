@@ -165,7 +165,7 @@ const initIpc = () => {
       })
   });
 
-  ipcMain.on("install-plugin-request", (event, arg) => {
+  ipcMain.on("install-plugin-request", (event, arg:string) => {
     pluginService.installPluginById(arg);
   });
 }
@@ -340,23 +340,21 @@ pluginService.registeredPlugins.subscribe({
     console.error(err);
   }
 });
-/*
-var x = './Plugin/main.js';
-import(x).then((a) => {
-  // `a` is imported and can be used here
-  var subject = new Subject<{notificationMessage: string;
-    actionType: number}>();
-  a.Plugin(subject, "18", "41");
-  subject.subscribe({
-    next: (val) => {
-      console.log(val);
-    },
-    error: (val) => {
-      console.log(val);
-    }
-  })
-});
-*/
+  // var x = 'C:\\Users\\cristian.mihaita\\AppData\\Roaming\\Bucky\\Plugins\\Alarm\\1.0.0/dist/main.js';
+  // import(x).then((a) => {
+  //   // `a` is imported and can be used here
+  //   var subject = new Subject<{notificationMessage: string;
+  //     actionType: number}>();
+  //   a.Plugin(subject,subject, "ola");
+  //   subject.subscribe({
+  //     next: (val) => {
+  //       console.log(val);
+  //     },
+  //     error: (val) => {
+  //       console.log(val);
+  //     }
+  //   })
+  // });
 });
 
 // Quit when all windows are closed.

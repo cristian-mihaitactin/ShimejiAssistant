@@ -5,8 +5,8 @@ import { BuckyBehaviourModel } from './models/bucky-behaviour-model';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyProfileModel } from './models/bucky-profile-model';
 import { delay } from 'rxjs-compat/operator/delay';
-import { PluginModel } from './models/plugin.model';
 import { PluginDetailsModel } from './models/plugin.details.model';
+import { PluginModel } from './models/plugin.model';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -23,14 +23,18 @@ export class AppComponent implements OnInit {
   buckyProfile = new BehaviorSubject<BuckyProfileModel>(
     {id: "", name: "", description: "", behaviours: new Array<BuckyBehaviourModel>()}
   );
-  displayedPlugins:PluginDetailsModel[] = [];
+  displayedPlugins:{
+    id: string,
+    imgBytes: SafeResourceUrl
+  }[] = [];
   plugins:BehaviorSubject<PluginModel[]> = new BehaviorSubject<PluginModel[]>([]);
+
+  
 
   constructor(private _sanitizer: DomSanitizer,
     // private buckyProfileService: BuckyProfileService,
     private cdr: ChangeDetectorRef) { 
       this.initElectronIpc();
-
      }
 
      private initElectronIpc(){
@@ -53,17 +57,32 @@ export class AppComponent implements OnInit {
       });
 
       electron.ipcRenderer.on('plugin-sample-response', (event, arg: PluginDetailsModel) => {
-        if (!this.displayedPlugins.includes(arg)){
-          arg.imgBytes = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
-          + arg.pluginImageBlob.pngBytes);
-          this.displayedPlugins.push(arg);
-        }
+        var pluginFound = false;
 
-        this.cdr.detectChanges();
+        this.displayedPlugins.forEach((value, index) => {
+          if (value.id === arg.id){
+            pluginFound = true;
+
+            return;
+          }
+        });
+
+        if (!pluginFound){
+          var newPlugin = {
+            id: arg.id,
+            imgBytes:  this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+            + arg.pluginImageBlob.pngBytes)
+          };
+
+            this.displayedPlugins.push(newPlugin);
+            this.cdr.detectChanges();
+          }
       });
      }
 
   ngOnInit() {
+    console.log('this.pluginService.testing_GetPluginHtml()');
+    //console.log(this.pluginService.testing_GetPluginHtml());
     this.buckyProfile.subscribe((value) => {
       this.buckyBehaviours = value.behaviours;
 
