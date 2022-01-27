@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using Barn.Entities;
 
@@ -34,6 +35,17 @@ namespace Barn.Services.BuckyProfile
             {
                 Behaviours.Add(new BuckyBehaviourDTO(buckyBehaviour));
             }
+        }
+
+        public Barn.Entities.Bucky.BuckyProfile ToEntity()
+        {
+            return new Barn.Entities.Bucky.BuckyProfile()
+            {
+                Id = Id,
+                Name = Name,
+                Description = Description,
+                Behaviours = Behaviours.Select(bb => bb.BuckyBehaviour).ToList()
+            };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Barn.API.Models
         public Guid? Id { get; set; }
         public Guid? UserId { get; set; }
         public Guid BuckyProfileID { get; set; }
-        public IList<PluginModel> Plugins { get; set; }
+        public IList<PluginModel>? Plugins { get; set; }
 
         public UserPreferencesModel()
         {

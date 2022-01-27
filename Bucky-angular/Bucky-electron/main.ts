@@ -26,7 +26,7 @@ const pluginService = new PluginService(userStore);
 
 const authService = new AuthService(userStore, pluginService);
 
-const barnService = new BarnBuckyService();
+const barnService = new BarnBuckyService(authService, userStore);
 const userService = new UserService(userStore);
 const buckyProfileService = new BuckyProfileService(
   userStore,  barnService

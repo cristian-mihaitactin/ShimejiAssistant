@@ -75,8 +75,14 @@ namespace Barn.Data.Mock
                 return false;
             }
 
-            _dbContext.UsersPreferences.Update(entity);
-            _dbContext.SaveChanges();
+            try
+            {
+                _dbContext.UsersPreferences.Update(entity);
+                _dbContext.SaveChanges();
+            } catch (Exception ex)
+            {
+                throw;
+            }
 
             return true;
         }

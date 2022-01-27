@@ -33,7 +33,6 @@ export class PluginService {
 
     constructor(private userStore: UserStore) {
         const userDataPath = app.getPath('userData');
-
         this.registeredPlugins = new BehaviorSubject<RegisteredPlugin[]>([]);
 
         this.registeredPlugins.subscribe({
@@ -59,22 +58,15 @@ export class PluginService {
             }
         });
 
-        this.pluginDirectory = path.join(userDataPath,pluginRelativePath);
+        this.pluginDirectory = path.join(userDataPath, 'dist' ,pluginRelativePath);
         
         const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
         if (userPlugins !== undefined && userPlugins !== null && Array.isArray(userPlugins)) {
-            console.log('userPlugins');
-            console.log(userPlugins.length);
             if (userPlugins.length > 0)
             {
                 userPlugins.forEach((userPlugin,index) => {
                     this.downloadAndInstallPlugin(userPlugin);
                 });
-
-                console.log('userPlugins.length');
-                console.log(userPlugins.length);
-                // Obs: registerPlugin only after installation -> register in the installation
-                //this.registeredPlugins.next(userPlugins);
             }
         }
 
@@ -83,9 +75,6 @@ export class PluginService {
         if (authTokens !== undefined && authTokens !== null) {
             this.registerUserPlugins();
         }
-
-
-        
     }
     
     installPluginById(id:string) {
@@ -150,7 +139,7 @@ export class PluginService {
                 map(res => res.data as PluginModel)
             );
     }
-    
+
     private downloadAndInstallPlugin(userPlugin: PluginModel){
         if (fs.existsSync(userPlugin.path)){
             return;
@@ -191,23 +180,24 @@ export class PluginService {
             ).subscribe({
                 next: (value) => {
                     // copy to user storage
-                    var pluginRelativePath = path.join(this.pluginDirectory, value.name);
-                    if (!fs.existsSync(pluginRelativePath)) {
-                        fs.mkdirSync(pluginRelativePath)
+                    const pluginMainPath = path.join(this.pluginDirectory, value.name);
+                    if (!fs.existsSync(pluginMainPath)) {
+                        fs.mkdirSync(pluginMainPath, { recursive: true });
                     }
 
-                    const pluginZipPath = path.join(this.pluginDirectory, pluginRelativePath, value.fileName)
-                    fs.writeFileSync(pluginZipPath  + '.zip', value.zipBytes, 'base64');
+                    const pluginZipPath = path.join(pluginMainPath, value.fileName)
+                    fs.writeFileSync(pluginZipPath, value.zipBytes, 'base64');
 
-                    fs.createReadStream(pluginZipPath + '.zip')
-                        .pipe(Extract({ path: pluginZipPath }));
+                    const pluginFinalPath = path.join(pluginMainPath, value.version);
+                    fs.createReadStream(pluginZipPath)
+                        .pipe(Extract({ path: pluginFinalPath }));
                     
                     // register plugin
                     const installedPluginModel = {
                         id: plugin.id,
                         name: value.name,
                         version: value.version,
-                        path: pluginZipPath,
+                        path: pluginFinalPath,
                     } as PluginModel;
 
                     this.importPlugin(installedPluginModel);
@@ -216,12 +206,34 @@ export class PluginService {
     }
 
     private importPlugin(pluginModel: PluginModel){
+/*
+        const x = (async () => {
+  
+            let file = pluginModel.path + "/main.js";
+          
+            const f = await import(file);
+            return f;
+          })().then(f => {
+            
+            var eventHandlerIn = new Subject<PluginNotification>();
+            var eventHandlerOut = new Subject<PluginNotification>();
 
-        import(pluginModel.path + "/dist/main.js").then((a) => {
+            const s = new f.default(eventHandlerIn,eventHandlerOut, 'id');
+            console.log(s.html);
+          })
+            .catch(error => {
+              // Handle/report error
+              console.error(error);
+            });
+*/
+
+        import(pluginModel.path + "/main.js").then((a) => {
         // `a` is imported and can be used here
         var eventHandlerIn = new Subject<PluginNotification>();
         var eventHandlerOut = new Subject<PluginNotification>();
 
+        
+          
         const importedPlugin = new a.Plugin(eventHandlerIn,eventHandlerOut, pluginModel.id) as IPlugin;
 
         eventHandlerIn.subscribe({
@@ -253,6 +265,7 @@ export class PluginService {
             this.registeredPlugins.next(existingPlugins);
         };
     });
+
     }
     
     private callBarnWithoutCreds(endpoint: string, method: Method) : Observable<AxiosResponse> {

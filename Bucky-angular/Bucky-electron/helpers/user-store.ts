@@ -20,7 +20,7 @@ export class UserStore {
     this.path = path.join(userDataPath, opts.configName + '.json');
     this.defaults = opts.defaults;
     this.data = parseDataFile(this.path, opts.defaults);
-    console.log('this is data: ', this.data);
+    //console.log('this is data: ', this.data);
   }
   
   // This will just return the property on the `data` object

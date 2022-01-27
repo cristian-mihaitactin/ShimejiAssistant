@@ -100,7 +100,7 @@ export class AuthService {
     refreshTokens(): Observable<AuthTokenModel> {
         return this.state.pipe(
             first(),
-            map(state => state.tokens),
+            map(state => state.tokens ?? this.localStorage.get('auth-tokens') as unknown as AuthTokenModel),
             flatMap(tokens => this.getTokens({ refresh_token: tokens.refresh_token }, 'refresh_token').pipe(
                 catchError(error => throwError('Session Expired')))
             ),
