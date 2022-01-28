@@ -16,6 +16,7 @@ import { read } from "fs-jetpack";
 import { PluginNotification } from "../models/plugin.notification";
 import { IPlugin } from "../models/iplugin";
 import { RegisteredPlugin } from "../models/registered.plugin";
+import { existsSync } from "original-fs";
 
 const pluginRelativePath = "Plugins";
 const pluginPackageEndpoint = "/api/Plugin"
@@ -39,18 +40,19 @@ export class PluginService {
             //store all registered plugins in userstore
             next: (value) => {
                 console.log('regitered plugins value')
-                var existingPlugins:RegisteredPlugin[] = [];
+                var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
-                    if (!existingPlugins.includes(plugin)){
+                    if (!existingPlugins.includes(plugin.pluginModel)){
                         this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
                             + "/Plugin/" + plugin.pluginModel.id, "POST" as Method).subscribe({
                                 error: (err) => {
                                     console.error(err);
                                 }
                             });
-                        existingPlugins.push(plugin);
+                        existingPlugins.push(plugin.pluginModel);
                     }
                 }); 
+
                 userStore.set('pluginsInstalled', existingPlugins);
             },
             error: (err) => {
@@ -58,7 +60,7 @@ export class PluginService {
             }
         });
 
-        this.pluginDirectory = path.join(userDataPath, 'dist' ,pluginRelativePath);
+        this.pluginDirectory = path.join(userDataPath ,pluginRelativePath);
         
         const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
         if (userPlugins !== undefined && userPlugins !== null && Array.isArray(userPlugins)) {
@@ -169,10 +171,13 @@ export class PluginService {
         } else {
             this.installPluginPackageBinaries(plugin);
         }
+
+        //plugin already installed
+        this.importPlugin(plugin);
     }
 
     private installPluginPackageBinaries(plugin: PluginModel) {
-        console.log('installing package')
+        console.log('installing package:', plugin)
 
         this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
             .pipe(
@@ -200,40 +205,26 @@ export class PluginService {
                         path: pluginFinalPath,
                     } as PluginModel;
 
+                    console.log('installedPluginModel: ', installedPluginModel);
                     this.importPlugin(installedPluginModel);
                 }
             });
     }
 
     private importPlugin(pluginModel: PluginModel){
-/*
-        const x = (async () => {
-  
-            let file = pluginModel.path + "/main.js";
-          
-            const f = await import(file);
-            return f;
-          })().then(f => {
-            
-            var eventHandlerIn = new Subject<PluginNotification>();
-            var eventHandlerOut = new Subject<PluginNotification>();
+        const pluginPath = pluginModel.path ?? path.join(this.pluginDirectory, pluginModel.name, pluginModel.version);
+        
+        if (!fs.existsSync(pluginPath)){
+            return;
+        }
 
-            const s = new f.default(eventHandlerIn,eventHandlerOut, 'id');
-            console.log(s.html);
-          })
-            .catch(error => {
-              // Handle/report error
-              console.error(error);
-            });
-*/
+        pluginModel.path = pluginPath;
 
         import(pluginModel.path + "/main.js").then((a) => {
         // `a` is imported and can be used here
         var eventHandlerIn = new Subject<PluginNotification>();
         var eventHandlerOut = new Subject<PluginNotification>();
 
-        
-          
         const importedPlugin = new a.Plugin(eventHandlerIn,eventHandlerOut, pluginModel.id) as IPlugin;
 
         eventHandlerIn.subscribe({
@@ -258,6 +249,7 @@ export class PluginService {
             plugin: importedPlugin,
             pluginModel: pluginModel
         };
+
         const existingPlugins = this.registeredPlugins.value;
 
         if (!existingPlugins.includes(registeredPlugin)) {

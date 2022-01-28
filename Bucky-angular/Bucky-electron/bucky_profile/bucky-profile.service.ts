@@ -29,7 +29,7 @@ export class BuckyProfileService {
   }
 
     getUserBuckyProfile() : Observable<BuckyProfileModel> {
-      const buckyId = this.userStore.get('buckyProfile');
+      const buckyId = this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile;
 
       if( buckyId !== undefined && buckyId !== null && buckyId !== ''){
         return this.barnService.callBarn(`${profileUrl}/${buckyId}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
@@ -60,9 +60,9 @@ export class BuckyProfileService {
     }
 
     getBuckyProfileById(id: string): Observable<BuckyProfileModel> {
-      const buckyId = this.userStore.get('buckyProfile');
+      const buckyId = this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile;
 
-      return this.barnService.callBarn(`${profileUrl}/${buckyId}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
+      return this.barnService.callBarn(`${profileUrl}/${id}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
       .pipe(
         map(res => res.data as BuckyProfileModel),
         tap((v) => {
@@ -76,7 +76,7 @@ export class BuckyProfileService {
     }
 
     getAllBuckyProfilesWithoutBehaviours(): Observable<BuckyProfileModel[]> {
-      const buckyId = this.userStore.get('buckyProfile');
+      const buckyId = this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile;
 
       return this.barnService.callBarn(`${profileUrl}`, "GET" as Method,  new Map([['Content-Type', 'application/x-www-form-urlencoded' ]])).pipe(
         map(res=> 
