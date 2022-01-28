@@ -121,7 +121,11 @@ const initIpc = () => {
       .subscribe({
         next: (value) => {
           console.log('in get-user-plugins');
-          event.reply("user-plugins-response", value);
+          var pluginModels = [];
+          value.forEach((val, index) => {
+            pluginModels.push(val.pluginModel);
+          })
+          event.reply("user-plugins-response", pluginModels);
         },
         error: (err) => {
           console.error(err);
