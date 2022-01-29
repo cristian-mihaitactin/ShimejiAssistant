@@ -25,7 +25,8 @@ export class AppComponent implements OnInit {
   );
   displayedPlugins:{
     id: string,
-    imgBytes: SafeResourceUrl
+    imgBytes: SafeResourceUrl,
+    defaultHtml: string
   }[] = [];
   plugins:BehaviorSubject<PluginModel[]> = new BehaviorSubject<PluginModel[]>([]);
 
@@ -56,13 +57,12 @@ export class AppComponent implements OnInit {
         this.plugins.next(arg);        
       });
 
-      electron.ipcRenderer.on('plugin-sample-response', (event, arg: PluginDetailsModel) => {
+      electron.ipcRenderer.on('plugin-details-response', (event, arg: PluginDetailsModel) => {
         var pluginFound = false;
 
         this.displayedPlugins.forEach((value, index) => {
           if (value.id === arg.id){
             pluginFound = true;
-
             return;
           }
         });
@@ -71,7 +71,8 @@ export class AppComponent implements OnInit {
           var newPlugin = {
             id: arg.id,
             imgBytes:  this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
-            + arg.pluginImageBlob.pngBytes)
+            + arg.pluginImageBlob.pngBytes),
+            defaultHtml: arg.html
           };
 
             this.displayedPlugins.push(newPlugin);
@@ -101,7 +102,7 @@ export class AppComponent implements OnInit {
         console.log(value);
         if(value !== undefined && value !== null){
           value.forEach((pluginModel,index) => {
-            electron.ipcRenderer.send('get-plugin-sample', pluginModel.id);
+            electron.ipcRenderer.send('get-plugin-details', pluginModel.id);
           });
         }
       },
@@ -112,6 +113,32 @@ export class AppComponent implements OnInit {
 
     electron.ipcRenderer.send('get-initial-bucky-profile', '');
     electron.ipcRenderer.send("get-user-plugins", '');
+
+
+    /*
+    
+    function pluginClick(event,data) {
+      var input = document.getElementById("appt");
+      console.log(input.value);
+      var timeArray = input.value.split(':');
+    
+    const alarmEvent = new CustomEvent('plugin-input', {
+        pluginName: '76433374-9d88-43f9-aaa1-c6a9c1c8592e',
+        data: {
+            action: 'add',
+            hour: timeArray[0],
+            minute:timeArray[1]
+        }
+    });
+  
+    dispatchEvent(alarmEvent);
+    }
+    
+    */
+
+    window.addEventListener('plugin-input', (e) => {
+      console.log('plugin-input:',e);
+    });
 //////////////////////////////////////////////////////////
     
 
@@ -161,6 +188,32 @@ export class AppComponent implements OnInit {
     window.addEventListener('mousemove',(windowMouseUpCallback));
 
     document.getElementById('systembar').addEventListener('mouseup',mouseUpCallback);
+  }
+
+  pluginIcoClick(event){
+    event.preventDefault();
+    console.log('pluginIcoClick:', event);
+
+    var activatedPlugin = document.getElementById("activatedPlugin");
+
+    if (activatedPlugin !== null && activatedPlugin !== undefined){
+      activatedPlugin.parentElement.removeChild(activatedPlugin);
+    }
+    
+    //get html of clicked plugin
+    const pluginId = event.srcElement.pluginId;
+    if (pluginId === undefined || pluginId === null || pluginId === ''){
+      return;
+    }
+    const html = this.getPluginHtml(pluginId);
+    let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
+    document.getElementById('notification-container').appendChild(frag);
+  }
+  
+  private getPluginHtml(id:string) {
+    const plugin = this.displayedPlugins.find(plugin => plugin.id === id);
+    
+    return plugin.defaultHtml;
   }
   
   private setBuckyBehaviour(bahaviourString: string) {

@@ -114,7 +114,6 @@ const initIpc = () => {
         })
     }
   });
-
   
   ipcMain.on("get-user-plugins", (event,arg) => {
     pluginService.registeredPlugins
@@ -154,19 +153,7 @@ const initIpc = () => {
         error: (err) => {
           console.error(err);
         }
-      })
-  });
-  
-  ipcMain.on("get-plugin-sample", (event,arg) => {
-    pluginService.getPluginDetails(arg)
-      .subscribe({
-        next: (value) => {
-          event.reply("plugin-sample-response", value);
-        },
-        error: (err) => {
-          console.error(err);
-        }
-      })
+      });
   });
 
   ipcMain.on("install-plugin-request", (event, arg:string) => {

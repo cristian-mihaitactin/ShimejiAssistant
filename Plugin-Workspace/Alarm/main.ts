@@ -32,15 +32,18 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
       var timeArray = input.value.split(':');
     
     const alarmEvent = new CustomEvent('plugin-input', {
+      bubbles: true,
+      detail: {
         pluginName: '${id}',
         data: {
             action: 'add',
             hour: timeArray[0],
             minute:timeArray[1]
         }
+      }
     });
   
-    dispatchEvent(alarmEvent);
+    this.dispatchEvent(alarmEvent);
     }
     </script>
     `;

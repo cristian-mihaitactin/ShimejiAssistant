@@ -1,7 +1,7 @@
 import { app } from "electron";
 import { environment } from "../environments/environment";
 
-import { BehaviorSubject, from, fromEventPattern, map, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, flatMap, from, fromEventPattern, map, Observable, of, Subject } from "rxjs";
 import { AxiosResponse, Method } from "axios";
 import Axios from "axios-observable";
 import * as path from "path";
@@ -101,7 +101,11 @@ export class PluginService {
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
         return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
             .pipe(
-                map(res => res.data as PluginDetailsModel)
+                map(res => res.data as PluginDetailsModel),
+                map(pdm => {
+                    pdm.html = this.registeredPlugins.value.find(element => element.plugin.id === id).plugin.html;
+                    return pdm;
+                })
             );
     }
 

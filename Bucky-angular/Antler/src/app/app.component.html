@@ -1,9 +1,19 @@
 <div id='systembar'>
   <img
   [src]="imagePath" width="250" height="200"/>
-  <div style="  display:flex;">
+  <!-- <div style="  display:flex;">
     <div *ngFor="let pluginModel of displayedPlugins">
-      <img [src]="pluginModel.imgBytes" width="30" height="30"/>
+      <img [src]="pluginModel.imgBytes" [pluginId]=pluginModel.id (click)=this.pluginIcoClick($event) width="30" height="30"/>
     </div>
   </div>
+  <div id="notification-container">
+  </div> -->
+</div>
+
+<div style="  display:flex;">
+  <div *ngFor="let pluginModel of displayedPlugins">
+    <img [src]="pluginModel.imgBytes" [pluginId]=pluginModel.id (click)=this.pluginIcoClick($event) width="30" height="30"/>
+  </div>
+</div>
+<div id="notification-container">
 </div>
