@@ -11,6 +11,7 @@ import { UserService } from "./user/user.service";
 import { BarnBuckyService } from "./barn-service/barn-bucky-service";
 import { Subject } from "rxjs";
 import { PluginService } from "./plugin-service/plugin.service";
+import { PluginInput } from "models/plugin.input";
 
 //import { environment } from "environments/environment";
 
@@ -159,7 +160,11 @@ const initIpc = () => {
   ipcMain.on("install-plugin-request", (event, arg:string) => {
     pluginService.installPluginById(arg);
   });
-}
+
+  ipcMain.on("plugin-input", (event, arg:PluginInput) => {
+    pluginService.handlePluginInput(arg);
+  });
+}// end of initIpc()
 
 app.on("ready", () => {
   initIpc();

@@ -16,7 +16,7 @@ import { read } from "fs-jetpack";
 import { PluginNotification } from "../models/plugin.notification";
 import { IPlugin } from "../models/iplugin";
 import { RegisteredPlugin } from "../models/registered.plugin";
-import { existsSync } from "original-fs";
+import { PluginInput } from "../models/plugin.input";
 
 const pluginRelativePath = "Plugins";
 const pluginPackageEndpoint = "/api/Plugin"
@@ -25,10 +25,12 @@ const userPreferencesEndpoint = '/api/UserPeferences';
 export class PluginService {
     pluginDirectory:string;
     registeredPlugins: BehaviorSubject<RegisteredPlugin[]>;
+    pluginHandlers: Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>
 
     constructor(private userStore: UserStore) {
         const userDataPath = app.getPath('userData');
         this.registeredPlugins = new BehaviorSubject<RegisteredPlugin[]>([]);
+        this.pluginHandlers = new Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>();
 
         this.registeredPlugins.subscribe({
             //store all registered plugins in userstore
@@ -44,6 +46,12 @@ export class PluginService {
                                 }
                             });
                         existingPlugins.push(plugin.pluginModel);
+
+                        this.pluginHandlers.set(plugin.plugin.id,
+                            {
+                                eventHandlerIn: plugin.plugin.eventHandlerIn,
+                                eventHandlerOut: plugin.plugin.eventHandlerOut
+                            });
                     }
                 }); 
 
@@ -134,6 +142,14 @@ export class PluginService {
                 }
     }
 
+    handlePluginInput(pluginInput: PluginInput) {
+        var eventHandlers = this.pluginHandlers.get(pluginInput.pluginId);
+
+        if (eventHandlers !== undefined && eventHandlers !== null){
+            eventHandlers.eventHandlerIn.next(pluginInput);
+        }
+    }
+
     private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
         return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(
@@ -221,7 +237,7 @@ export class PluginService {
 
         import(pluginModel.path + "/main.js").then((a) => {
         // `a` is imported and can be used here
-        var eventHandlerIn = new Subject<PluginNotification>();
+        var eventHandlerIn = new Subject<PluginInput>();
         var eventHandlerOut = new Subject<PluginNotification>();
 
         const importedPlugin = new a.Plugin(eventHandlerIn,eventHandlerOut, pluginModel.id) as IPlugin;

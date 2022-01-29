@@ -3,6 +3,7 @@ import { Subject } from "rxjs";
 import { Plugin } from './main'
 // import fs = require('fs');
 import http = require('http');
+import { PluginInput } from "interfaces/plugin.input";
 
 
 // fs.readFile('./index.html', function (err, html) {
@@ -27,11 +28,15 @@ function pluginClick(event,data) {
 
 // Create a new event, allow bubbling, and provide any data you want to pass to the "detail" property
 const eventAwesome = new CustomEvent('plugin-input', {
+  bubbles: false,
+  detail: {
     plugin-id: '',
     data: {
+        action: "add",
         hour: timeArray[0],
         minute:timeArray[1]
     }
+}
 });
 }
 </script>
@@ -62,20 +67,20 @@ var server = http.createServer(function(request, response) {
     response.end('Hello HTTP!');});
 server.listen();
 */
-var testSubjectIn = new Subject<PluginNotification>();
-var testSubjectOut = new Subject<PluginNotification>();
+// var testSubjectIn = new Subject<PluginInput>();
+// var testSubjectOut = new Subject<PluginNotification>();
 
-testSubjectOut.subscribe({
-    next: (val) => {
-      console.log(val);
-    },
-    error: (val) => {
-      console.log('error: ', val);
-    }
-  })
-
-
-var plugin = new Plugin(testSubjectIn , testSubjectOut, '19', '20');
+// testSubjectOut.subscribe({
+//     next: (val) => {
+//       console.log(val);
+//     },
+//     error: (val) => {
+//       console.log('error: ', val);
+//     }
+//   })
 
 
-console.log("HEELLOO")
+// var plugin = new Plugin(testSubjectIn , testSubjectOut, '19', '20');
+
+
+// console.log("HEELLOO")

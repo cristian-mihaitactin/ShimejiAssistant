@@ -138,6 +138,8 @@ export class AppComponent implements OnInit {
 
     window.addEventListener('plugin-input', (e) => {
       console.log('plugin-input:',e);
+      // electron.ipcRenderer.send('plugin-input', e.);
+
     });
 //////////////////////////////////////////////////////////
     

@@ -1,12 +1,13 @@
 import { Subject } from "rxjs";
+import { PluginInput } from "./plugin.input";
 import { PluginNotification } from "./plugin.notification";
 
 export interface IPluginConstructor {
-  new (eventHandlerIn:Subject<PluginNotification> , eventHandlerOut:Subject<PluginNotification>, id: string, ...argv: string[]): IPlugin
+  new (eventHandlerIn:Subject<PluginInput> , eventHandlerOut:Subject<PluginNotification>, id: string, ...argv: string[]): IPlugin
 };
 
 export interface IPlugin {
-  eventHandlerIn:Subject<PluginNotification>,
+  eventHandlerIn:Subject<PluginInput>,
   eventHandlerOut:Subject<PluginNotification>,
   id: string,
   getHtml():string

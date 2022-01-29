@@ -1,23 +1,23 @@
 import { IPluginConstructor, IPlugin } from "./interfaces/iplugin";
 import { PluginNotification } from "./interfaces/plugin.notification";
-import { filter, Subject } from "rxjs";
-import { map } from "rxjs-compat/operator/map";
-import { AlarmMessage } from "interfaces/alarm.message";
-import { AlarmModel } from "interfaces/alarm.model";
+import { Subject } from "rxjs";
 
 import * as path from "path";
 import * as fs from "fs";
+
 import { AlarmService } from "./alarm.service";
+import { AlarmMessage, PluginInput } from "interfaces/plugin.input";
+import { parentPort } from "worker_threads";
 
 const Plugin: IPluginConstructor = class Plugin implements IPlugin {
-  eventHandlerIn:Subject<PluginNotification>;
+  eventHandlerIn:Subject<PluginInput>;
   eventHandlerOut:Subject<PluginNotification>;
   id:string;
   htmlTemplate: string;
   
   private alarmService:AlarmService;
 
-  constructor(eventHandlerIn:Subject<PluginNotification>, eventHandlerOut:Subject<PluginNotification>, id: string, ...argv: string[]) {
+  constructor(eventHandlerIn:Subject<PluginInput>, eventHandlerOut:Subject<PluginNotification>, id: string, ...argv: string[]) {
     this.eventHandlerOut = eventHandlerOut;
     this.eventHandlerIn = eventHandlerIn;
     this.id = id;
@@ -26,7 +26,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     this.htmlTemplate = `<div><label for="appt">Choose a time for your meeting:</label>
     <input type="time" id="appt" name="appt"
            min="00:00" max="23:59" required> <button onclick="pluginClick(event)">click here</button></div>
-           <ul id="alarmList"></ul>
+           
     <script>
     function pluginClick(event,data) {
       var input = document.getElementById("appt");
@@ -36,7 +36,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     const alarmEvent = new CustomEvent('plugin-input', {
       bubbles: true,
       detail: {
-        pluginName: '${id}',
+        pluginId: '${id}',
         data: {
             action: 'add',
             hour: timeArray[0],
@@ -113,18 +113,23 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
   }
 
   getHtml():string {
-    let frag = document.createRange().createContextualFragment(this.htmlTemplate);
+    let frag = this.htmlTemplate;
 
     const alarmList = this.alarmService.getAlarms();
+    if (alarmList.length < 1) {
+      return frag;
+    }
+
+    frag.concat(`<ul>
+    `);
+
     alarmList.forEach((value,index) => {
-      let listFrag = document.createRange().createContextualFragment(
-        `<li>${value.hour}:${value.minute} - Enabled: ${value.enabled}</li>`
-      );
-      frag.getElementById('alarmList').appendChild(listFrag);
+      frag.concat(`<li>${value.hour}:${value.minute} - Enabled: ${value.enabled}</li>`);
     });
-    var div = document.createElement('div');
-    div.appendChild( frag.cloneNode(true) );
-    return div.innerHTML
+    frag.concat(`</ul>
+    `);
+
+    return frag;
   }
 
 };
