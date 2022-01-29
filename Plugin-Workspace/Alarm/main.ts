@@ -7,24 +7,26 @@ import { AlarmModel } from "interfaces/alarm.model";
 
 import * as path from "path";
 import * as fs from "fs";
+import { AlarmService } from "./alarm.service";
 
 const Plugin: IPluginConstructor = class Plugin implements IPlugin {
   eventHandlerIn:Subject<PluginNotification>;
   eventHandlerOut:Subject<PluginNotification>;
   id:string;
-  html:string;
-
-  private alarmList: AlarmModel[];
+  htmlTemplate: string;
   
+  private alarmService:AlarmService;
+
   constructor(eventHandlerIn:Subject<PluginNotification>, eventHandlerOut:Subject<PluginNotification>, id: string, ...argv: string[]) {
     this.eventHandlerOut = eventHandlerOut;
     this.eventHandlerIn = eventHandlerIn;
     this.id = id;
-    this.alarmList = this.getAlarmList();
-
-    this.html = `<div><label for="appt">Choose a time for your meeting:</label>
+    this.alarmService = new AlarmService(__dirname);
+    
+    this.htmlTemplate = `<div><label for="appt">Choose a time for your meeting:</label>
     <input type="time" id="appt" name="appt"
            min="00:00" max="23:59" required> <button onclick="pluginClick(event)">click here</button></div>
+           <ul id="alarmList"></ul>
     <script>
     function pluginClick(event,data) {
       var input = document.getElementById("appt");
@@ -60,31 +62,19 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
       }
     })
   }
-
-  private getAlarmList(): AlarmModel[] {
-    const alarmJsonPath = path.join(__dirname , 'alarm.json'); 
-    if (fs.existsSync(alarmJsonPath)) { 
-      try {
-        return JSON.parse(fs.readFileSync(alarmJsonPath).toString());
-      } catch(error) {
-        // if there was some kind of error, return the passed in defaults instead.
-        console.error(error);
-        return [];
-      }
-    } else {
-      try{
-        fs.writeFileSync(alarmJsonPath, JSON.stringify([]));
-      } catch (error) {
-        console.error(error);
-        return [];
-      }
-    }
-  }
   
   private addAlarm(timeHour:string, timeMinute:string) {
     // Each plugin receives an even handler with which it communicates with the electron app (ping when ready)
     var now = new Date();
     var toUTC = new Date();
+
+    var thisAlarm = {
+      hour: timeHour,
+      minute: timeMinute,
+      enabled: true
+    };
+
+    this.alarmService.addAlarm(thisAlarm);
 
     function checkTime () {
       toUTC.setHours(parseInt(timeHour))
@@ -92,6 +82,8 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     
       if (now.getUTCHours() >= toUTC.getUTCHours() && now.getUTCMinutes() >= toUTC.getUTCMinutes()) {
           console.log("WAKE UP");
+          thisAlarm.enabled = false;
+          this.alarmService.updateAlarm(thisAlarm);
           this.eventHandler.next({
               notificationMessage: "Wake up message",
               actionType: 1
@@ -119,6 +111,22 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
         data:null
     });
   }
+
+  getHtml():string {
+    let frag = document.createRange().createContextualFragment(this.htmlTemplate);
+
+    const alarmList = this.alarmService.getAlarms();
+    alarmList.forEach((value,index) => {
+      let listFrag = document.createRange().createContextualFragment(
+        `<li>${value.hour}:${value.minute} - Enabled: ${value.enabled}</li>`
+      );
+      frag.getElementById('alarmList').appendChild(listFrag);
+    });
+    var div = document.createElement('div');
+    div.appendChild( frag.cloneNode(true) );
+    return div.innerHTML
+  }
+
 };
 
 // console.log('running plugin: ', plugin("16:54"));

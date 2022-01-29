@@ -9,5 +9,5 @@ export interface IPlugin {
   eventHandlerIn:Subject<PluginNotification>,
   eventHandlerOut:Subject<PluginNotification>,
   id: string,
-  html:string
+  getHtml():string
   };

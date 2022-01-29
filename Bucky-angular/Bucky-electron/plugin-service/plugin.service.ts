@@ -24,12 +24,6 @@ const userPreferencesEndpoint = '/api/UserPeferences';
 
 export class PluginService {
     pluginDirectory:string;
-
-    //registeredPlugins: BehaviorSubject<PluginModel[]>;
-    /**
-     *
-     */
-
     registeredPlugins: BehaviorSubject<RegisteredPlugin[]>;
 
     constructor(private userStore: UserStore) {
@@ -103,7 +97,8 @@ export class PluginService {
             .pipe(
                 map(res => res.data as PluginDetailsModel),
                 map(pdm => {
-                    pdm.html = this.registeredPlugins.value.find(element => element.plugin.id === id).plugin.html;
+                    pdm.html = this.registeredPlugins.value.find(element => element.plugin.id === id).plugin.getHtml()
+                    ;
                     return pdm;
                 })
             );
