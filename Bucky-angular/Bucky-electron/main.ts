@@ -336,6 +336,28 @@ pluginService.registeredPlugins.subscribe({
     console.error(err);
   }
 });
+
+pluginService.registeredPlugins.subscribe({
+  next : registeredPluginList => {
+    registeredPluginList.forEach((plugin,index) => {
+      pluginService.pluginHandlers.get(plugin.plugin.id).eventHandlerOut
+      .subscribe({
+        next: value => {
+          console.log('sending notification:' , value);
+          value.pluginId = plugin.plugin.id;
+          buckyWindow.webContents.send('plugin-notification', value);
+        },
+        error: err => {
+          console.error(err);
+        }
+      })
+    })
+  },
+    error: err => {
+      console.error(err);
+    }
+  });
+
   // var x = 'C:\\Users\\cristian.mihaita\\AppData\\Roaming\\Bucky\\Plugins\\Alarm\\1.0.0/dist/main.js';
   // import(x).then((a) => {
   //   // `a` is imported and can be used here

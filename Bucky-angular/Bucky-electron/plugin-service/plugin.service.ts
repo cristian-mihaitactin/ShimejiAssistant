@@ -253,6 +253,7 @@ export class PluginService {
 
         eventHandlerOut.subscribe({
             next: (val) => {
+                console.log('in plugin service')
                 console.log(val);
             },
             error: (val) => {

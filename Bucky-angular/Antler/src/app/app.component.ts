@@ -7,6 +7,7 @@ import { BuckyProfileModel } from './models/bucky-profile-model';
 import { delay } from 'rxjs-compat/operator/delay';
 import { PluginDetailsModel } from './models/plugin.details.model';
 import { PluginModel } from './models/plugin.model';
+import { PluginNotification } from './models/plugin.notification';
 const electron = (<any>window).require('electron');
 
 @Component({
@@ -79,6 +80,10 @@ export class AppComponent implements OnInit {
             this.cdr.detectChanges();
           }
       });
+
+      electron.ipcRenderer.on('plugin-notification', (event, arg: PluginNotification) => {
+        console.log('Got a plugin notification: ', arg);
+      });
      }
 
   ngOnInit() {
@@ -136,9 +141,14 @@ export class AppComponent implements OnInit {
     
     */
 
-    window.addEventListener('plugin-input', (e) => {
+    window.addEventListener('plugin-input', (e: CustomEvent) => {
+      /*
+      detail:
+data: {action: 'add', hour: '02', minute: '03'}
+pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
+      */
       console.log('plugin-input:',e);
-      // electron.ipcRenderer.send('plugin-input', e.);
+      electron.ipcRenderer.send('plugin-input', e.detail);
 
     });
 //////////////////////////////////////////////////////////

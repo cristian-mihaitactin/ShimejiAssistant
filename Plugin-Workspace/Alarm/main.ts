@@ -76,27 +76,29 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
 
     this.alarmService.addAlarm(thisAlarm);
 
-    function checkTime () {
+    function checkTime (alarmService: AlarmService, plugin: IPlugin) {
       toUTC.setHours(parseInt(timeHour))
       toUTC.setMinutes(parseInt(timeMinute))
     
       if (now.getUTCHours() >= toUTC.getUTCHours() && now.getUTCMinutes() >= toUTC.getUTCMinutes()) {
           console.log("WAKE UP");
           thisAlarm.enabled = false;
-          this.alarmService.updateAlarm(thisAlarm);
-          this.eventHandler.next({
-              notificationMessage: "Wake up message",
-              actionType: 1
+          
+          alarmService.updateAlarm(thisAlarm);
+          plugin.eventHandlerOut.next({
+            data: "It's time",
+            notificationMessage: "Wake up message",
+            actionType: 1
           });
       }
       else {
         console.log('Alarm check at ', now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds() + ':' + now.getMilliseconds());
         //Check at most every minute
-        setTimeout(this.checkTime, 1000*(59 - now.getSeconds()) + (999 - now.getMilliseconds()));
+        setTimeout(this.checkTime(alarmService, plugin), 1000*(59 - now.getSeconds()) + (999 - now.getMilliseconds()));
       }
     }// end checkTime
 
-    checkTime();
+    checkTime(this.alarmService, this);
     
     let dateDifference = toUTC.valueOf() - now.valueOf();
     var minutes = Math.floor((dateDifference/1000)/60);

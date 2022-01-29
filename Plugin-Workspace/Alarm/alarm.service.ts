@@ -58,8 +58,6 @@ export class AlarmService {
     }
 
     private writeAlarmsToFile() {
-        if (!fs.existsSync(this.alarmsJsonPath)){
-            fs.writeFileSync(this.alarmsJsonPath, JSON.stringify(this.alarmList));
-        }
+        fs.writeFileSync(this.alarmsJsonPath, JSON.stringify(this.alarmList));
     }
 }
