@@ -16,6 +16,7 @@ import jwt_decode  from 'jwt-decode'
 import { UserStore } from 'helpers/user-store';
 import { UserModel } from '../user/models/user-model';
 import { fstat } from 'original-fs';
+import { PluginService } from '../plugin-service/plugin.service';
 
 export class AuthService {
 
@@ -33,7 +34,8 @@ export class AuthService {
     profile$: Observable<ProfileModel>;
     loggedIn$: Observable<boolean>;
     constructor(
-        private localStorage:UserStore
+        private localStorage:UserStore,
+        private pluginService: PluginService
     ) {
         this.state = new BehaviorSubject<AuthStateModel>(this.initalState);
         this.state$ = this.state.asObservable();
@@ -98,7 +100,7 @@ export class AuthService {
     refreshTokens(): Observable<AuthTokenModel> {
         return this.state.pipe(
             first(),
-            map(state => state.tokens),
+            map(state => state.tokens ?? this.localStorage.get('auth-tokens') as unknown as AuthTokenModel),
             flatMap(tokens => this.getTokens({ refresh_token: tokens.refresh_token }, 'refresh_token').pipe(
                 catchError(error => throwError('Session Expired')))
             ),
@@ -165,6 +167,7 @@ export class AuthService {
     
                     this.storeToken(tokens);
                     this.storeUserInfo(tokens.access_token);
+                    this.pluginService.registerUserPlugins()
                     this.updateState({ authReady: true, tokens, profile });
                 }));
         //});

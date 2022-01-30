@@ -1,5 +1,7 @@
 ﻿using Barn.Entities.Users;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Barn.API.Models
 {
@@ -8,6 +10,7 @@ namespace Barn.API.Models
         public Guid? Id { get; set; }
         public Guid? UserId { get; set; }
         public Guid BuckyProfileID { get; set; }
+        public IList<PluginModel>? Plugins { get; set; }
 
         public UserPreferencesModel()
         {
@@ -18,6 +21,18 @@ namespace Barn.API.Models
             Id = userPreference.Id;
             UserId = userPreference.UserId;
             BuckyProfileID = userPreference.BuckyProfileID;
+            Plugins = userPreference.UserPreferencesPlugins?.Select(upp =>
+            {
+                var plugin = upp.Plugin;
+
+                return new PluginModel()
+                {
+                    Id = plugin.Id,
+                    Name = plugin.Name,
+                    Description = plugin.Description,
+                    Version = plugin.Version
+                };
+            }).ToList();
         }
 
         public UserPreferences ToEntity()

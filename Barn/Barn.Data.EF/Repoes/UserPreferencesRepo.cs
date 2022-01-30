@@ -21,12 +21,29 @@ namespace Barn.Data.Mock
 
         public IEnumerable<UserPreferences> GetAll()
         {
-            return _dbContext.UsersPreferences;
+            var userPreferenceList = new List<UserPreferences>();
+
+            foreach(var userPreference in _dbContext.UsersPreferences.ToList())
+            {
+                userPreference.UserPreferencesPlugins = _dbContext.UserPreferencesPlugins.Where(upp => upp.UserPreferenceId == userPreference.Id).ToList();
+                userPreferenceList.Add(userPreference);
+            }
+
+            return userPreferenceList;
         }
 
         public UserPreferences GetById(Guid id)
         {
-            return _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
+            var userPref = _dbContext.UsersPreferences.FirstOrDefault(x => x.Id == id);
+            if( userPref == null)
+            {
+                return null;
+            }
+
+            var userPrefPlugins = _dbContext.UserPreferencesPlugins.Where(usp => usp.UserPreferenceId == id).ToList();
+            userPref.UserPreferencesPlugins = userPrefPlugins;
+
+            return userPref;
         }
 
         public bool Insert(UserPreferences entity)
@@ -58,8 +75,14 @@ namespace Barn.Data.Mock
                 return false;
             }
 
-            _dbContext.UsersPreferences.Update(entity);
-            _dbContext.SaveChanges();
+            try
+            {
+                _dbContext.UsersPreferences.Update(entity);
+                _dbContext.SaveChanges();
+            } catch (Exception ex)
+            {
+                throw;
+            }
 
             return true;
         }

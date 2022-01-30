@@ -37,8 +37,10 @@ namespace Barn.Services.Plugins
 
             return new PluginPackageDTO
             {
-                FileName = plugin.Name + ".zip",
-                ZipBytes = pluginBytes.ZipBytes
+                FileName = plugin.Version + ".zip",
+                ZipBytes = pluginBytes.ZipBytes,
+                Version = plugin.Version,
+                Name = plugin.Name
             };
         }
 
@@ -56,7 +58,6 @@ namespace Barn.Services.Plugins
                 PluginImageBlob = pluginImageBlob
             };
         }
-
 
         public IList<Plugin> GetPlugins()
         {

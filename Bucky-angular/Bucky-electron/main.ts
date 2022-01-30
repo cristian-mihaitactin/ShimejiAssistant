@@ -11,6 +11,7 @@ import { UserService } from "./user/user.service";
 import { BarnBuckyService } from "./barn-service/barn-bucky-service";
 import { Subject } from "rxjs";
 import { PluginService } from "./plugin-service/plugin.service";
+import { PluginInput } from "models/plugin.input";
 
 //import { environment } from "environments/environment";
 
@@ -22,16 +23,16 @@ const userStore = new UserStore({
   configName: environment.config,
   defaults: environment.default_user
 });
+const pluginService = new PluginService(userStore);
 
-const authService = new AuthService(userStore);
+const authService = new AuthService(userStore, pluginService);
 
-const barnService = new BarnBuckyService();
+const barnService = new BarnBuckyService(authService, userStore);
 const userService = new UserService(userStore);
 const buckyProfileService = new BuckyProfileService(
   userStore,  barnService
 );
 
-const pluginService = new PluginService(userStore);
 
 
 //////////////////////////////////////
@@ -59,7 +60,8 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    mainBuckyProfile
+    //mainBuckyProfile
+    buckyProfileService.getUserBuckyProfile()
       .subscribe({
         next: (value) => {
           event.reply("selected-bucky-profile", value);
@@ -85,31 +87,52 @@ const initIpc = () => {
 
   ipcMain.on("get-bucky-profile-by-id", (event,arg) => {
     console.log('get-bucky-profile-by-id: ' + arg);
-    buckyProfileService.getBuckyProfileById(arg)
-      .subscribe({
-        next: (value) => {
-          event.reply("bucky-profile-by-id", value);
-        },
-        error: (error) => {
-          console.error(error);
-        }
-      })
+    if(arg !== undefined && arg !== null) {
+      buckyProfileService.getBuckyProfileById(arg)
+        .subscribe({
+          next: (value) => {
+            event.reply("bucky-profile-by-id", value);
+          },
+          error: (error) => {
+            console.error(error);
+          }
+        })
+
+    }
   });
 
   ipcMain.on("get-bucky-assitant-profile-by-id", (event,arg) => {
     console.log('get-bucky-assitant-profile-by-id', arg);
-    buckyProfileService.getBuckyProfileById(arg)
+    if(arg !== undefined && arg !== null) {
+      buckyProfileService.getBuckyProfileById(arg)
+        .subscribe({
+          next: (value) => {
+            event.reply("bucky-assistant-profile-by-id", value);
+          },
+          error: (error) => {
+            console.error(error);
+          }
+        })
+    }
+  });
+  
+  ipcMain.on("get-user-plugins", (event,arg) => {
+    pluginService.registeredPlugins
       .subscribe({
         next: (value) => {
-          event.reply("bucky-assistant-profile-by-id", value);
+          console.log('in get-user-plugins');
+          var pluginModels = [];
+          value.forEach((val, index) => {
+            pluginModels.push(val.pluginModel);
+          })
+          event.reply("user-plugins-response", pluginModels);
         },
-        error: (error) => {
-          console.error(error);
+        error: (err) => {
+          console.error(err);
         }
-      })
+      });
   });
 
-  
   ipcMain.on("get-all-plugins", (event,arg) => {
     pluginService.getAllPlugins()
       .subscribe({
@@ -131,27 +154,17 @@ const initIpc = () => {
         error: (err) => {
           console.error(err);
         }
-      })
-  });
-  
-  ipcMain.on("get-plugin-sample", (event,arg) => {
-    pluginService.getPluginDetails(arg)
-      .subscribe({
-        next: (value) => {
-          event.reply("plugin-sample-response", value);
-        },
-        error: (err) => {
-          console.error(err);
-        }
-      })
+      });
   });
 
-  ipcMain.on("install-plugin-request", (event, arg) => {
+  ipcMain.on("install-plugin-request", (event, arg:string) => {
     pluginService.installPluginById(arg);
   });
-}
 
-
+  ipcMain.on("plugin-input", (event, arg:PluginInput) => {
+    pluginService.handlePluginInput(arg);
+  });
+}// end of initIpc()
 
 app.on("ready", () => {
   initIpc();
@@ -316,30 +329,41 @@ app.on("ready", () => {
 //////////////////
 
 pluginService.registeredPlugins.subscribe({
-  next: (value) => {
-    console.log(value);
+  next : registeredPluginList => {
+    registeredPluginList.forEach((plugin,index) => {
+      pluginService.pluginHandlers.get(plugin.plugin.id).eventHandlerOut
+      .subscribe({
+        next: value => {
+          console.log('sending notification:' , value);
+          value.pluginId = plugin.plugin.id;
+          buckyWindow.webContents.send('plugin-notification', value);
+        },
+        error: err => {
+          console.error(err);
+        }
+      })
+    })
   },
-  error: (err) => {
-    console.error(err);
-  }
-});
-/*
-var x = './Plugin/main.js';
-import(x).then((a) => {
-  // `a` is imported and can be used here
-  var subject = new Subject<{notificationMessage: string;
-    actionType: number}>();
-  a.Plugin(subject, "18", "41");
-  subject.subscribe({
-    next: (val) => {
-      console.log(val);
-    },
-    error: (val) => {
-      console.log(val);
+    error: err => {
+      console.error(err);
     }
-  })
-});
-*/
+  });
+
+  // var x = 'C:\\Users\\cristian.mihaita\\AppData\\Roaming\\Bucky\\Plugins\\Alarm\\1.0.0/dist/main.js';
+  // import(x).then((a) => {
+  //   // `a` is imported and can be used here
+  //   var subject = new Subject<{notificationMessage: string;
+  //     actionType: number}>();
+  //   a.Plugin(subject,subject, "ola");
+  //   subject.subscribe({
+  //     next: (val) => {
+  //       console.log(val);
+  //     },
+  //     error: (val) => {
+  //       console.log(val);
+  //     }
+  //   })
+  // });
 });
 
 // Quit when all windows are closed.

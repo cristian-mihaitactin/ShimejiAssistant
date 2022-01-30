@@ -1,5 +1,7 @@
 ﻿using Barn.API.Models;
+using Barn.Entities.Plugins;
 using Barn.Entities.Users;
+using Barn.Services.Plugins;
 using Barn.Services.UserPreferences;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,19 +23,23 @@ namespace Barn.API.Controllers
     public class UserPeferencesController : ControllerBase
     {
         private IUserPreferencesService _userPrefService;
+        private IPluginService _pluginService;
         private UserManager<User> _userManager;
 
         public UserPeferencesController(IUserPreferencesService userPrefService,
+            IPluginService pluginService,
             UserManager<User> userManager
             )
         {
             _userPrefService = userPrefService;
+            _pluginService = pluginService;
             _userManager = userManager;
 
         }
         // GET api/<UserPeferencesController>/5
         [HttpGet]
         [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+        [SwaggerResponse((int)HttpStatusCode.Accepted, "", typeof(UserPreferencesModel))]
         [SwaggerResponse(500, "Error retrieving UserPreferences")]
         [SwaggerResponse(404, "UserPreferences not found for user")]
         public async Task<IActionResult> Get()
@@ -43,6 +50,16 @@ namespace Barn.API.Controllers
             {
                 return NotFound();
             }
+            var userPreferencesPlugins = new List<UserPreferencesPlugins>();
+            foreach(var userPlugin in found.UserPreferencesPlugins)
+            {
+                var plugin = _pluginService.GetPlugin(userPlugin.PluginId);
+                userPlugin.Plugin = plugin;
+
+                userPreferencesPlugins.Add(userPlugin);
+            }
+
+            found.UserPreferencesPlugins = userPreferencesPlugins;
             return Ok(new UserPreferencesModel(found));
         }
 
@@ -55,6 +72,17 @@ namespace Barn.API.Controllers
             var found = _userPrefService.GetUserPreferenceByUserId(user.Id);
             found.BuckyProfileID = value.BuckyProfileID;
             _userPrefService.UpdateUserPreference(found);
+        }
+
+        [HttpPost("/api/UserPeferences/Plugin/{pluginId}")]
+        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Post(Guid pluginId)
+        {
+            var user = await GetUser();
+            var found = _userPrefService.GetUserPreferenceByUserId(user.Id);
+
+            _userPrefService.InstallPluginToUser(found.Id,pluginId);
+            return Ok();
         }
 
         // DELETE api/<UserPeferencesController>/5

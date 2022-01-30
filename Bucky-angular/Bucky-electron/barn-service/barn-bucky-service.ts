@@ -1,48 +1,58 @@
 import { environment } from '../environments/environment'
 import { Observable, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { BuckyProfileModel } from '../bucky_profile/bucky-profile-model'
-import { BuckyBehaviourModel } from '../bucky_profile/bucky-behaviour-model'
 import {AxiosResponse, AxiosResponseHeaders, Method } from 'axios'
 import {Axios} from 'axios-observable'
+import { AuthService } from '../auth/auth.service';
+import { UserStore } from '../helpers/user-store';
 
 export class BarnBuckyService {
-    
-    private profileUrl = '/api/Profile';
 
+    constructor(
+        private authService: AuthService,
+        private userStore: UserStore
+    ) {}
 
-    getBuckyProfile(id: string): Observable<BuckyProfileModel> {
-        /*
-        const params = new URLSearchParams();
-        params.append('id', id);
-        */
+    public callBarn(endpoint: string, method: Method, customHeaders: Map<string, string> = new Map<string,string>(), body: string = null) : Observable<AxiosResponse> {
+        const tokens = this.userStore.getAuthTokens();
 
-        var response = this.callBarn(`${this.profileUrl}/${id}`, "GET" as Method , null);
+        if (tokens !== undefined && tokens !== null) {
+            //'Authorization': `Bearer ${accessToken}`
+            customHeaders.set('Authorization', `${tokens.token_type} ${tokens.access_token}`);
+        }
 
-        return response.pipe(
-            map(res => res.data as BuckyProfileModel)
-        );
-    }
+        let headerObj = Array.from(customHeaders).reduce((obj, [key, value]) => (
+            Object.assign(obj, { [key]: value })
+        ), {});
 
-    getAllBuckyProfiles(): Observable<BuckyProfileModel[]> {
-        var response = this.callBarn(`${this.profileUrl}`, "GET" as Method , null);
-
-        return response.pipe(
-            map(res=> 
-                res.data as BuckyProfileModel[])
-        )
-      }
-
-    private callBarn(endpoint: string, method: Method, params: URLSearchParams) : Observable<AxiosResponse> {
         const options = {
             baseURL: `${environment.baseApiUrl}`,
             url: endpoint,
             method: method, //"POST" as Method,
-            // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            params: params,
+            data: body,
+            headers: headerObj//,
         }
+
+        const instance = Axios.create(options);
         
-        // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
-        return Axios.request(options)
+        instance.interceptors.response.use(null, (error) => {
+            console.log('in interceptor error: ', error)
+            console.log('error.response.status: ', error.response.status)
+
+            if (error.config && error.response && error.response.status === 401) {
+            this.authService.refreshTokens().subscribe({
+                next: (value) => {
+                    console.log('in interceptor if')
+                    options.headers['Authorization'] = `${value.token_type} ${value.access_token}`;
+                },
+                error: (err) => {
+                    console.error(err);
+                }
+            });
+            }
+
+            return Promise.reject(error);
+        });
+
+        return instance.request(options).pipe();
     }
 }
