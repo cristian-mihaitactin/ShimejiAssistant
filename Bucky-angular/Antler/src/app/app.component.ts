@@ -94,7 +94,15 @@ export class AppComponent implements OnInit {
         const html = arg.data;
         let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
         activatedPlugin.appendChild(frag);
-      });
+
+        const newBehaviour = this.buckyBehaviours.find(element => parseInt(element.actionType) === arg.actionType);
+
+        if (newBehaviour){
+          this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+          + newBehaviour.imageBytes);
+          this.cdr.detectChanges();
+        }
+        });
      }
 
   ngOnInit() {
