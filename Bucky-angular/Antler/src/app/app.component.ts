@@ -83,6 +83,17 @@ export class AppComponent implements OnInit {
 
       electron.ipcRenderer.on('plugin-notification', (event, arg: PluginNotification) => {
         console.log('Got a plugin notification: ', arg);
+
+        var activatedPlugin = document.getElementById("notification-container");
+        if (activatedPlugin !== null && activatedPlugin !== undefined && activatedPlugin.firstChild){
+          while (activatedPlugin.firstChild) {
+            activatedPlugin.removeChild(activatedPlugin.firstChild);
+          };
+        }
+
+        const html = arg.data;
+        let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
+        activatedPlugin.appendChild(frag);
       });
      }
 
@@ -96,9 +107,7 @@ export class AppComponent implements OnInit {
 
         this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
         + value.behaviours[0].imageBytes);
-        //this.image = value.behaviours[0].imageBytes;
       }
-
     });
     
     this.plugins.subscribe({
@@ -118,28 +127,6 @@ export class AppComponent implements OnInit {
 
     electron.ipcRenderer.send('get-initial-bucky-profile', '');
     electron.ipcRenderer.send("get-user-plugins", '');
-
-
-    /*
-    
-    function pluginClick(event,data) {
-      var input = document.getElementById("appt");
-      console.log(input.value);
-      var timeArray = input.value.split(':');
-    
-    const alarmEvent = new CustomEvent('plugin-input', {
-        pluginName: '76433374-9d88-43f9-aaa1-c6a9c1c8592e',
-        data: {
-            action: 'add',
-            hour: timeArray[0],
-            minute:timeArray[1]
-        }
-    });
-  
-    dispatchEvent(alarmEvent);
-    }
-    
-    */
 
     window.addEventListener('plugin-input', (e: CustomEvent) => {
       /*
@@ -204,12 +191,13 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
 
   pluginIcoClick(event){
     event.preventDefault();
-    console.log('pluginIcoClick:', event);
 
-    var activatedPlugin = document.getElementById("activatedPlugin");
-
-    if (activatedPlugin !== null && activatedPlugin !== undefined){
-      activatedPlugin.parentElement.removeChild(activatedPlugin);
+    var activatedPlugin = document.getElementById("notification-container");
+    if (activatedPlugin !== null && activatedPlugin !== undefined && activatedPlugin.firstChild){
+      while (activatedPlugin.firstChild) {
+        activatedPlugin.removeChild(activatedPlugin.firstChild);
+      };
+      return; 
     }
     
     //get html of clicked plugin
@@ -219,7 +207,7 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
     }
     const html = this.getPluginHtml(pluginId);
     let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
-    document.getElementById('notification-container').appendChild(frag);
+    activatedPlugin.appendChild(frag);
   }
   
   private getPluginHtml(id:string) {

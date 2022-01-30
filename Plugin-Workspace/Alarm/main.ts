@@ -5,7 +5,7 @@ import { Subject } from "rxjs";
 import * as path from "path";
 import * as fs from "fs";
 
-import { AlarmService } from "./alarm.service";
+import { Alarm, AlarmService } from "./alarm.service";
 import { AlarmMessage, PluginInput } from "interfaces/plugin.input";
 import { parentPort } from "worker_threads";
 
@@ -15,15 +15,14 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
   id:string;
   htmlTemplate: string;
   
-  private alarmService:AlarmService;
+  alarmService:AlarmService = new AlarmService(__dirname);
 
   constructor(eventHandlerIn:Subject<PluginInput>, eventHandlerOut:Subject<PluginNotification>, id: string, ...argv: string[]) {
     this.eventHandlerOut = eventHandlerOut;
     this.eventHandlerIn = eventHandlerIn;
     this.id = id;
-    this.alarmService = new AlarmService(__dirname);
     
-    this.htmlTemplate = `<div><label for="appt">Choose a time for your meeting:</label>
+    this.htmlTemplate = `<div><label for="appt">Choose a time for your alarm:</label>
     <input type="time" id="appt" name="appt"
            min="00:00" max="23:59" required> <button onclick="pluginClick(event)">click here</button></div>
            
@@ -61,12 +60,11 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
         console.error(err);
       }
     })
-  }
+    this.startCheckTime(this.alarmService, this.eventHandlerOut);
+  }// end ctor
   
   private addAlarm(timeHour:string, timeMinute:string) {
     // Each plugin receives an even handler with which it communicates with the electron app (ping when ready)
-    var now = new Date();
-    var toUTC = new Date();
 
     var thisAlarm = {
       hour: timeHour,
@@ -76,30 +74,12 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
 
     this.alarmService.addAlarm(thisAlarm);
 
-    function checkTime (alarmService: AlarmService, plugin: IPlugin) {
-      toUTC.setHours(parseInt(timeHour))
-      toUTC.setMinutes(parseInt(timeMinute))
-    
-      if (now.getUTCHours() >= toUTC.getUTCHours() && now.getUTCMinutes() >= toUTC.getUTCMinutes()) {
-          console.log("WAKE UP");
-          thisAlarm.enabled = false;
-          
-          alarmService.updateAlarm(thisAlarm);
-          plugin.eventHandlerOut.next({
-            data: "It's time",
-            notificationMessage: "Wake up message",
-            actionType: 1
-          });
-      }
-      else {
-        console.log('Alarm check at ', now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds() + ':' + now.getMilliseconds());
-        //Check at most every minute
-        setTimeout(this.checkTime(alarmService, plugin), 1000*(59 - now.getSeconds()) + (999 - now.getMilliseconds()));
-      }
-    }// end checkTime
+    var now = new Date();
+    var toUTC = new Date();
 
-    checkTime(this.alarmService, this);
-    
+    toUTC.setHours(parseInt(thisAlarm.hour))
+    toUTC.setMinutes(parseInt(thisAlarm.minute));
+
     let dateDifference = toUTC.valueOf() - now.valueOf();
     var minutes = Math.floor((dateDifference/1000)/60);
 
@@ -110,9 +90,50 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     this.eventHandlerOut.next({
         notificationMessage: settingMessage,
         actionType: 8,
-        data:null
+        data:`<div>Alarm set for ${timeHour}:${timeMinute}(in aprox ${minutes} minutes)</div>
+        ${this.getHtml()}`
     });
-  }
+  }// end of addAlarm
+
+  private startCheckTime (functionAlarmService: AlarmService, pluginOut: Subject<PluginNotification>) : void {
+    var thisPlugin = this;
+
+    function checkTime (functionAlarmService: AlarmService, pluginOut: Subject<PluginNotification>) {
+      var now = new Date();
+      function checkAlarm(alarm: Alarm, functionAlarmService: AlarmService, pluginOut: Subject<PluginNotification>): void  {
+        var now = new Date();
+    
+        var toUTC = new Date();
+        toUTC.setHours(parseInt(alarm.hour))
+        toUTC.setMinutes(parseInt(alarm.minute));
+    
+        if (now.getUTCHours() >= toUTC.getUTCHours() && now.getUTCMinutes() >= toUTC.getUTCMinutes()) {
+          console.log("WAKE UP");
+          alarm.enabled = false;
+          
+          functionAlarmService.updateAlarm(alarm);
+    
+          console.log(pluginOut);
+          pluginOut.next({
+            data: `<div style="color=red;">!!!ALARM!!!</div>
+            ${thisPlugin.getHtml()}`,
+            notificationMessage: "Wake up message",
+            actionType: 1
+          });
+        } else {
+          console.log('Alarm check at ', now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds() + ':' + now.getMilliseconds());
+        } 
+      }
+  
+      var alarmList = functionAlarmService.getAlarms();
+      alarmList.filter(element => element.enabled).forEach((alarm, index) => {
+        checkAlarm(alarm, functionAlarmService, pluginOut);
+      });
+      //Check at most every minute
+      setTimeout(() => {checkTime(functionAlarmService, pluginOut)}, 1000*(59 - now.getSeconds()) + (999 - now.getMilliseconds()));
+    }// end checkTime
+    checkTime(functionAlarmService, pluginOut);
+  }// end of startCheckTime
 
   getHtml():string {
     let frag = this.htmlTemplate;

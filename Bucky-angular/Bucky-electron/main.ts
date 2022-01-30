@@ -329,15 +329,6 @@ app.on("ready", () => {
 //////////////////
 
 pluginService.registeredPlugins.subscribe({
-  next: (value) => {
-    console.log(value);
-  },
-  error: (err) => {
-    console.error(err);
-  }
-});
-
-pluginService.registeredPlugins.subscribe({
   next : registeredPluginList => {
     registeredPluginList.forEach((plugin,index) => {
       pluginService.pluginHandlers.get(plugin.plugin.id).eventHandlerOut
