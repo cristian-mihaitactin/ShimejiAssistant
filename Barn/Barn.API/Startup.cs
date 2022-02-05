@@ -62,6 +62,7 @@ namespace Barn.API
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             services.AddScoped<IBuckyProfileService, BuckyProfileService>();
             services.AddScoped<IPluginService, PluginService>();
+            services.AddSingleton<IConfiguration>(Configuration);
 
 
             // --------------------------------- OpenId ---------------------------------//

@@ -1,6 +1,7 @@
 ﻿using Barn.AzIntegration.Plugin;
 using Barn.Entities.Plugins;
 using Barn.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,17 +14,19 @@ namespace Barn.Services.Plugins
     {
         private IGenericRepo<Guid, Plugin> _pluginRepo;
         private IGenericRepo<Guid, PluginNotification> _pluginNotificationRepo;
+        private IConfiguration _configuration;
 
         private PluginClient _pluginClient;
 
 
         public PluginService(IGenericRepo<Guid, Plugin> pluginRepo,
-            IGenericRepo<Guid, PluginNotification> pluginNotificationRepo)
+            IGenericRepo<Guid, PluginNotification> pluginNotificationRepo, IConfiguration configuration)
         {
+            _configuration = configuration;
             _pluginRepo = pluginRepo;
             _pluginNotificationRepo = pluginNotificationRepo;
 
-            _pluginClient = new PluginClient("UseDevelopmentStorage=true");
+            _pluginClient = new PluginClient(_configuration.GetConnectionString("AzStorageConnectionString"));
         }
 
         public Plugin GetPlugin(Guid id)

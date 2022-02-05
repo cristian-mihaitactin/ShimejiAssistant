@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Barn.AzIntegration.BuckyBehaviour;
 using Barn.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Barn.Services.BuckyProfile
@@ -14,11 +15,13 @@ namespace Barn.Services.BuckyProfile
         private Guid DEFAULT_BUCKY_PROFILE = new Guid("8919E40E-D588-42F2-A0A8-4AFB9AD1589B");
         private BehaviourClient _behaviourClient;
         private IGenericRepo<Guid, Entities.Bucky.BuckyProfile> _buckyProfileRepo;
+        private IConfiguration _configuration;
 
         public BuckyProfileService(IGenericRepo<Guid, 
-            Entities.Bucky.BuckyProfile> buckyProfileRepo)
+            Entities.Bucky.BuckyProfile> buckyProfileRepo, IConfiguration configuration)
         {
-            _behaviourClient = new BehaviourClient("UseDevelopmentStorage=true");
+            _configuration = configuration;
+            _behaviourClient = new BehaviourClient(_configuration.GetConnectionString("AzStorageConnectionString"));
             _buckyProfileRepo = buckyProfileRepo;
         }
 
