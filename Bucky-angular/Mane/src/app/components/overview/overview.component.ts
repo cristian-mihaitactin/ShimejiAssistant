@@ -28,15 +28,11 @@ export class OverviewComponent implements OnInit {
   ) { 
     electron.ipcRenderer.on('bucky-profiles', (_event: any, arg: BuckyProfileModel[]) => {
       this.buckyProfiles.next(arg);
-      // buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
-      //buckyProfiles.complete();
     });
 
     
     electron.ipcRenderer.on("all-plugins-response", (_event: any, arg: PluginModel[]) => {
       this.plugins.next(arg);
-      // buckyProfiles = new BehaviorSubject<BuckyProfileModel[]>([]);
-      //buckyProfiles.complete();
     });
   }
 
@@ -62,8 +58,7 @@ export class OverviewComponent implements OnInit {
           })
           this.cdr.detectChanges();
         }
-      })
-
+      });
   }
 
   newAreaSelected(event: string){

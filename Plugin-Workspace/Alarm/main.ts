@@ -115,7 +115,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     
           console.log(pluginOut);
           pluginOut.next({
-            data: `<div style="color=red;">!!!ALARM!!!</div>
+            data: `<div style="color:red;">!!!ALARM!!!</div>
             ${thisPlugin.getHtml()}`,
             notificationMessage: "Wake up message",
             actionType: 1
