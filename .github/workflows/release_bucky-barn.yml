@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release ./Barn/
 
       - name: dotnet publish
-        run: dotnet publish ./Barn/Barn.API/Barn.API.csproj -c Release ./Barn -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release ./Barn/Barn.API/Barn.API.csproj -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
