@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31727.386
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.API", "Barn.API\Barn.API.csproj", "{E752A1AC-7589-43B6-AEDD-EFE0AF9ADFB1}"
 EndProject
@@ -12,6 +12,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.Data.EF", "Barn.Data.EF\Barn.Data.EF.csproj", "{855372C0-780C-46AF-B774-3FA63CE493BF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Barn.AzIntegration", "Barn.AzIntegration\Barn.AzIntegration.csproj", "{D64AB617-5AAE-4663-8C7F-8ED3DC3D866F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD7FB59E-EE3D-43DD-83E4-9A1F233CECC6}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\release_bucky-barn.yml = ..\.github\workflows\release_bucky-barn.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
