@@ -234,16 +234,15 @@ export class PluginService {
         }
 
         pluginModel.path = pluginPath;
-
         import(pluginModel.path + "/main.js").then((a) => {
         // `a` is imported and can be used here
         var eventHandlerIn = new Subject<PluginInput>();
         var eventHandlerOut = new Subject<PluginNotification>();
 
         const importedPlugin = new a.Plugin(eventHandlerIn,eventHandlerOut, pluginModel.id) as IPlugin;
-
         eventHandlerIn.subscribe({
         next: (val) => {
+            console.log('in plugin input')
             console.log(val);
         },
         error: (val) => {
@@ -253,7 +252,7 @@ export class PluginService {
 
         eventHandlerOut.subscribe({
             next: (val) => {
-                console.log('in plugin service')
+                console.log('in plugin output')
                 console.log(val);
             },
             error: (val) => {

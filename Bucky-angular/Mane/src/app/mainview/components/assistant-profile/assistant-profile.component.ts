@@ -58,7 +58,6 @@ export class AssistantProfileComponent implements OnInit {
         })
 
         this.cdr.detectChanges();
-        //this.image = value.behaviours[0].imageBytes;
       }
     });
 

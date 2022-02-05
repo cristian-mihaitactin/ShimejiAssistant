@@ -134,18 +134,12 @@ export class AuthService {
     }
 
     private getTokens(data: RefreshGrantModel | LoginModel, grantType: string): Observable<AxiosResponse> {
-        //const headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
-        //const options = new RequestOptions({ headers: headers });
-
         Object.assign(data, { grant_type: grantType, scope: 'openid offline_access' });
-
         const params = new URLSearchParams();
         Object.keys(data)
             .forEach(key => {
                 params.append(key, data[key])
             });
-
-        
         const options = {
             baseURL: `${environment.baseApiUrl}`,
             url: '/connect/token',
@@ -170,7 +164,6 @@ export class AuthService {
                     this.pluginService.registerUserPlugins()
                     this.updateState({ authReady: true, tokens, profile });
                 }));
-        //});
     }
 
     private startupTokenRefresh(): Observable<AuthTokenModel> {
