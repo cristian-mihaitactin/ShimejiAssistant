@@ -33,8 +33,6 @@ export class PluginDetailsComponent implements OnInit {
       });// end
     }
   ngOnInit(): void {
-    console.log('this.pluginId')
-      console.log(this.pluginId)
     if (this.pluginId !== undefined && this.pluginId !== null && this.pluginId !== ''){
       electron.ipcRenderer.send('get-plugin-details', this.pluginId);
     }

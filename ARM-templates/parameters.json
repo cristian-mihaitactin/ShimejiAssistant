@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vulnerabilityAssessments_Default_storageContainerPath": {
+            "value": null
+        },
+        "sites_bucky_barn_name": {
+            "value": null
+        },
+        "servers_bucky_server_name": {
+            "value": null
+        },
+        "components_bucky_barn_name": {
+            "value": null
+        },
+        "storageAccounts_buckyblobs_name": {
+            "value": null
+        },
+        "serverfarms_bucky_barn_appserv_name": {
+            "value": null
+        },
+        "actionGroups_Application_Insights_Smart_Detection_name": {
+            "value": null
+        },
+        "smartdetectoralertrules_failure_anomalies___bucky_barn_name": {
+            "value": null
+        },
+        "workspaces_DefaultWorkspace_e88753b7_ff7a_43f7_9fa7_bf720964d88f_WEU_externalid": {
+            "value": null
+        }
+    }
+}

@@ -148,12 +148,8 @@ namespace Barn.API
             services.AddDbContext<ApplicationDbContext>(options =>
             {
 
-                // Adding configuration to use Sqlite with our application
-                options.UseSqlServer( // adding the connection string path to our db
+                options.UseSqlServer(
                         Configuration.GetConnectionString("DefaultConnection"));
-                // Register the entity sets needed by OpenIddict.
-                // Note: use the generic overload if you need
-                // to replace the default OpenIddict entities.
                 options.UseOpenIddict<Guid>();
             });
 

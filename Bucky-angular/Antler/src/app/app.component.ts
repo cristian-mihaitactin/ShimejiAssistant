@@ -75,15 +75,12 @@ export class AppComponent implements OnInit {
             + arg.pluginImageBlob.pngBytes),
             defaultHtml: arg.html
           };
-
             this.displayedPlugins.push(newPlugin);
             this.cdr.detectChanges();
           }
       });
 
       electron.ipcRenderer.on('plugin-notification', (event, arg: PluginNotification) => {
-        console.log('Got a plugin notification: ', arg);
-
         var activatedPlugin = document.getElementById("notification-container");
         if (activatedPlugin !== null && activatedPlugin !== undefined && activatedPlugin.firstChild){
           while (activatedPlugin.firstChild) {
@@ -96,13 +93,26 @@ export class AppComponent implements OnInit {
         activatedPlugin.appendChild(frag);
 
         const newBehaviour = this.buckyBehaviours.find(element => parseInt(element.actionType) === arg.actionType);
-
         if (newBehaviour){
           this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
           + newBehaviour.imageBytes);
           this.cdr.detectChanges();
         }
+
+        //notification-message
+        var pluginMessage = document.getElementById("notification-message");
+        if (pluginMessage !== null && pluginMessage !== undefined && pluginMessage.firstChild){
+          while (pluginMessage.firstChild) {
+            pluginMessage.removeChild(pluginMessage.firstChild);
+          };
+        }
+        pluginMessage.textContent = arg.notificationMessage;
+
+        if (pluginMessage.style.display === "none") {
+          pluginMessage.style.display = "block";
+        }
         });
+
      }
 
   ngOnInit() {
@@ -199,6 +209,17 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
 
   pluginIcoClick(event){
     event.preventDefault();
+
+    var pluginMessage = document.getElementById("notification-message");
+    if (pluginMessage !== null && pluginMessage !== undefined && pluginMessage.firstChild){
+      while (pluginMessage.firstChild) {
+        pluginMessage.removeChild(pluginMessage.firstChild);
+      };
+    }
+
+    if (pluginMessage.style.display !== "none") {
+      pluginMessage.style.display = "none";
+    }
 
     var activatedPlugin = document.getElementById("notification-container");
     if (activatedPlugin !== null && activatedPlugin !== undefined && activatedPlugin.firstChild){
