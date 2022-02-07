@@ -17,6 +17,7 @@ import { UserStore } from 'helpers/user-store';
 import { UserModel } from '../user/models/user-model';
 import { fstat } from 'original-fs';
 import { PluginService } from '../plugin-service/plugin.service';
+import { BarnBuckyService } from 'barn-service/barn-bucky-service';
 
 export class AuthService {
 
@@ -35,7 +36,6 @@ export class AuthService {
     loggedIn$: Observable<boolean>;
     constructor(
         private localStorage:UserStore,
-        private pluginService: PluginService
     ) {
         this.state = new BehaviorSubject<AuthStateModel>(this.initalState);
         this.state$ = this.state.asObservable();
@@ -161,7 +161,6 @@ export class AuthService {
     
                     this.storeToken(tokens);
                     this.storeUserInfo(tokens.access_token);
-                    this.pluginService.registerUserPlugins()
                     this.updateState({ authReady: true, tokens, profile });
                 }));
     }
@@ -241,8 +240,26 @@ export class AuthService {
             // params: params,
         }
         
-        // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
-        return Axios.request(options)
-    }
+            const instance = Axios.create(options);
+        
+            instance.interceptors.response.use(null, (error) => {
+                console.log("in interceptor")
+                if (error.config && error.response && error.response.status === 401) {
+                console.log("in interceptor IFF")
+    
+                this.refreshTokens().subscribe({
+                    next: (value) => {
+                        options.headers['Authorization'] = `${value.token_type} ${value.access_token}`;
+                    },
+                    error: (err) => {
+                        console.error(err);
+                    }
+                });
+                }
+    
+                return Promise.reject(error);
+            });
+    
+            return instance.request(options).pipe();    }
 }
 

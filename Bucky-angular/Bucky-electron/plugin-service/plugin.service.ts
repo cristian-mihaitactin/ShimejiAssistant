@@ -17,6 +17,7 @@ import { PluginNotification } from "../models/plugin.notification";
 import { IPlugin } from "../models/iplugin";
 import { RegisteredPlugin } from "../models/registered.plugin";
 import { PluginInput } from "../models/plugin.input";
+import { BarnBuckyService } from "../barn-service/barn-bucky-service";
 
 const pluginRelativePath = "Plugins";
 const pluginPackageEndpoint = "/api/Plugin"
@@ -27,7 +28,8 @@ export class PluginService {
     registeredPlugins: BehaviorSubject<RegisteredPlugin[]>;
     pluginHandlers: Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>
 
-    constructor(private userStore: UserStore) {
+    constructor(private userStore: UserStore, 
+        private barnService: BarnBuckyService) {
         const userDataPath = app.getPath('userData');
         this.registeredPlugins = new BehaviorSubject<RegisteredPlugin[]>([]);
         this.pluginHandlers = new Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>();
@@ -39,7 +41,7 @@ export class PluginService {
                 var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
                     if (!existingPlugins.includes(plugin.pluginModel)){
-                        this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
+                        this.barnService.callBarn(userPreferencesEndpoint
                             + "/Plugin/" + plugin.pluginModel.id, "POST" as Method).subscribe({
                                 error: (err) => {
                                     console.error(err);
@@ -94,14 +96,14 @@ export class PluginService {
     }
 
     getAllPlugins() : Observable<PluginModel[]> {
-        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/`, "GET" as Method)
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel[])
             );
     }
 
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
-        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginDetailsModel),
                 map(pdm => {
@@ -121,7 +123,7 @@ export class PluginService {
     registerUserPlugins(){
         const authtokens = this.userStore.getAuthTokens();
                 if(authtokens !== undefined && authtokens !== null){
-                    this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
+                    this.barnService.callBarn(userPreferencesEndpoint, "GET" as Method)
                         .pipe(
                             map(res => res.data),
                             map(userpref => userpref.plugins as Array<PluginModel>)
@@ -151,7 +153,7 @@ export class PluginService {
     }
 
     private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
-        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel)
             );
@@ -194,7 +196,7 @@ export class PluginService {
     private installPluginPackageBinaries(plugin: PluginModel) {
         console.log('installing package:', plugin)
 
-        this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
+        this.barnService.callBarn(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginPackageModel)
             ).subscribe({
@@ -275,24 +277,24 @@ export class PluginService {
 
     }
     
-    private callBarnWithoutCreds(endpoint: string, method: Method) : Observable<AxiosResponse> {
-        const options = {
-            baseURL: `${environment.baseApiUrl}`,
-            url: endpoint,
-            method: method, //"POST" as Method,
-        }
+    // private callBarnWithoutCreds(endpoint: string, method: Method) : Observable<AxiosResponse> {
+    //     const options = {
+    //         baseURL: `${environment.baseApiUrl}`,
+    //         url: endpoint,
+    //         method: method, //"POST" as Method,
+    //     }
         
-        return Axios.request(options)
-    }
+    //     return Axios.request(options)
+    // }
 
-    private callBarnWithAuth(accessToken,endpoint: string, method: Method) : Observable<AxiosResponse> {
-        const options = {
-            baseURL: `${environment.baseApiUrl}`,
-            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            url: endpoint,
-            method: method //"POST" as Method,
-        }
+    // private callBarnWithAuth(accessToken,endpoint: string, method: Method) : Observable<AxiosResponse> {
+    //     const options = {
+    //         baseURL: `${environment.baseApiUrl}`,
+    //         headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    //         url: endpoint,
+    //         method: method //"POST" as Method,
+    //     }
         
-        return Axios.request(options)
-    }
+    //     return Axios.request(options)
+    // }
 }
