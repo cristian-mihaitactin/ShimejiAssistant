@@ -7,13 +7,20 @@
     border: 5px solid green;
 }
 
-.choose-btn {
+.app-bucky-profile-sample-wrapper {
     position: relative;
-    top: calc((250px / 3));
-    right: calc((200px / 1.15));
+
+}
+.choose-btn {  
+    margin: 0;
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
     display: none;
 }
 
-.app-bucky-profile-sample-instance:hover + .choose-btn {
+.app-bucky-profile-sample-instance:hover + .choose-btn, .choose-btn:hover {
     display: inline-block;
   }
