@@ -80,6 +80,7 @@ export class OverviewComponent implements OnInit {
   }
   changeAssistantProfile(event:MouseEvent, buckyProfileId:string){
     event.stopPropagation();
+    console.log('changeAssistantProfile');
 
     this.mainBuckyProfileId = buckyProfileId;
 
@@ -88,6 +89,7 @@ export class OverviewComponent implements OnInit {
 
   setAssistantProfile(event:MouseEvent, buckyProfileId:string){
     event.stopPropagation();
+    console.log('setAssistantPRofile');
     this.mainBuckyProfileId = buckyProfileId;
 
     electron.ipcRenderer.send('set-bucky-profile', buckyProfileId);
