@@ -23,11 +23,13 @@ const userStore = new UserStore({
   configName: environment.config,
   defaults: environment.default_user
 });
-const pluginService = new PluginService(userStore);
-
-const authService = new AuthService(userStore, pluginService);
+const authService = new AuthService(userStore);
 
 const barnService = new BarnBuckyService(authService, userStore);
+
+const pluginService = new PluginService(userStore, barnService);
+
+
 const userService = new UserService(userStore);
 const buckyProfileService = new BuckyProfileService(
   userStore,  barnService
@@ -265,6 +267,7 @@ app.on("ready", () => {
     authService.login(arg).subscribe(
       {
         next: (value) => {
+          pluginService.registerUserPlugins()
           event.reply("login-reply", 
           {
             result: 'Logged In',

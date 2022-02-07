@@ -35,7 +35,10 @@ export class BarnBuckyService {
         const instance = Axios.create(options);
         
         instance.interceptors.response.use(null, (error) => {
+            console.log("in interceptor")
             if (error.config && error.response && error.response.status === 401) {
+            console.log("in interceptor IFF")
+
             this.authService.refreshTokens().subscribe({
                 next: (value) => {
                     options.headers['Authorization'] = `${value.token_type} ${value.access_token}`;
