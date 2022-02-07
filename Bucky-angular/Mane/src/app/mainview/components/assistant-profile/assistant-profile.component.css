@@ -13,3 +13,7 @@
 .carousel-control-btn {
     background-color: rgb(14, 189, 58) !important;;
 }
+
+.carousel-inner img {
+    margin: auto;
+}
