@@ -107,8 +107,9 @@ export class PluginService {
             .pipe(
                 map(res => res.data as PluginDetailsModel),
                 map(pdm => {
-                    pdm.html = this.registeredPlugins.value.find(element => element.plugin.id === id).plugin.getHtml()
-                    ;
+                    var registeredPlugin = this.registeredPlugins.value.find(element => element.plugin.id === id);
+                    pdm.html = registeredPlugin !== undefined && registeredPlugin !== null ? registeredPlugin.plugin.getHtml(): '';
+
                     return pdm;
                 })
             );

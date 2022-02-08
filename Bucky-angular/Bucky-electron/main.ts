@@ -227,7 +227,6 @@ app.on("ready", () => {
 
   buckyProfileService.defaultBuckyProfile.subscribe({
     next: value => {
-      console.log('defaultBuckyProfile.subscribe: ', value)
       buckyWindow.webContents.send("selected-bucky-profile", value);
       mainWindow.webContents.send("selected-bucky-profile", value);
     },

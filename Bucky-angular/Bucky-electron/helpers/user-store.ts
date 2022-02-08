@@ -111,7 +111,6 @@ export class UserStore {
 }
 
 function parseDataFile(filePath, defaults, force = false) {
-    console.log('fs.existsSync(filePath)', fs.existsSync(filePath))
     if (fs.existsSync(filePath) && !force) { 
       try {
         return JSON.parse(fs.readFileSync(filePath).toString());
