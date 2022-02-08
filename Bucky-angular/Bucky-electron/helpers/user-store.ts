@@ -3,9 +3,11 @@ import * as path from "path";
 import * as fs from "fs";
 import { AuthTokenModel } from "../auth/models/auth-tokens-model";
 import { BuckyProfileModel } from "bucky_profile/bucky-profile-model";
-import { BuckyBehaviourModel } from "../bucky_profile/bucky-behaviour-model";
+import { environment } from "../environments/environment";
 
 const profilePath = 'buckyProfile'
+const defaultProfilePath = 'default_profile'
+
 export class UserStore {
   
     
@@ -23,21 +25,20 @@ export class UserStore {
     }*/
     this.defaults = opts.defaults;
     this.data = parseDataFile(this.path, opts.defaults);
+
+    const buckyPath = path.join(app.getPath('userData'), profilePath);
+    if (!fs.existsSync(buckyPath)){
+      this.setDefaultBuckyProfile();
+    }
   }
   
-  // This will just return the property on the `data` object
   public get(key) {
     return this.data[key];
   }
   
-  // ...and this will set it
   public set(key, val) {
-    console.log('key,val', key,val);
+    console.log('userstore.set:', key);
     this.data[key] = val;
-    // Wait, I thought using the node.js' synchronous APIs was bad form?
-    // We're not writing a server so there's not nearly the same IO demand on the process
-    // Also if we used an async API and our app was quit before the asynchronous write had a chance to complete,
-    // we might lose that data. Note that in a real app, we would try/catch this.
     fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
   public remove(key) {
@@ -48,11 +49,8 @@ export class UserStore {
   }
 
   resetToDefault() {
-    console.log('before this.data');
-    console.log(this.data);
     this.data = parseDataFile(this.path, this.defaults, true);
-    console.log('after this.data');
-    console.log(this.data);
+    this.setDefaultBuckyProfile();
   }
 
   getAuthTokens(): AuthTokenModel {
@@ -64,23 +62,56 @@ export class UserStore {
     return null;
   }
 
-  setBuckyProfile(buckyProfile: BuckyProfileModel) {
+  getUserBuckyProfile(): BuckyProfileModel{
     const buckyPath = path.join(app.getPath('userData'), profilePath);
+
+    const buckyProfileString = this.get('buckyProfile');
+    if (buckyProfileString === undefined || buckyProfileString === null || buckyProfileString === ''){
+      this.setDefaultBuckyProfile();
+    }
+    const buckyProfile = this.get('buckyProfile') as unknown as BuckyProfileModel;
+
+    buckyProfile.behaviours.forEach((element, index) => {
+      buckyProfile.behaviours[index].imageBytes = fs.readFileSync(path.join(buckyPath, element.actionTypeString) + '.png', 'base64');
+    });
+
+    return buckyProfile;
+  }
+
+  setBuckyProfile(newBuckyProfile: BuckyProfileModel) {
+    const buckyPath = path.join(app.getPath('userData'), profilePath);
+
+    var buckyProfile = newBuckyProfile;
 
     if (!fs.existsSync(buckyPath)){
       fs.mkdirSync(buckyPath, { recursive: true });
+    }
+
+    buckyProfile.behaviours.forEach((element, index) => {
+      fs.writeFileSync(path.join(buckyPath, element.actionTypeString) + '.png', element.imageBytes, 'base64');
+      buckyProfile.behaviours[index].imageBytes = '';
+    });
+    buckyProfile.isMainProfile = true;
+    this.set('buckyProfile', buckyProfile);
   }
 
-    buckyProfile.behaviours.forEach(element => {
-      fs.writeFileSync(path.join(buckyPath, element.actionTypeString) + '.png', element.imageBytes, 'base64');
+  private setDefaultBuckyProfile(){
+    var defaultProfile = environment.default_buckyProfile as BuckyProfileModel;
+
+    defaultProfile.behaviours.forEach((element,index) => {
+      const defaultBehaviourPath = path.join(app.getAppPath(), 'dist', defaultProfilePath,defaultProfile.id, element.actionTypeString + '.png');
+      
+      if(fs.existsSync(defaultBehaviourPath)){
+        defaultProfile.behaviours[index].imageBytes = fs.readFileSync(defaultBehaviourPath, 'base64');
+      }
     });
+
+    this.setBuckyProfile(defaultProfile);
   }
 }
 
 function parseDataFile(filePath, defaults, force = false) {
-  // We'll try/catch it in case the file doesn't exist yet, which will be the case on the first application run.
-  // `fs.readFileSync` will return a JSON string which we then parse into a Javascript object
-
+    console.log('fs.existsSync(filePath)', fs.existsSync(filePath))
     if (fs.existsSync(filePath) && !force) { 
       try {
         return JSON.parse(fs.readFileSync(filePath).toString());

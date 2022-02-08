@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angula
 import { BehaviorSubject, Subject } from 'rxjs';
 import { BuckyProfileModel } from  '../../models/bucky-profile-model';
 import { PluginModel } from  '../../models/plugin.model';
-import { BuckyProfileService } from '../../services/bucky-profile-service';
 import * as $ from 'jquery';
 
 const electron = (<any>window).require('electron');

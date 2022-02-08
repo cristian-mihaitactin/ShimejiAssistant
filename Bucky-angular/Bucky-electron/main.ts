@@ -51,7 +51,6 @@ if (env.name !== "production") {
   app.setPath("userData", `${userDataPath} (${env.name})`);
 }
 */
-var mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
 // We can communicate with our window (the renderer process) via messages.
 const initIpc = () => {
   ipcMain.on("need-app-path", (event, arg) => {
@@ -62,17 +61,11 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    //mainBuckyProfile
-    buckyProfileService.getUserBuckyProfile()
-      .subscribe({
-        next: (value) => {
-          event.reply("selected-bucky-profile", value);
-        },
-        error: (error) => {
-          console.error(error);
-        }
-      })
+    
+    const mainBuckyProfile = userStore.getUserBuckyProfile();
+    event.reply("selected-bucky-profile", mainBuckyProfile);
   });
+ 
   ipcMain.on("get-all-bucky-profiles", (event,arg) => {
     console.log("in get-all-bucky-profiles")
     buckyProfileService.getAllBuckyProfilesWithoutBehaviours()
@@ -184,6 +177,7 @@ app.on("ready", () => {
     height: 300,
     transparent: true,
     frame: false,
+    resizable: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -220,10 +214,7 @@ app.on("ready", () => {
   });
 
   ipcMain.on("setPosition", (event,arg) => {
-    // buckyWindow.setPosition(arg.x, arg.y);
     buckyWindow.setBounds({
-      width: buckyWindow.getSize()[0],
-      height: buckyWindow.getSize()[1],
       x: arg.x,
       y: arg.y
   });
@@ -232,19 +223,18 @@ app.on("ready", () => {
   ipcMain.on("set-bucky-profile", (event,arg) => {
     console.log('set-bucky-profile: ' + arg);
     buckyProfileService.setBuckyProfileById(arg);
-    mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
-    mainBuckyProfile
-    .subscribe({
-      next: (value) => {
-        console.log('set-bucky-profile sending ');
-        buckyWindow.webContents.send("selected-bucky-profile", value);
-      },
-      error: (error) => {
-        console.error(error);
-      }
-    });
   });
-  
+
+  buckyProfileService.defaultBuckyProfile.subscribe({
+    next: value => {
+      console.log('defaultBuckyProfile.subscribe: ', value)
+      buckyWindow.webContents.send("selected-bucky-profile", value);
+      mainWindow.webContents.send("selected-bucky-profile", value);
+    },
+    error: err => {
+      console.error(err);
+    }
+  });
   
   ipcMain.on("user-info-request", (event,arg) => {
     console.log('user-info');
@@ -340,22 +330,6 @@ pluginService.registeredPlugins.subscribe({
       console.error(err);
     }
   });
-
-  // var x = 'C:\\Users\\cristian.mihaita\\AppData\\Roaming\\Bucky\\Plugins\\Alarm\\1.0.0/dist/main.js';
-  // import(x).then((a) => {
-  //   // `a` is imported and can be used here
-  //   var subject = new Subject<{notificationMessage: string;
-  //     actionType: number}>();
-  //   a.Plugin(subject,subject, "ola");
-  //   subject.subscribe({
-  //     next: (val) => {
-  //       console.log(val);
-  //     },
-  //     error: (val) => {
-  //       console.log(val);
-  //     }
-  //   })
-  // });
 });
 
 // Quit when all windows are closed.

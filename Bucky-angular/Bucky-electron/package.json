@@ -4,10 +4,10 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-files",
     "start": "electron .",
     "postbuild": "",
-    "copy-files": "robocopy bucky_profile/profiles/ dist/bucky_profile/profiles/ /s",
+    "copy-files": "copyfiles -u 3 bucky_profile/profiles/8919e40e-d588-42f2-a0a8-4afb9ad1589b/* dist/default_profile/8919e40e-d588-42f2-a0a8-4afb9ad1589b/",
     "dev-dotenv": "electron -r dotenv/config .",
     "dev": "electron ."
   },
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/unzip-stream": "^0.3.1",
+    "copyfiles": "^2.4.1",
     "electron": "^16.0.4"
   }
 }

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Observable, of, Subject, connectable} from 'rxjs';
+import { Observable, of, Subject, connectable, BehaviorSubject} from 'rxjs';
 import {map, filter, take, tap, flatMap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 
@@ -22,51 +22,29 @@ const userPreferencesEndpoint = '/api/UserPeferences';
 export class BuckyProfileService {
   private userStore: UserStore;
   private barnService: BarnBuckyService;
+  defaultBuckyProfile: BehaviorSubject<BuckyProfileModel>
 
   constructor(userStore: UserStore, barnService: BarnBuckyService){
     this.userStore = userStore;
     this.barnService = barnService;
+
+    this.defaultBuckyProfile = new BehaviorSubject(this.userStore.getUserBuckyProfile());
   }
 
-    getUserBuckyProfile() : Observable<BuckyProfileModel> {
-      const buckyId = this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile;
-
-      if( buckyId !== undefined && buckyId !== null && buckyId !== ''){
-        return this.barnService.callBarn(`${profileUrl}/${buckyId}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
-        .pipe(
-          map(res => res.data as BuckyProfileModel),
-          tap((v) => v.isMainProfile = true)
-        );
-      } else {
-        // call barn to set
-        var accessToken = this.userStore.getAuthTokens().access_token;
-        if (accessToken !== undefined && accessToken !== null && accessToken !== '' ){
-          console.log('fetching user profile')
-          return this.barnService.callBarn('/api/User/Profile', 'GET' as Method)
-            .pipe(
-              map(res => res.data as BuckyProfileModel)
-            );
-        } else {
-          // return default profile
-          console.log('returning default profile');
-          var defaultProfile = environment.default_user.buckyProfile;
-          return this.barnService.callBarn(`${profileUrl}/${defaultProfile}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
-          .pipe(
-            map(res => res.data as BuckyProfileModel)
-          );
-        }
-      }
-      
-    }
+    // getUserBuckyProfile() : BuckyProfileModel {//Observable<BuckyProfileModel> {
+    //   console.log('getUserBuckyProfile');
+    //   return this.userStore.getUserBuckyProfile();
+    // }
 
     getBuckyProfileById(id: string): Observable<BuckyProfileModel> {
-      const buckyId = this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile;
+      console.log('getBuckyProfileById', id);
+      const buckyProfile = (this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile) as BuckyProfileModel;
 
       return this.barnService.callBarn(`${profileUrl}/${id}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
       .pipe(
         map(res => res.data as BuckyProfileModel),
         tap((v) => {
-          if(v.id  === buckyId) {
+          if(v.id  === buckyProfile.id) {
             v.isMainProfile = true;
           } else {
             v.isMainProfile = false;
@@ -76,13 +54,13 @@ export class BuckyProfileService {
     }
 
     getAllBuckyProfilesWithoutBehaviours(): Observable<BuckyProfileModel[]> {
-      const buckyId = this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile;
+      const buckyProfile = (this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile) as BuckyProfileModel;
 
       return this.barnService.callBarn(`${profileUrl}`, "GET" as Method,  new Map([['Content-Type', 'application/x-www-form-urlencoded' ]])).pipe(
         map(res=> 
           res.data as BuckyProfileModel[]),
         map((v) =>v.map(value => {
-          if(value.id === buckyId) {
+          if(value.id === buckyProfile.id) {
              value.isMainProfile = true
           } else {
             value.isMainProfile = false;
@@ -92,22 +70,20 @@ export class BuckyProfileService {
     }
     
     setBuckyProfileById(buckyProfileId:string) {
-      
-      console.log('setBuckyProfileById:', buckyProfileId);
-
-      this.barnService.callBarn( `${userPreferencesEndpoint}`,
+      console.log('setBuckyProfileById', buckyProfileId);
+      return this.barnService.callBarn( `${userPreferencesEndpoint}`,
         "PUT" as Method, new Map([['Content-Type', 'application/json' ]]),JSON.stringify({
           buckyProfileID: buckyProfileId
         })
         ).subscribe({
             next: (value) => {
               //Store new behaviour
-              this.userStore.set('buckyProfile', buckyProfileId);
-
               this.getBuckyProfileById(buckyProfileId)
                 .subscribe({
                   next: (val) => {
                     this.userStore.setBuckyProfile(val);
+
+                    this.defaultBuckyProfile.next(this.userStore.getUserBuckyProfile());
                   }
                 });
             },
