@@ -8,9 +8,14 @@ export const environment = {
   baseApiUrl: "https://localhost:5001",
   config: "development",
   default_user: {
-    username: "anonymous",
+    username: "Guest",
     email : "",
-    buckyProfile: "8919e40e-d588-42f2-a0a8-4afb9ad1589b",
+    buckyProfile: {
+      id: '8919e40e-d588-42f2-a0a8-4afb9ad1589b',
+      isMainProfile: true,
+      name: 'Bucky',
+      description: 'Default profile'
+  },
     pluginsInstalled: "[]"
   },
   default_buckyProfile: {

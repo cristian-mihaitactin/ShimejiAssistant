@@ -51,7 +51,6 @@ if (env.name !== "production") {
   app.setPath("userData", `${userDataPath} (${env.name})`);
 }
 */
-var mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
 // We can communicate with our window (the renderer process) via messages.
 const initIpc = () => {
   ipcMain.on("need-app-path", (event, arg) => {
@@ -62,17 +61,11 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-initial-bucky-profile", (event,arg) => {
-    //mainBuckyProfile
-    buckyProfileService.getUserBuckyProfile()
-      .subscribe({
-        next: (value) => {
-          event.reply("selected-bucky-profile", value);
-        },
-        error: (error) => {
-          console.error(error);
-        }
-      })
+    
+    const mainBuckyProfile = userStore.getUserBuckyProfile();
+    event.reply("selected-bucky-profile", mainBuckyProfile);
   });
+ 
   ipcMain.on("get-all-bucky-profiles", (event,arg) => {
     console.log("in get-all-bucky-profiles")
     buckyProfileService.getAllBuckyProfilesWithoutBehaviours()
@@ -230,19 +223,18 @@ app.on("ready", () => {
   ipcMain.on("set-bucky-profile", (event,arg) => {
     console.log('set-bucky-profile: ' + arg);
     buckyProfileService.setBuckyProfileById(arg);
-    mainBuckyProfile = buckyProfileService.getUserBuckyProfile();
-    mainBuckyProfile
-    .subscribe({
-      next: (value) => {
-        console.log('set-bucky-profile sending ');
-        buckyWindow.webContents.send("selected-bucky-profile", value);
-      },
-      error: (error) => {
-        console.error(error);
-      }
-    });
   });
-  
+
+  buckyProfileService.defaultBuckyProfile.subscribe({
+    next: value => {
+      console.log('defaultBuckyProfile.subscribe: ', value)
+      buckyWindow.webContents.send("selected-bucky-profile", value);
+      mainWindow.webContents.send("selected-bucky-profile", value);
+    },
+    error: err => {
+      console.error(err);
+    }
+  });
   
   ipcMain.on("user-info-request", (event,arg) => {
     console.log('user-info');

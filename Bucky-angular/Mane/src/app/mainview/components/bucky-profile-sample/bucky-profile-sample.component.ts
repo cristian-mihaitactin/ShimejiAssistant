@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { BuckyProfileModel } from '../../../models/bucky-profile-model';
 import { BuckyBehaviourModel } from '../../../models/bucky-behaviour-model'
-import { BuckyProfileService } from 'src/app/services/bucky-profile-service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscriber, map, BehaviorSubject } from 'rxjs';
 import { filter } from 'rxjs/operators';

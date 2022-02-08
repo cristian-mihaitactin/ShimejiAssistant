@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { BuckyProfileService } from './services/bucky-profile-service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BuckyBehaviourModel } from './models/bucky-behaviour-model';
 import { BehaviorSubject } from 'rxjs';
@@ -44,7 +43,7 @@ export class AppComponent implements OnInit {
         console.log('arg: ', arg);
         if (arg === undefined || arg === null) {
           console.log('arg is not ok. Try again')
-          //electron.ipcRenderer.send('get-initial-bucky-profile', '');
+          electron.ipcRenderer.send('get-initial-bucky-profile', '');
         }else {
           console.log(arg) // prints "pong"
           this.buckyProfile.next(arg);
@@ -122,7 +121,6 @@ export class AppComponent implements OnInit {
       this.buckyBehaviours = value.behaviours;
 
       if (value.behaviours.length > 0){
-
         this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
         + value.behaviours[0].imageBytes);
       }
@@ -246,9 +244,10 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
   }
   
   private setBuckyBehaviour(bahaviourString: string) {
-    const behaviour = this.buckyBehaviours.find(bb=> bb.actionTypeString === bahaviourString);
-      this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
-        + behaviour.imageBytes);
-      this.cdr.detectChanges();
+
+    const behaviour = this.buckyBehaviours.find(bb=> bb.actionTypeString.toLowerCase() === bahaviourString.toLowerCase());
+    this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
+      + behaviour.imageBytes);
+    this.cdr.detectChanges();
   }
 }

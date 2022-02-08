@@ -1,5 +1,5 @@
 import { environment } from '../environments/environment'
-import { Observable, Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import {AxiosResponse, AxiosResponseHeaders, Method } from 'axios'
 import {Axios} from 'axios-observable'
 import { AuthService } from '../auth/auth.service';
@@ -18,6 +18,11 @@ export class BarnBuckyService {
         if (tokens !== undefined && tokens !== null) {
             //'Authorization': `Bearer ${accessToken}`
             customHeaders.set('Authorization', `${tokens.token_type} ${tokens.access_token}`);
+        } else {
+            // User not logged in - do not go forward if method is different than GET
+            if (method !== "GET" as Method) {
+                return of(null);
+            } 
         }
 
         let headerObj = Array.from(customHeaders).reduce((obj, [key, value]) => (

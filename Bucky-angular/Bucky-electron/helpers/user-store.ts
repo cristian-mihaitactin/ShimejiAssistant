@@ -3,8 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { AuthTokenModel } from "../auth/models/auth-tokens-model";
 import { BuckyProfileModel } from "bucky_profile/bucky-profile-model";
-import { BuckyBehaviourModel } from "../bucky_profile/bucky-behaviour-model";
-import { environment } from "environments/environment";
+import { environment } from "../environments/environment";
 
 const profilePath = 'buckyProfile'
 const defaultProfilePath = 'default_profile'
@@ -26,7 +25,7 @@ export class UserStore {
     }*/
     this.defaults = opts.defaults;
     this.data = parseDataFile(this.path, opts.defaults);
-    
+
     const buckyPath = path.join(app.getPath('userData'), profilePath);
     if (!fs.existsSync(buckyPath)){
       this.setDefaultBuckyProfile();
@@ -38,7 +37,7 @@ export class UserStore {
   }
   
   public set(key, val) {
-    console.log('key,val', key,val);
+    console.log('userstore.set:', key);
     this.data[key] = val;
     fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
@@ -63,23 +62,45 @@ export class UserStore {
     return null;
   }
 
-  setBuckyProfile(buckyProfile: BuckyProfileModel) {
+  getUserBuckyProfile(): BuckyProfileModel{
     const buckyPath = path.join(app.getPath('userData'), profilePath);
+
+    const buckyProfileString = this.get('buckyProfile');
+    if (buckyProfileString === undefined || buckyProfileString === null || buckyProfileString === ''){
+      this.setDefaultBuckyProfile();
+    }
+    const buckyProfile = this.get('buckyProfile') as unknown as BuckyProfileModel;
+
+    buckyProfile.behaviours.forEach((element, index) => {
+      buckyProfile.behaviours[index].imageBytes = fs.readFileSync(path.join(buckyPath, element.actionTypeString) + '.png', 'base64');
+    });
+
+    return buckyProfile;
+  }
+
+  setBuckyProfile(newBuckyProfile: BuckyProfileModel) {
+    const buckyPath = path.join(app.getPath('userData'), profilePath);
+
+    var buckyProfile = newBuckyProfile;
 
     if (!fs.existsSync(buckyPath)){
       fs.mkdirSync(buckyPath, { recursive: true });
-  }
+    }
 
-    buckyProfile.behaviours.forEach(element => {
+    buckyProfile.behaviours.forEach((element, index) => {
       fs.writeFileSync(path.join(buckyPath, element.actionTypeString) + '.png', element.imageBytes, 'base64');
+      buckyProfile.behaviours[index].imageBytes = '';
     });
+    buckyProfile.isMainProfile = true;
+    this.set('buckyProfile', buckyProfile);
   }
 
   private setDefaultBuckyProfile(){
     var defaultProfile = environment.default_buckyProfile as BuckyProfileModel;
 
     defaultProfile.behaviours.forEach((element,index) => {
-      const defaultBehaviourPath = path.join(__dirname,defaultProfilePath,defaultProfile.id, element.actionTypeString, '.png');
+      const defaultBehaviourPath = path.join(app.getAppPath(), 'dist', defaultProfilePath,defaultProfile.id, element.actionTypeString + '.png');
+      
       if(fs.existsSync(defaultBehaviourPath)){
         defaultProfile.behaviours[index].imageBytes = fs.readFileSync(defaultBehaviourPath, 'base64');
       }
@@ -90,7 +111,7 @@ export class UserStore {
 }
 
 function parseDataFile(filePath, defaults, force = false) {
-
+    console.log('fs.existsSync(filePath)', fs.existsSync(filePath))
     if (fs.existsSync(filePath) && !force) { 
       try {
         return JSON.parse(fs.readFileSync(filePath).toString());

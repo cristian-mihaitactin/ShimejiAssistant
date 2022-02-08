@@ -3,7 +3,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BehaviorSubject } from 'rxjs';
 import { BuckyBehaviourModel } from '../../../models/bucky-behaviour-model';
 import { BuckyProfileModel } from '../../../models/bucky-profile-model';
-import { BuckyProfileService } from '../../../services/bucky-profile-service';
 import * as $ from "jquery";
 
 const electron = (<any>window).require('electron');

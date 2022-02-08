@@ -7,7 +7,7 @@
     "build": "tsc && npm run copy-files",
     "start": "electron .",
     "postbuild": "",
-    "copy-files": "copyfiles bucky_profile/profiles/8919e40e-d588-42f2-a0a8-4afb9ad1589b/* dist/default_prrofile/8919e40e-d588-42f2-a0a8-4afb9ad1589b/",
+    "copy-files": "copyfiles -u 3 bucky_profile/profiles/8919e40e-d588-42f2-a0a8-4afb9ad1589b/* dist/default_profile/8919e40e-d588-42f2-a0a8-4afb9ad1589b/",
     "dev-dotenv": "electron -r dotenv/config .",
     "dev": "electron ."
   },
