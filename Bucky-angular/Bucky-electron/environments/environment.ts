@@ -14,7 +14,34 @@ export const environment = {
       id: '8919e40e-d588-42f2-a0a8-4afb9ad1589b',
       isMainProfile: true,
       name: 'Bucky',
-      description: 'Default profile'
+      description: 'Default profile',
+      behaviours: [
+        {
+          actionType: '0',
+          actionTypeString: 'standby',
+          imageBytes: ''
+        },
+        {
+          actionType: '1',
+          actionTypeString: 'notification',
+          imageBytes: ''
+        },
+        {
+          actionType: '2',
+          actionTypeString: 'dragged',
+          imageBytes: ''
+        },
+        {
+          actionType: '4',
+          actionTypeString: 'attention',
+          imageBytes: ''
+        },
+        {
+          actionType: '8',
+          actionTypeString: 'bow',
+          imageBytes: ''
+        }
+      ]
   },
     pluginsInstalled: "[]"
   },

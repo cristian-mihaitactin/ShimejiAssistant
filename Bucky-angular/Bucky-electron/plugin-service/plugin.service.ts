@@ -31,8 +31,11 @@ export class PluginService {
     constructor(private userStore: UserStore, 
         private barnService: BarnBuckyService) {
         const userDataPath = app.getPath('userData');
+
         this.registeredPlugins = new BehaviorSubject<RegisteredPlugin[]>([]);
         this.pluginHandlers = new Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>();
+
+        const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
 
         this.registeredPlugins.subscribe({
             //store all registered plugins in userstore
@@ -62,11 +65,10 @@ export class PluginService {
             error: (err) => {
                 console.error(err);
             }
-        });
+        });// end registeredPlugins subscribe
 
         this.pluginDirectory = path.join(userDataPath ,pluginRelativePath);
         
-        const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
         if (userPlugins !== undefined && userPlugins !== null && Array.isArray(userPlugins)) {
             if (userPlugins.length > 0)
             {
@@ -162,7 +164,9 @@ export class PluginService {
 
     private downloadAndInstallPlugin(userPlugin: PluginModel){
         if (fs.existsSync(userPlugin.path)){
-            return;
+            const pluginModelString = fs.readFileSync(path.join(userPlugin.path,'details') + '.json', 'utf8');
+            const pluginModel = JSON.parse(pluginModelString) as PluginModel;
+            this.importPlugin(pluginModel);
         } else {
             this.getPluginModelByIdFromBarn(userPlugin.id)
                 .subscribe({
@@ -213,18 +217,23 @@ export class PluginService {
 
                     const pluginFinalPath = path.join(pluginMainPath, value.version);
                     fs.createReadStream(pluginZipPath)
-                        .pipe(Extract({ path: pluginFinalPath }));
-                    
-                    // register plugin
-                    const installedPluginModel = {
-                        id: plugin.id,
-                        name: value.name,
-                        version: value.version,
-                        path: pluginFinalPath,
-                    } as PluginModel;
+                        .pipe(
+                            Extract({ path: pluginFinalPath })
+                                .on('finish', () => {
+                                    // register plugin
+                                    const installedPluginModel = {
+                                        id: plugin.id,
+                                        name: value.name,
+                                        version: value.version,
+                                        path: pluginFinalPath,
+                                    } as PluginModel;
 
-                    console.log('installedPluginModel: ', installedPluginModel);
-                    this.importPlugin(installedPluginModel);
+                                    fs.writeFileSync(path.join(pluginFinalPath,'details') + '.json', JSON.stringify(installedPluginModel), 'utf8');
+
+                                    console.log('installedPluginModel: ', installedPluginModel);
+                                    this.importPlugin(installedPluginModel);     
+                           })
+                        );
                 }
             });
     }
@@ -232,6 +241,8 @@ export class PluginService {
     private importPlugin(pluginModel: PluginModel){
         const pluginPath = pluginModel.path ?? path.join(this.pluginDirectory, pluginModel.name, pluginModel.version);
         
+        console.log('pluginPath', pluginPath)
+        console.log('fs.existsSync(pluginPath)', fs.existsSync(pluginPath))
         if (!fs.existsSync(pluginPath)){
             return;
         }
@@ -275,27 +286,5 @@ export class PluginService {
             this.registeredPlugins.next(existingPlugins);
         };
     });
-
     }
-    
-    // private callBarnWithoutCreds(endpoint: string, method: Method) : Observable<AxiosResponse> {
-    //     const options = {
-    //         baseURL: `${environment.baseApiUrl}`,
-    //         url: endpoint,
-    //         method: method, //"POST" as Method,
-    //     }
-        
-    //     return Axios.request(options)
-    // }
-
-    // private callBarnWithAuth(accessToken,endpoint: string, method: Method) : Observable<AxiosResponse> {
-    //     const options = {
-    //         baseURL: `${environment.baseApiUrl}`,
-    //         headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-    //         url: endpoint,
-    //         method: method //"POST" as Method,
-    //     }
-        
-    //     return Axios.request(options)
-    // }
 }

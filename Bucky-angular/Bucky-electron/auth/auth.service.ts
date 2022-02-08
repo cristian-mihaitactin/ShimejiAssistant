@@ -18,6 +18,7 @@ import { UserModel } from '../user/models/user-model';
 import { fstat } from 'original-fs';
 import { PluginService } from '../plugin-service/plugin.service';
 import { BarnBuckyService } from 'barn-service/barn-bucky-service';
+import { BuckyProfileModel } from 'bucky_profile/bucky-profile-model';
 
 export class AuthService {
 
@@ -223,6 +224,12 @@ export class AuthService {
         });
         this.callCallBarn(accessToken, this.userPreferencesEndpoint, "GET" as Method).subscribe({
             next: (barnValue: any) => {
+                var buckyProfile = barnValue.buckyProfile as BuckyProfileModel;
+
+                buckyProfile.behaviours.forEach((element, index) => {
+                    buckyProfile.behaviours[index].imageBytes = '';
+                  });
+
                 this.localStorage.set('buckyProfile',barnValue.buckyProfile);
             }
         });
