@@ -71,39 +71,21 @@ namespace Barn.API
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            // Configure Identity to use the same JWT claims as OpenIddict instead
-            // of the legacy WS-Federation claims it uses by default (ClaimTypes),
-            // which saves you from doing the mapping in your authorization controller.
             services.Configure<IdentityOptions>(options =>
             {
+                options.ClaimsIdentity.RoleClaimType = Claims.Role;
                 options.ClaimsIdentity.UserNameClaimType = Claims.Name;
                 options.ClaimsIdentity.UserIdClaimType = Claims.Subject;
-                options.ClaimsIdentity.RoleClaimType = Claims.Role;
             });
-
-            // OpenIddict offers native integration with Quartz.NET to perform scheduled tasks
-            // (like pruning orphaned authorizations/tokens from the database) at regular intervals.
-            //services.AddQuartz(options =>
-            //{
-            //    options.UseMicrosoftDependencyInjectionJobFactory();
-            //    options.UseSimpleTypeLoader();
-            //    options.UseInMemoryStore();
-            //});
-            //// Register the Quartz.NET service and configure it to block shutdown until jobs are complete.
-            //services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
             services.AddOpenIddict()
                 // Register the OpenIddict core components.
                 .AddCore(options =>
                  {
                      // Configure OpenIddict to use the Entity Framework Core stores and models.
-                     // Note: call ReplaceDefaultEntities() to replace the default OpenIddict entities.
                      options.UseEntityFrameworkCore()
                             .UseDbContext<ApplicationDbContext>()
                             .ReplaceDefaultEntities<Guid>();
-
-                     // Enable Quartz.NET integration.
-                     //options.UseQuartz();
                  })
 
                 // Register the OpenIddict server components.
@@ -140,11 +122,9 @@ namespace Barn.API
 
 
             // Register the worker responsible of seeding the database with the sample clients.
-            // Note: in a real world application, this step should be part of a setup script.
             services.AddHostedService<Worker>();
 
             // --------------------------------- EF ---------------------------------//
-            // We are adding the DI services - We setup a Db Context
             services.AddDbContext<ApplicationDbContext>(options =>
             {
 
@@ -159,8 +139,8 @@ namespace Barn.API
             services.AddScoped<IGenericRepo<Guid, Entities.Plugins.Plugin>, PluginRepo>();
             services.AddScoped<IGenericRepo<Guid, Entities.Plugins.PluginNotification>, PluginNotificationRepo>();
             services.AddScoped<IGenericRepo<Tuple<Guid, Guid>, UserPreferencesPlugins>, UserPreferencesPluginsRepo>();
-            // Auto Mapper Configurations
 
+            // Auto Mapper Configurations
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MappingProfile());
@@ -187,7 +167,7 @@ namespace Barn.API
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Barn API V1");
                 c.RoutePrefix = string.Empty;
 
             });

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using System;
@@ -62,20 +61,15 @@ namespace Barn.API.Controllers
                     return Forbid(properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                 }
 
-                // Create a new ClaimsPrincipal containing the claims that
-                // will be used to create an id_token, a token or a code.
                 var principal = await _signInManager.CreateUserPrincipalAsync(user);
 
-                // Set the list of scopes granted to the client application.
-                // Note: the offline_access scope must be granted
-                // to allow OpenIddict to return a refresh token.
                 principal.SetScopes(new[]
                 {
-                Scopes.OpenId,
-                Scopes.Email,
-                Scopes.Profile,
-                Scopes.OfflineAccess,
-                Scopes.Roles
+                    Scopes.Email,
+                    Scopes.Profile,
+                    Scopes.OfflineAccess,
+                    Scopes.OpenId,
+                    Scopes.Roles
             }.Intersect(request.GetScopes()));
 
                 foreach (var claim in principal.Claims)
@@ -91,9 +85,6 @@ namespace Barn.API.Controllers
                 var info = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
                 // Retrieve the user profile corresponding to the refresh token.
-                // Note: if you want to automatically invalidate the refresh token
-                // when the user password/roles change, use the following line instead:
-                // var user = _signInManager.ValidateSecurityStampAsync(info.Principal);
                 var user = await _userManager.GetUserAsync(info.Principal);
                 if (user == null)
                 {
@@ -135,10 +126,6 @@ namespace Barn.API.Controllers
 
         private IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
         {
-            // Note: by default, claims are NOT automatically included in the access and identity tokens.
-            // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
-            // whether they should be included in access tokens, in identity tokens or in both.
-
             switch (claim.Type)
             {
                 case Claims.Name:
@@ -165,7 +152,6 @@ namespace Barn.API.Controllers
 
                     yield break;
 
-                // Never include the security stamp in the access and identity tokens, as it's a secret value.
                 case "AspNet.Identity.SecurityStamp": yield break;
 
                 default:
