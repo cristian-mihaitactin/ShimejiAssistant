@@ -37,13 +37,15 @@ namespace Barn.Services.Plugins
         {
             var plugin = _pluginRepo.GetById(id);
             var pluginBytes = await _pluginClient.GetPluginPackageBlob(plugin);
+            var pluginImageBlob = await _pluginClient.GetPluginImagesBlob(plugin);
 
             return new PluginPackageDTO
             {
                 FileName = plugin.Version + ".zip",
                 ZipBytes = pluginBytes.ZipBytes,
                 Version = plugin.Version,
-                Name = plugin.Name
+                Name = plugin.Name,
+                PluginImagesBlob = pluginImageBlob
             };
         }
 

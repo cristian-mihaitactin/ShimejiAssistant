@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Barn.AzIntegration.Plugin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,6 @@ namespace Barn.Services.Plugins
         public byte[] ZipBytes { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }
+        public PluginImagesBlob PluginImagesBlob  { get;set; }
     }
 }

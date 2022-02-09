@@ -173,8 +173,8 @@ app.on("ready", () => {
     }
   });
   const buckyWindow = createWindow("antler", {
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 200,
     transparent: true,
     frame: false,
     resizable: false,

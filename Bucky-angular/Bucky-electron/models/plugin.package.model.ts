@@ -3,4 +3,9 @@ export interface PluginPackageModel{
     zipBytes: string,
     name: string,
     version: string,
+    pluginImagesBlob: {
+      icoBytes: string,
+      svgBytes: string,
+      pngBytes: string
+    }
 }

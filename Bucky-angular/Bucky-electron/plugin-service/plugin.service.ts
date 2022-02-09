@@ -105,16 +105,59 @@ export class PluginService {
     }
 
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
-        return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
-            .pipe(
-                map(res => res.data as PluginDetailsModel),
-                map(pdm => {
-                    var registeredPlugin = this.registeredPlugins.value.find(element => element.plugin.id === id);
-                    pdm.html = registeredPlugin !== undefined && registeredPlugin !== null ? registeredPlugin.plugin.getHtml(): '';
+        var pluginFound = this.registeredPlugins.value.find(profile => profile.plugin.id === id);
+        if (pluginFound !== undefined && pluginFound !== null){
+            console.log('getPluginDetails FOUND');
+            const pluginDetails = {
+                id: pluginFound.pluginModel.id,
+                name: pluginFound.pluginModel.name,
+                description: pluginFound.pluginModel.description,
+                version: pluginFound.pluginModel.version,
+                html: pluginFound.plugin.getHtml(),
+                pluginImageBlob: {
+                    icoBytes: '',
+                    pngBytes: '',
+                    svgBytes: ''
+                }
+            } as PluginDetailsModel;
 
-                    return pdm;
-                })
-            );
+            pluginDetails.pluginImageBlob.icoBytes = fs.readFileSync(path.join(pluginFound.pluginModel.path,'../','ico' + '.ico'), 'base64');
+            pluginDetails.pluginImageBlob.pngBytes = fs.readFileSync(path.join(pluginFound.pluginModel.path,'../','png' + '.png'), 'base64');
+            pluginDetails.pluginImageBlob.svgBytes = fs.readFileSync(path.join(pluginFound.pluginModel.path,'../','svg' + '.svg'), 'base64');
+
+            return of(pluginDetails);
+        } else {
+            console.log('getPluginDetails NOOOOT FOUND');
+
+            return this.getPluginDetailsFromBarn(id);
+        }
+        
+        /*
+         id: string,
+    name: string,
+    description: string,
+    version: string,
+    html:string,
+    pluginImageBlob: {
+      icoBytes: string,
+      svgBytes: string,
+      pngBytes: string
+    }
+        */
+
+    }
+
+    private getPluginDetailsFromBarn(id:string): Observable<PluginDetailsModel>{
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
+        .pipe(
+            map(res => res.data as PluginDetailsModel),
+            map(pdm => {
+                var registeredPlugin = this.registeredPlugins.value.find(element => element.plugin.id === id);
+                pdm.html = registeredPlugin !== undefined && registeredPlugin !== null ? registeredPlugin.plugin.getHtml(): '';
+
+                return pdm;
+            })
+        );
     }
 
     clean() {
@@ -211,6 +254,10 @@ export class PluginService {
                     if (!fs.existsSync(pluginMainPath)) {
                         fs.mkdirSync(pluginMainPath, { recursive: true });
                     }
+                    //Write ico file
+                    fs.writeFileSync(path.join(pluginMainPath,'ico') + '.ico', value.pluginImagesBlob.icoBytes, 'base64');
+                    fs.writeFileSync(path.join(pluginMainPath,'png') + '.png', value.pluginImagesBlob.pngBytes, 'base64');
+                    fs.writeFileSync(path.join(pluginMainPath,'svg') + '.svg', value.pluginImagesBlob.svgBytes, 'base64');
 
                     const pluginZipPath = path.join(pluginMainPath, value.fileName)
                     fs.writeFileSync(pluginZipPath, value.zipBytes, 'base64');
@@ -226,6 +273,7 @@ export class PluginService {
                                         name: value.name,
                                         version: value.version,
                                         path: pluginFinalPath,
+                                        description: plugin.description
                                     } as PluginModel;
 
                                     fs.writeFileSync(path.join(pluginFinalPath,'details') + '.json', JSON.stringify(installedPluginModel), 'utf8');
