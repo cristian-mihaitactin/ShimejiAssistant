@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Barn.Entities.Bucky;
 using Barn.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Barn.Data.EF.Repoes
 {
@@ -59,20 +60,25 @@ namespace Barn.Data.EF.Repoes
             }
 
             _dbContext.BuckyProfiles.Update(entity);
+            _dbContext.Entry(entity).State = EntityState.Modified;
 
+            _dbContext.SaveChanges();
             return true;
         }
         public void Delete(Guid id)
         {
 
-            var user = _dbContext.BuckyProfiles.FirstOrDefault(u => u.Id == id);
+            var entity = _dbContext.BuckyProfiles.FirstOrDefault(u => u.Id == id);
 
-            if (user == null)
+            if (entity == null)
             {
                 return;
             }
 
-            _dbContext.BuckyProfiles.Remove(user);
+            _dbContext.BuckyProfiles.Remove(entity);
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+
+            _dbContext.SaveChanges();
         }
     }
 }

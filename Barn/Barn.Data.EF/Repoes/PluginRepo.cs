@@ -1,5 +1,6 @@
 ﻿using Barn.Entities.Plugins;
 using Barn.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,6 @@ namespace Barn.Data.EF.Repoes
         public PluginRepo(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-        }
-
-        public void Delete(Guid id)
-        {
-            throw new NotImplementedException();
         }
 
         public IEnumerable<Plugin> GetAll()
@@ -39,7 +35,45 @@ namespace Barn.Data.EF.Repoes
 
         public bool Update(Plugin entity)
         {
-            throw new NotImplementedException();
+            if (!_dbContext.Plugins.Contains(entity))
+            {
+                return false;
+
+            }
+
+            var existingEntitiy = _dbContext.Plugins.FirstOrDefault(u => u.Id == entity.Id);
+            if (existingEntitiy == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                _dbContext.Plugins.Update(entity);
+                _dbContext.Entry(entity).State = EntityState.Modified;
+
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return true;
+        }
+
+        public void Delete(Guid id)
+        {
+            var entity = _dbContext.Plugins.FirstOrDefault(u => u.Id == id);
+            if (entity == null)
+            {
+                return;
+            }
+
+            _dbContext.Plugins.Remove(entity);
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+
+            _dbContext.SaveChanges();
         }
     }
 }

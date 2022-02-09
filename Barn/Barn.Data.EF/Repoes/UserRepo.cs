@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Barn.Data.EF;
 using Barn.Entities.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace Barn.Data.Mock
 {
@@ -57,23 +58,40 @@ namespace Barn.Data.Mock
                 return false;
             }
 
-            _dbContext.Users.Update(entity);
-            _userPrefRepo.Update(entity.UserPreferences);
+
+            try
+            {
+                _dbContext.Users.Update(entity);
+                _userPrefRepo.Update(entity.UserPreferences);
+
+                _dbContext.Entry(entity).State = EntityState.Modified;
+                _dbContext.Entry(entity.UserPreferences).State = EntityState.Modified;
+
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
             return true;
         }
         public void Delete(Guid id)
         {
 
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
+            var entity = _dbContext.Users.FirstOrDefault(u => u.Id == id);
 
-            if (user == null)
+            if (entity == null)
             {
                 return;
             }
 
-            _userPrefRepo.Delete(user.UserPreferences.Id);
-            _dbContext.Users.Remove(user);
+            _userPrefRepo.Delete(entity.UserPreferences.Id);
+            _dbContext.Users.Remove(entity);
+
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+
+            _dbContext.SaveChanges();
         }
     }
 }

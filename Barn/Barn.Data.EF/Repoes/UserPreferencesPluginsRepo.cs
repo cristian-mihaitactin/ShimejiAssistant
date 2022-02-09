@@ -1,5 +1,6 @@
 ﻿using Barn.Entities.Plugins;
 using Barn.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,6 @@ namespace Barn.Data.EF.Repoes
         public UserPreferencesPluginsRepo(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-        }
-        public void Delete(Tuple<Guid, Guid> id)
-        {
-            var upp = _dbContext.UserPreferencesPlugins.FirstOrDefault(upp => upp.UserPreferenceId == id.Item1 && upp.PluginId == id.Item2);
-            _dbContext.UserPreferencesPlugins.Remove(upp);
         }
 
         public IEnumerable<UserPreferencesPlugins> GetAll()
@@ -48,6 +44,19 @@ namespace Barn.Data.EF.Repoes
         public bool Update(UserPreferencesPlugins entity)
         {
             throw new NotImplementedException();
+        }
+        public void Delete(Tuple<Guid, Guid> id)
+        {
+            var entity = _dbContext.UserPreferencesPlugins.FirstOrDefault(upp => upp.UserPreferenceId == id.Item1 && upp.PluginId == id.Item2);
+            if (entity == null)
+            {
+                return;
+            }
+
+            _dbContext.UserPreferencesPlugins.Remove(entity);
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+
+            _dbContext.SaveChanges();
         }
     }
 }

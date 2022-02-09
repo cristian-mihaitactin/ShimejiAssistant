@@ -92,17 +92,16 @@ namespace Barn.Data.Mock
 
         public void Delete(Guid id)
         {
-            var usPref = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
-            if (usPref == null)
+            var entity = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
+            if (entity == null)
             {
                 return;
             }
 
-            _dbContext.UsersPreferences.Remove(usPref);
-            _dbContext.Entry(usPref).State = EntityState.Deleted;
-
-            var result = _dbContext.SaveChanges();
-            var x = 1;
+            _dbContext.UsersPreferences.Remove(entity);
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+            
+            _dbContext.SaveChanges();
         }
     }
 }

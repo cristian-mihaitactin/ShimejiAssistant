@@ -12,6 +12,8 @@ using OpenIddict.Validation.AspNetCore;
 using Barn.Services.UserPreferences;
 using Barn.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 
 namespace Barn.API.Controllers
 {
@@ -44,13 +46,22 @@ namespace Barn.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public BuckyProfileModel Get(Guid id)
+        [SwaggerResponse(500, "Error retrieving BuckyProfileModel")]
+        [SwaggerResponse(404, "BuckyProfileModel not found for provided id")]
+        public IActionResult Get(Guid id)
         {
             var profile = _profileService.GetProfile(id);
+
+            if (profile == null)
+            {
+                return NotFound();
+            }
+
             var behaviourModels = profile.Behaviours.Select(b => new BuckyBehaviourModel(b)/*_mapper.Map<BuckyBehaviourModel>(b)*/).ToList();
-            var profileModel =  _mapper.Map<BuckyProfileModel>(profile);
+            var profileModel = _mapper.Map<BuckyProfileModel>(profile);
             profileModel.Behaviours = behaviourModels;
-            return profileModel;
+            return Ok(profileModel);
+
         }
 
 
