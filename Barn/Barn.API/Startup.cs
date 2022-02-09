@@ -127,7 +127,6 @@ namespace Barn.API
             // --------------------------------- EF ---------------------------------//
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-
                 options.UseSqlServer(
                         Configuration.GetConnectionString("DefaultConnection"));
                 options.UseOpenIddict<Guid>();

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Barn.Data.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace Barn.Data.Mock
 {
@@ -78,6 +79,8 @@ namespace Barn.Data.Mock
             try
             {
                 _dbContext.UsersPreferences.Update(entity);
+                _dbContext.Entry(entity).State = EntityState.Modified;
+
                 _dbContext.SaveChanges();
             } catch (Exception ex)
             {
@@ -96,7 +99,10 @@ namespace Barn.Data.Mock
             }
 
             _dbContext.UsersPreferences.Remove(usPref);
-            _dbContext.SaveChanges();
+            _dbContext.Entry(usPref).State = EntityState.Deleted;
+
+            var result = _dbContext.SaveChanges();
+            var x = 1;
         }
     }
 }

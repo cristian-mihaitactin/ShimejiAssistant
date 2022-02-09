@@ -18,7 +18,8 @@ namespace Barn.Data.EF.Repoes
         }
         public void Delete(Tuple<Guid, Guid> id)
         {
-            throw new NotImplementedException();
+            var upp = _dbContext.UserPreferencesPlugins.FirstOrDefault(upp => upp.UserPreferenceId == id.Item1 && upp.PluginId == id.Item2);
+            _dbContext.UserPreferencesPlugins.Remove(upp);
         }
 
         public IEnumerable<UserPreferencesPlugins> GetAll()
