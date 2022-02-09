@@ -173,8 +173,8 @@ app.on("ready", () => {
     }
   });
   const buckyWindow = createWindow("antler", {
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 200,
     transparent: true,
     frame: false,
     resizable: false,
@@ -227,7 +227,6 @@ app.on("ready", () => {
 
   buckyProfileService.defaultBuckyProfile.subscribe({
     next: value => {
-      console.log('defaultBuckyProfile.subscribe: ', value)
       buckyWindow.webContents.send("selected-bucky-profile", value);
       mainWindow.webContents.send("selected-bucky-profile", value);
     },

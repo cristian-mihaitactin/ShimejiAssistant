@@ -27,6 +27,7 @@ export class UserStore {
     this.data = parseDataFile(this.path, opts.defaults);
 
     const buckyPath = path.join(app.getPath('userData'), profilePath);
+
     if (!fs.existsSync(buckyPath)){
       this.setDefaultBuckyProfile();
     }
@@ -111,7 +112,6 @@ export class UserStore {
 }
 
 function parseDataFile(filePath, defaults, force = false) {
-    console.log('fs.existsSync(filePath)', fs.existsSync(filePath))
     if (fs.existsSync(filePath) && !force) { 
       try {
         return JSON.parse(fs.readFileSync(filePath).toString());
