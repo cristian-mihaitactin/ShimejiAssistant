@@ -33,9 +33,9 @@ namespace Barn.Data.Mock
             return userPreferenceList;
         }
 
-        public UserPreferences GetById(Guid id)
+        public async Task<UserPreferences> GetAsyncById(Guid id)
         {
-            var userPref = _dbContext.UsersPreferences.FirstOrDefault(x => x.Id == id);
+            var userPref = await _dbContext.UsersPreferences.FindAsync(id);
             if( userPref == null)
             {
                 return null;
@@ -47,11 +47,11 @@ namespace Barn.Data.Mock
             return userPref;
         }
 
-        public bool Insert(UserPreferences entity)
+        public async Task<bool> InsertAsync(UserPreferences entity)
         {
             if (!_dbContext.UsersPreferences.Contains(entity))
             {
-                _dbContext.UsersPreferences.Add(entity);
+                await _dbContext.UsersPreferences.AddAsync(entity);
                 _dbContext.SaveChanges();
             }
             else
@@ -62,18 +62,13 @@ namespace Barn.Data.Mock
             return true;
         }
 
-        public bool Update(UserPreferences entity)
+        public async Task<bool> UpdateAsync(UserPreferences entity)
         {
-            if (!_dbContext.UsersPreferences.Contains(entity))
-            {
-                return false;
-
-            }
-
-            var existingEntitiy = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == entity.Id);
+            var existingEntitiy = await _dbContext.UsersPreferences.FindAsync(entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
+
             }
 
             try
@@ -90,9 +85,11 @@ namespace Barn.Data.Mock
             return true;
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            var entity = _dbContext.UsersPreferences.FirstOrDefault(u => u.Id == id);
+
+            var entity = await _dbContext.UsersPreferences.FindAsync(id);
+
             if (entity == null)
             {
                 return;
@@ -100,7 +97,7 @@ namespace Barn.Data.Mock
 
             _dbContext.UsersPreferences.Remove(entity);
             _dbContext.Entry(entity).State = EntityState.Deleted;
-            
+
             _dbContext.SaveChanges();
         }
     }

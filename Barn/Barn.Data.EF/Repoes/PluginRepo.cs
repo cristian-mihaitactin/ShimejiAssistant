@@ -20,51 +20,56 @@ namespace Barn.Data.EF.Repoes
 
         public IEnumerable<Plugin> GetAll()
         {
-            return _dbContext.Plugins;
+            return _dbContext.Plugins.ToList();
         }
 
-        public Plugin GetById(Guid id)
+        public async Task<Plugin> GetAsyncById(Guid id)
         {
-            return (Plugin)_dbContext.Plugins.FirstOrDefault(p => p.Id == id);
+            var result = await _dbContext.Plugins.FindAsync(id);
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result;
         }
 
-        public bool Insert(Plugin entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Update(Plugin entity)
+        public async Task<bool> InsertAsync(Plugin entity)
         {
             if (!_dbContext.Plugins.Contains(entity))
             {
-                return false;
-
-            }
-
-            var existingEntitiy = _dbContext.Plugins.FirstOrDefault(u => u.Id == entity.Id);
-            if (existingEntitiy == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                _dbContext.Plugins.Update(entity);
-                _dbContext.Entry(entity).State = EntityState.Modified;
-
+                await _dbContext.Plugins.AddAsync(entity);
                 _dbContext.SaveChanges();
             }
-            catch (Exception ex)
+            else
             {
-                throw;
+                return false;
             }
 
             return true;
         }
 
-        public void Delete(Guid id)
+        public async Task<bool> UpdateAsync(Plugin entity)
         {
-            var entity = _dbContext.Plugins.FirstOrDefault(u => u.Id == id);
+            var existingEntitiy = await _dbContext.Plugins.FindAsync(entity.Id);
+            if (existingEntitiy == null)
+            {
+                return false;
+
+            }
+
+            _dbContext.Plugins.Update(entity);
+            _dbContext.Entry(entity).State = EntityState.Modified;
+
+            _dbContext.SaveChanges();
+            return true;
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+
+            var entity = await _dbContext.Plugins.FindAsync(id);
+
             if (entity == null)
             {
                 return;

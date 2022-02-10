@@ -20,26 +20,25 @@ namespace Barn.Data.EF.Repoes
 
         public IEnumerable<BuckyProfile> GetAll()
         {
-            return _dbContext.BuckyProfiles;
+            return _dbContext.BuckyProfiles.ToList();
         }
 
-        public BuckyProfile GetById(Guid id)
+        public async Task<BuckyProfile> GetAsyncById(Guid id)
         {
-            var result = _dbContext.BuckyProfiles.FirstOrDefault(u => u.Id == id);
+            var result = await _dbContext.BuckyProfiles.FindAsync(id);
             if (result == null)
             {
                 return null;
             }
-            result.Behaviours = _dbContext.BuckyBehaviours.Where(b => b.BuckyProfileId == id).ToList();
 
             return result;
         }
 
-        public bool Insert(BuckyProfile entity)
+        public async Task<bool> InsertAsync(BuckyProfile entity)
         {
             if (!_dbContext.BuckyProfiles.Contains(entity))
             {
-                _dbContext.BuckyProfiles.Add(entity);
+                await _dbContext.BuckyProfiles.AddAsync(entity);
                 _dbContext.SaveChanges();
             }
             else
@@ -50,18 +49,13 @@ namespace Barn.Data.EF.Repoes
             return true;
         }
 
-        public bool Update(BuckyProfile entity)
+        public async Task<bool> UpdateAsync(BuckyProfile entity)
         {
-            if (!_dbContext.BuckyProfiles.Contains(entity))
-            {
-                return false;
-
-            }
-
-            var existingEntitiy = _dbContext.BuckyProfiles.FirstOrDefault(u => u.Id == entity.Id);
+            var existingEntitiy = await _dbContext.BuckyProfiles.FindAsync(entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
+
             }
 
             _dbContext.BuckyProfiles.Update(entity);
@@ -70,10 +64,11 @@ namespace Barn.Data.EF.Repoes
             _dbContext.SaveChanges();
             return true;
         }
-        public void Delete(Guid id)
+
+        public async Task DeleteAsync(Guid id)
         {
 
-            var entity = _dbContext.BuckyProfiles.FirstOrDefault(u => u.Id == id);
+            var entity = await _dbContext.BuckyProfiles.FindAsync(id);
 
             if (entity == null)
             {

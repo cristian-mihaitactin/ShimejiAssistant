@@ -20,31 +20,42 @@ namespace Barn.Data.EF.Repoes
 
         public IEnumerable<PluginNotification> GetAll()
         {
-            throw new NotImplementedException();
+            return _dbContext.PluginNotifications.ToList();
         }
 
-        public PluginNotification GetById(Guid id)
+        public async Task<PluginNotification> GetAsyncById(Guid id)
         {
-            throw new NotImplementedException();
+            var result = await _dbContext.PluginNotifications.FindAsync(id);
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result;
         }
 
-        public bool Insert(PluginNotification entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Update(PluginNotification entity)
+        public async Task<bool> InsertAsync(PluginNotification entity)
         {
             if (!_dbContext.PluginNotifications.Contains(entity))
             {
+                await _dbContext.PluginNotifications.AddAsync(entity);
+                _dbContext.SaveChanges();
+            }
+            else
+            {
                 return false;
-
             }
 
-            var existingEntitiy = _dbContext.PluginNotifications.FirstOrDefault(u => u.Id == entity.Id);
+            return true;
+        }
+
+        public async Task<bool> UpdateAsync(PluginNotification entity)
+        {
+            var existingEntitiy = await _dbContext.PluginNotifications.FindAsync(entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
+
             }
 
             try
@@ -62,9 +73,11 @@ namespace Barn.Data.EF.Repoes
             return true;
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            var entity = _dbContext.PluginNotifications.FirstOrDefault(u => u.Id == id);
+
+            var entity = await _dbContext.PluginNotifications.FindAsync(id);
+
             if (entity == null)
             {
                 return;

@@ -23,31 +23,52 @@ namespace Barn.Data.EF.Repoes
             return _dbContext.UserPreferencesPlugins.ToList();
         }
 
-        public UserPreferencesPlugins GetById(Tuple<Guid, Guid> id)
+        public async Task<UserPreferencesPlugins> GetAsyncById(Tuple<Guid, Guid> id)
         {
-            return _dbContext.UserPreferencesPlugins.FirstOrDefault(upp => upp.UserPreferenceId== id.Item1 && upp.PluginId == id.Item2);
+            var result = await _dbContext.UserPreferencesPlugins.FindAsync(id.Item1,id.Item2);
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result;
         }
 
-        public bool Insert(UserPreferencesPlugins entity)
+        public async Task<bool> InsertAsync(UserPreferencesPlugins entity)
         {
-            var exists = _dbContext.UserPreferencesPlugins.Any( x => x.PluginId == entity.PluginId && x.UserPreferenceId == entity.UserPreferenceId);
-            if (exists)
+            var exists = await _dbContext.UserPreferencesPlugins.AnyAsync( x => x.PluginId == entity.PluginId && x.UserPreferenceId == entity.UserPreferenceId);
+            if (!exists)
+            {
+                await _dbContext.UserPreferencesPlugins.AddAsync(entity);
+                _dbContext.SaveChanges();
+            }
+            else
             {
                 return false;
             }
-            _dbContext.UserPreferencesPlugins.Add(entity);
-            _dbContext.SaveChanges();
 
             return true;
         }
 
-        public bool Update(UserPreferencesPlugins entity)
+        public async Task<bool> UpdateAsync(UserPreferencesPlugins entity)
         {
-            throw new NotImplementedException();
+            var existingEntitiy = await _dbContext.UserPreferencesPlugins.FindAsync(entity.PluginId,entity.UserPreferenceId);
+            if (existingEntitiy == null)
+            {
+                return false;
+
+            }
+
+            _dbContext.UserPreferencesPlugins.Update(entity);
+            _dbContext.Entry(entity).State = EntityState.Modified;
+
+            _dbContext.SaveChanges();
+            return true;
         }
-        public void Delete(Tuple<Guid, Guid> id)
+
+        public async Task DeleteAsync(Tuple<Guid, Guid> id)
         {
-            var entity = _dbContext.UserPreferencesPlugins.FirstOrDefault(upp => upp.UserPreferenceId == id.Item1 && upp.PluginId == id.Item2);
+            var entity = await _dbContext.UserPreferencesPlugins.FindAsync(id.Item1, id.Item2);
             if (entity == null)
             {
                 return;
