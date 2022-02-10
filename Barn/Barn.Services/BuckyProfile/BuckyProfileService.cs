@@ -12,8 +12,8 @@ namespace Barn.Services.BuckyProfile
 {
     public class BuckyProfileService: IBuckyProfileService
     {
-        private Guid DEFAULT_BUCKY_PROFILE = new Guid("8919E40E-D588-42F2-A0A8-4AFB9AD1589B");
-        private BehaviourClient _behaviourClient;
+        public Guid DEFAULT_BUCKY_PROFILE = new Guid("8919E40E-D588-42F2-A0A8-4AFB9AD1589B");
+        private IBehaviourClient _behaviourClient;
         private IGenericRepo<Guid, Entities.Bucky.BuckyProfile> _buckyProfileRepo;
         private IConfiguration _configuration;
 
@@ -25,16 +25,23 @@ namespace Barn.Services.BuckyProfile
             _buckyProfileRepo = buckyProfileRepo;
         }
 
-        public BuckyProfileDTO GetProfile(Guid id)
+        public BuckyProfileService(IGenericRepo<Guid,
+            Entities.Bucky.BuckyProfile> buckyProfileRepo, IBehaviourClient behaviourClient)
+        {
+            _behaviourClient = behaviourClient;
+            _buckyProfileRepo = buckyProfileRepo;
+        }
+
+        public async Task<BuckyProfileDTO> GetProfile(Guid id)
         {
             //Get profile and behaviours from sql
-            var buckyProfile = _buckyProfileRepo.GetById(id);
+            var buckyProfile = await _buckyProfileRepo.GetAsyncById(id);
             var profile = new BuckyProfileDTO(buckyProfile);
 
             //Get behaviour blobs
             foreach (var profileBehaviour in profile.Behaviours)
             {
-                var imageBytes = _behaviourClient.GetBehaviourBlob(profileBehaviour.BuckyBehaviour).Result;
+                var imageBytes = await _behaviourClient.GetBehaviourBlob(profileBehaviour.BuckyBehaviour);
                 profileBehaviour.ImageBytes = imageBytes.Image;
             }
 

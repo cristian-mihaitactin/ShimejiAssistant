@@ -6,7 +6,7 @@ using Barn.Entities.Bucky;
 
 namespace Barn.AzIntegration.BuckyBehaviour
 {
-    public class BehaviourClient
+    public class BehaviourClient: IBehaviourClient
     {
         private BlobService _blobService;
         public BehaviourClient(string connectionString)

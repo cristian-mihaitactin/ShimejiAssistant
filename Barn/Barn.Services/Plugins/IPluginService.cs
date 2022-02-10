@@ -10,10 +10,10 @@ namespace Barn.Services.Plugins
     public interface IPluginService
     {
         IList<Plugin> GetPlugins();
-        Plugin GetPlugin(Guid id);
+        Task<Plugin> GetPlugin(Guid id);
         Task<PluginPackageDTO> GetPluginPackageAsync(Guid id);
         Task<PluginDTO> GetPluginWithImagesAsync(Guid id);
-        void UpdatePlugin(Plugin plugin);
-        void DeletePlugin(Guid id);
+        Task UpdatePlugin(Plugin plugin);
+        Task DeletePlugin(Guid id);
     }
 }
