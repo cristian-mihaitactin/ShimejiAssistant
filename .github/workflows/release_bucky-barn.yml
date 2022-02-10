@@ -46,17 +46,8 @@ jobs:
           dotnet-version: '5.0.x'
           include-prerelease: true
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release ./Barn/
-
-      - name: dotnet publish
-        run: dotnet publish -c Release ./Barn/Barn.API/Barn.API.csproj -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+      - name: Run Unit tests
+        run: dotnet test ./Barn/Barn.Tests/Barn.Tests.csproj --filter Category=Unit
 
   test-barn-integration:
     runs-on: windows-latest
@@ -70,17 +61,8 @@ jobs:
           dotnet-version: '5.0.x'
           include-prerelease: true
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release ./Barn/
-
-      - name: dotnet publish
-        run: dotnet publish -c Release ./Barn/Barn.API/Barn.API.csproj -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+      - name: Run Integration tests
+        run: dotnet test ./Barn/Barn.Tests/Barn.Tests.csproj --filter Category=Integration
 
   test-bucky-electron:
     runs-on: windows-latest

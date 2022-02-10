@@ -85,7 +85,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public void ReturnAllPluginNotification()
         {
             //Arrange
@@ -98,7 +98,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task InsertPluginNotification()
         {
             //Arrange
@@ -126,7 +126,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnPluginNotificationFoGivenId()
         {
             //Arrange
@@ -151,7 +151,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnNullForUnknownId()
         {
             //Arrange
@@ -166,7 +166,7 @@ namespace Barn.Tests.Data
 
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task UpdatePluginNotificationForProvidedPluginNotification()
         {
             //Arrange
@@ -200,7 +200,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task NotUpdatePluginNotificationFoUnknownPluginNotification()
         {
             //Arrange
@@ -228,7 +228,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task DeletePluginNotificationWithProvidedID()
         {
             //Arrange

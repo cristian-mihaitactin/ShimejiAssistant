@@ -84,7 +84,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public void ReturnAllPlugin()
         {
             //Arrange
@@ -97,7 +97,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task InsertPlugin()
         {
             //Arrange
@@ -125,7 +125,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnPluginFoGivenId()
         {
             //Arrange
@@ -150,7 +150,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnNullForUnknownId()
         {
             //Arrange
@@ -165,7 +165,7 @@ namespace Barn.Tests.Data
 
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task UpdatePluginForProvidedPlugin()
         {
             //Arrange
@@ -210,7 +210,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task NotUpdatePluginFoUnknownPlugin()
         {
             //Arrange
@@ -238,7 +238,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task DeletePluginWithProvidedID()
         {
             //Arrange

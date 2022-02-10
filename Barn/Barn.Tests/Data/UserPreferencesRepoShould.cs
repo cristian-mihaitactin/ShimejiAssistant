@@ -73,7 +73,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnAllUserPreferences()
         {
             //Arrange
@@ -86,7 +86,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task InsertUserPreference()
         {
             //Arrange
@@ -116,7 +116,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnUserPreferenceFoGivenId()
         {
             //Arrange
@@ -143,7 +143,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnNullForUnknownId()
         {
             //Arrange
@@ -158,7 +158,7 @@ namespace Barn.Tests.Data
 
         
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task UpdateUserPreferenceForProvidedUserPreference()
         {
             //Arrange
@@ -194,7 +194,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task NotUpdateUserPreferenceFoUnknownUserPreference()
         {
             //Arrange
@@ -227,7 +227,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task DeleteUserPreferenceWithProvidedID()
         {
             //Arrange

@@ -89,7 +89,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnAllBuckyProfile()
         {
             //Arrange
@@ -102,7 +102,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task InsertBuckyProfile()
         {
             //Arrange
@@ -130,7 +130,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnBuckyProfileFoGivenId()
         {
             //Arrange
@@ -167,7 +167,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task ReturnNullForUnknownId()
         {
             //Arrange
@@ -182,7 +182,7 @@ namespace Barn.Tests.Data
 
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task UpdateBuckyProfileForProvidedBuckyProfile()
         {
             //Arrange
@@ -216,7 +216,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task NotUpdateBuckyProfileFoUnknownBuckyProfile()
         {
             //Arrange
@@ -244,7 +244,7 @@ namespace Barn.Tests.Data
         }
 
         [Fact]
-        [Trait("Category", "UnitTest")]
+        [Trait("Category", "Unit")]
         public async Task DeleteBuckyProfileWithProvidedID()
         {
             //Arrange
