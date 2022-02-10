@@ -1,15 +1,13 @@
 ﻿using Barn.Data.EF;
+using Barn.Data.EF.Repoes;
 using Barn.Data.Mock;
+using Barn.Entities.Bucky;
 using Barn.Entities.Users;
-using Barn.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Shouldly;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Barn.Tests.Data
@@ -17,53 +15,60 @@ namespace Barn.Tests.Data
     public class UserPreferencesRepoShould
     {
         private UserPreferencesRepo _userPreferencesRepo;
-        private ApplicationDbContext _context;
-        private List<UserPreferences> _userPreferenceList = new List<UserPreferences>(new UserPreferences[] {
+        private static ApplicationDbContext _context = null;
+        private static List<UserPreferences> _userPreferenceList = new List<UserPreferences>(new UserPreferences[] {
                 new UserPreferences()
-        {
-            BuckyProfile = new Entities.Bucky.BuckyProfile(),
-                    BuckyProfileID = Guid.NewGuid(),
-                    Id = Guid.NewGuid(),
-                    User = null,
-                    UserId = Guid.NewGuid(),
-                    UserPreferencesPlugins = null
-                },
-                new UserPreferences()
-        {
-            BuckyProfile = new Entities.Bucky.BuckyProfile(),
-                    BuckyProfileID = Guid.NewGuid(),
-                    Id = Guid.NewGuid(),
-                    User = null,
-                    UserId = Guid.NewGuid(),
-                    UserPreferencesPlugins = null
-                },
-                new UserPreferences()
-        {
-            BuckyProfile = new Entities.Bucky.BuckyProfile(),
+                {
+                    BuckyProfile = new Entities.Bucky.BuckyProfile(),
+                            BuckyProfileID = Guid.NewGuid(),
+                            Id = Guid.NewGuid(),
+                            User = null,
+                            UserId = Guid.NewGuid(),
+                            UserPreferencesPlugins = null
+                        },
+                        new UserPreferences()
+                {
+                    BuckyProfile = new Entities.Bucky.BuckyProfile(),
+                            BuckyProfileID = Guid.NewGuid(),
+                            Id = Guid.NewGuid(),
+                            User = null,
+                            UserId = Guid.NewGuid(),
+                            UserPreferencesPlugins = null
+                        },
+                        new UserPreferences()
+                {
+                    BuckyProfile = new Entities.Bucky.BuckyProfile(),
                     BuckyProfileID = Guid.NewGuid(),
                     Id = Guid.NewGuid(),
                     User = null,
                     UserId = Guid.NewGuid(),
                     UserPreferencesPlugins = null
                 }
-    });
+        });
+        public static ApplicationDbContext DbContext
+        {
+            get
+            {
+                if (_context == null)
+                {
+                    var builder = new DbContextOptionsBuilder<ApplicationDbContext>()
+                    .UseInMemoryDatabase("Bucky-test-userPreferences");
+
+                    _context = new ApplicationDbContext(builder.Options);
+
+                    _context.UsersPreferences.AddRange(_userPreferenceList);
+                    int changed = _context.SaveChanges();
+
+                }
+
+                return _context;
+            }
+            private set { _context = value; }
+        }
 
         public UserPreferencesRepoShould()
         {
-            
-            var builder = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Bucky-test");
-
-            _context = new ApplicationDbContext(builder.Options);
-
-            /*
-            var dbSetMock = DBHelper.GetQueryableMockDbSet(userPreferencesList);
-            context.UsersPreferences = dbSetMock;
-            */
-            _context.UsersPreferences.AddRange(_userPreferenceList);
-            int changed = _context.SaveChanges();
-
-            _userPreferencesRepo = new UserPreferencesRepo(_context);
+            _userPreferencesRepo = new UserPreferencesRepo(DbContext);
         }
 
         [Fact]
@@ -249,6 +254,53 @@ namespace Barn.Tests.Data
             userPrefListResult.ShouldNotBeNull();
             userPrefListResult.ShouldNotContain(userPref);
             userFound.ShouldBeNull();
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void DeleteUserPreferenceWithBuckyProfileDoesNotDeleteBuckyProfile()
+        {
+            //Arrange
+            var userPrefId = Guid.Parse("FB08B218-8289-4544-8D40-C3A5DF303556");
+            var buckyProfileId = Guid.NewGuid();
+            var buckyProfile = new Entities.Bucky.BuckyProfile()
+            {
+                Id = buckyProfileId,
+                Behaviours = new List<BuckyBehaviour>(new BuckyBehaviour[] {
+                        new BuckyBehaviour()
+                        {
+                            BuckyProfileId = buckyProfileId,
+                            Id = Guid.NewGuid()
+                        }
+                    })
+            };
+
+            var userPref = new UserPreferences()
+            {
+                BuckyProfile = buckyProfile,
+                Id = userPrefId,
+                User = null,
+                UserId = Guid.NewGuid(),
+                UserPreferencesPlugins = null
+            };
+            var buckyProfileRepo = new BuckyProfileRepo(DbContext);
+
+            buckyProfileRepo.Insert(buckyProfile);
+            _userPreferencesRepo.Insert(userPref);
+
+            //Act
+            _userPreferencesRepo.Delete(userPrefId);
+
+            //Assert
+            var userPrefListResult = _userPreferencesRepo.GetAll();
+            var userFound = _userPreferencesRepo.GetById(userPrefId);
+
+            userPrefListResult.ShouldNotBeNull();
+            userPrefListResult.ShouldNotContain(userPref);
+            userFound.ShouldBeNull();
+
+            var buckyProfileFound = buckyProfileRepo.GetById(buckyProfileId);
+            buckyProfileFound.ShouldNotBeNull();
         }
     }
 }

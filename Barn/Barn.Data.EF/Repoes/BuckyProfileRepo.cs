@@ -26,6 +26,10 @@ namespace Barn.Data.EF.Repoes
         public BuckyProfile GetById(Guid id)
         {
             var result = _dbContext.BuckyProfiles.FirstOrDefault(u => u.Id == id);
+            if (result == null)
+            {
+                return null;
+            }
             result.Behaviours = _dbContext.BuckyBehaviours.Where(b => b.BuckyProfileId == id).ToList();
 
             return result;
@@ -36,6 +40,7 @@ namespace Barn.Data.EF.Repoes
             if (!_dbContext.BuckyProfiles.Contains(entity))
             {
                 _dbContext.BuckyProfiles.Add(entity);
+                _dbContext.SaveChanges();
             }
             else
             {

@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Folder Include="API\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
   <ItemGroup>
