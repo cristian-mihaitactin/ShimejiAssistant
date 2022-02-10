@@ -8,6 +8,7 @@ using Moq;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Barn.Tests.Data
@@ -73,7 +74,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void ReturnAllUserPreferences()
+        public async Task ReturnAllUserPreferences()
         {
             //Arrange
 
@@ -86,7 +87,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void InsertUserPreference()
+        public async Task InsertUserPreference()
         {
             //Arrange
             var userPrefId = Guid.Parse("34FF5D40-0064-4E1B-987C-AE59740CF30B");
@@ -102,11 +103,11 @@ namespace Barn.Tests.Data
             };
 
             //Act
-            var result = _userPreferencesRepo.Insert(userPref);
+            var result = await _userPreferencesRepo.InsertAsync(userPref);
 
             //Assert
             var userPrefListResult = _userPreferencesRepo.GetAll();
-            var userFound = _userPreferencesRepo.GetById(userPrefId);
+            var userFound = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             result.ShouldBeTrue();
             userPrefListResult.ShouldNotBeNull();
@@ -116,7 +117,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void ReturnUserPreferenceFoGivenId()
+        public async Task ReturnUserPreferenceFoGivenId()
         {
             //Arrange
             var userPrefId = Guid.Parse("5E000909-73F0-42BD-A2B3-83B85354D8E0");
@@ -131,10 +132,10 @@ namespace Barn.Tests.Data
                 UserPreferencesPlugins = null
             };
 
-            _userPreferencesRepo.Insert(userPref);
+            await _userPreferencesRepo.InsertAsync(userPref);
 
             //Act
-            var result = _userPreferencesRepo.GetById(userPrefId);
+            var result = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             //Assert
             result.ShouldNotBeNull();
@@ -143,13 +144,13 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void ReturnNullForUnknownId()
+        public async Task ReturnNullForUnknownId()
         {
             //Arrange
             var userPrefId = Guid.Parse("254F75BA-8679-4049-B646-CCD32FCC9C1E");
 
             //Act
-            var result = _userPreferencesRepo.GetById(userPrefId);
+            var result = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             //Assert
             result.ShouldBeNull();
@@ -158,7 +159,7 @@ namespace Barn.Tests.Data
         
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void UpdateUserPreferenceForProvidedUserPreference()
+        public async Task UpdateUserPreferenceForProvidedUserPreference()
         {
             //Arrange
             var userPrefId = Guid.Parse("FFA47F13-3ACA-4457-AC26-D2B2A14C1E11");
@@ -173,16 +174,16 @@ namespace Barn.Tests.Data
                 UserPreferencesPlugins = null
             };
 
-            _userPreferencesRepo.Insert(userPref);
+            await _userPreferencesRepo.InsertAsync(userPref);
 
             userPref.BuckyProfileID = Guid.Empty;
             userPref.BuckyProfile = null;
             //Act
-            var result = _userPreferencesRepo.Update(userPref);
+            var result = await _userPreferencesRepo.UpdateAsync(userPref);
 
             //Assert
             var userPrefListResult = _userPreferencesRepo.GetAll();
-            var userFound = _userPreferencesRepo.GetById(userPrefId);
+            var userFound = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             result.ShouldBeTrue();
             userPrefListResult.ShouldNotBeNull();
@@ -194,7 +195,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void NotUpdateUserPreferenceFoUnknownUserPreference()
+        public async Task NotUpdateUserPreferenceFoUnknownUserPreference()
         {
             //Arrange
             var userPrefId = Guid.Parse("77ED0629-838D-4FE2-A5D1-966B9F8A7439");
@@ -213,11 +214,11 @@ namespace Barn.Tests.Data
             userPref.BuckyProfileID = Guid.Empty;
             userPref.BuckyProfile = null;
             //Act
-            var result = _userPreferencesRepo.Update(userPref);
+            var result = await _userPreferencesRepo.UpdateAsync(userPref);
 
             //Assert
             var userPrefListResult = _userPreferencesRepo.GetAll();
-            var userFound = _userPreferencesRepo.GetById(userPrefId);
+            var userFound = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             result.ShouldBeFalse();
             userPrefListResult.ShouldNotBeNull();
@@ -227,7 +228,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void DeleteUserPreferenceWithProvidedID()
+        public async Task DeleteUserPreferenceWithProvidedID()
         {
             //Arrange
             var userPrefId = Guid.Parse("A1855DFE-C302-4E36-A738-5D93067B0586");
@@ -242,14 +243,14 @@ namespace Barn.Tests.Data
                 UserPreferencesPlugins = null
             };
 
-            _userPreferencesRepo.Insert(userPref);
+            await _userPreferencesRepo.InsertAsync(userPref);
 
             //Act
-            _userPreferencesRepo.Delete(userPrefId);
+            await _userPreferencesRepo.DeleteAsync(userPrefId);
 
             //Assert
             var userPrefListResult = _userPreferencesRepo.GetAll();
-            var userFound = _userPreferencesRepo.GetById(userPrefId);
+            var userFound = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             userPrefListResult.ShouldNotBeNull();
             userPrefListResult.ShouldNotContain(userPref);
@@ -258,7 +259,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "Integration")]
-        public void DeleteUserPreferenceWithBuckyProfileDoesNotDeleteBuckyProfile()
+        public async Task DeleteUserPreferenceWithBuckyProfileDoesNotDeleteBuckyProfile()
         {
             //Arrange
             var userPrefId = Guid.Parse("FB08B218-8289-4544-8D40-C3A5DF303556");
@@ -285,21 +286,21 @@ namespace Barn.Tests.Data
             };
             var buckyProfileRepo = new BuckyProfileRepo(DbContext);
 
-            buckyProfileRepo.Insert(buckyProfile);
-            _userPreferencesRepo.Insert(userPref);
+            await buckyProfileRepo.InsertAsync(buckyProfile);
+            await _userPreferencesRepo.InsertAsync(userPref);
 
             //Act
-            _userPreferencesRepo.Delete(userPrefId);
+            await _userPreferencesRepo.DeleteAsync(userPrefId);
 
             //Assert
             var userPrefListResult = _userPreferencesRepo.GetAll();
-            var userFound = _userPreferencesRepo.GetById(userPrefId);
+            var userFound = await _userPreferencesRepo.GetAsyncById(userPrefId);
 
             userPrefListResult.ShouldNotBeNull();
             userPrefListResult.ShouldNotContain(userPref);
             userFound.ShouldBeNull();
 
-            var buckyProfileFound = buckyProfileRepo.GetById(buckyProfileId);
+            var buckyProfileFound = await buckyProfileRepo.GetAsyncById(buckyProfileId);
             buckyProfileFound.ShouldNotBeNull();
         }
     }

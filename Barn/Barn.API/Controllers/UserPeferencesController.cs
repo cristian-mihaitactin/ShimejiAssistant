@@ -53,7 +53,7 @@ namespace Barn.API.Controllers
             var userPreferencesPlugins = new List<UserPreferencesPlugins>();
             foreach(var userPlugin in found.UserPreferencesPlugins)
             {
-                var plugin = _pluginService.GetPlugin(userPlugin.PluginId);
+                var plugin = await _pluginService.GetPlugin(userPlugin.PluginId);
                 userPlugin.Plugin = plugin;
 
                 userPreferencesPlugins.Add(userPlugin);
@@ -71,7 +71,7 @@ namespace Barn.API.Controllers
             var user = await GetUser();
             var found = _userPrefService.GetUserPreferenceByUserId(user.Id);
             found.BuckyProfileID = value.BuckyProfileID;
-            _userPrefService.UpdateUserPreference(found);
+            await _userPrefService.UpdateUserPreference(found);
         }
 
         [HttpPost("/api/UserPeferences/Plugin/{pluginId}")]
@@ -81,7 +81,7 @@ namespace Barn.API.Controllers
             var user = await GetUser();
             var found = _userPrefService.GetUserPreferenceByUserId(user.Id);
 
-            _userPrefService.InstallPluginToUser(found.Id,pluginId);
+            await _userPrefService.InstallPluginToUser(found.Id,pluginId);
             return Ok();
         }
 

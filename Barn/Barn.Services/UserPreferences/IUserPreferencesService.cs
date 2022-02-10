@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Barn.Services.UserPreferences
 {
     public interface IUserPreferencesService
     {
-        Entities.Users.UserPreferences GetUserPreferenceById(Guid id);
+        Task<Entities.Users.UserPreferences> GetUserPreferenceById(Guid id);
         
         Entities.Users.UserPreferences GetUserPreferenceByUserId(Guid userId);
-        bool CreateUserPreference(Entities.Users.UserPreferences userPref);
-        bool UpdateUserPreference(Entities.Users.UserPreferences userPref);
-        void InstallPluginToUser(Guid userPrefId, Guid pluginId);
-        void DeleteUserPreference(Guid id);
-        void CreateDefaultUserPreference(Entities.Users.User user);
+        Task<bool> CreateUserPreference(Entities.Users.UserPreferences userPref);
+        Task<bool> UpdateUserPreference(Entities.Users.UserPreferences userPref);
+        Task InstallPluginToUser(Guid userPrefId, Guid pluginId);
+        Task DeleteUserPreference(Guid id);
+        Task CreateDefaultUserPreference(Entities.Users.User user);
     }
 }

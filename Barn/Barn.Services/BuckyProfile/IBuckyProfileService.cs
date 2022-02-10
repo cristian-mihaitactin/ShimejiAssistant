@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Barn.Services.BuckyProfile
 {
     public interface IBuckyProfileService
     {
         BuckyProfileDTO GetDefaultProfile();
-        BuckyProfileDTO GetProfile(Guid id);
+        Task<BuckyProfileDTO> GetProfile(Guid id);
         IList<BuckyProfileDTO> GetAllProfiles();
     }
 }

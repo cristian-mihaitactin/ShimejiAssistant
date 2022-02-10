@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Barn.Tests.Data
@@ -89,7 +90,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void ReturnAllBuckyProfile()
+        public async Task ReturnAllBuckyProfile()
         {
             //Arrange
 
@@ -102,7 +103,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void InsertBuckyProfile()
+        public async Task InsertBuckyProfile()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("18517671-D85A-49C7-8B8D-C2B3901D9CC0");
@@ -116,11 +117,11 @@ namespace Barn.Tests.Data
             };
 
             //Act
-            var result = _buckyProfileRepo.Insert(buckyProfile);
+            var result = await _buckyProfileRepo.InsertAsync(buckyProfile);
 
             //Assert
             var buckyProfileListResult = _buckyProfileRepo.GetAll();
-            var buckyFound = _buckyProfileRepo.GetById(buckyProfileId);
+            var buckyFound = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             result.ShouldBeTrue();
             buckyProfileListResult.ShouldNotBeNull();
@@ -130,7 +131,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void ReturnBuckyProfileFoGivenId()
+        public async Task ReturnBuckyProfileFoGivenId()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("1040AE1F-F89F-4D40-8A6D-267765B678A7");
@@ -143,10 +144,10 @@ namespace Barn.Tests.Data
                 Behaviours = null
             };
 
-            _buckyProfileRepo.Insert(buckyProfile);
+            await _buckyProfileRepo.InsertAsync(buckyProfile);
 
             //Act
-            var result = _buckyProfileRepo.GetById(buckyProfileId);
+            var result = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             //Assert
             result.ShouldNotBeNull();
@@ -155,13 +156,13 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void ReturnNullForUnknownId()
+        public async Task ReturnNullForUnknownId()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("6BA70A5F-6601-4EDA-8355-42A8F0397E69");
 
             //Act
-            var result = _buckyProfileRepo.GetById(buckyProfileId);
+            var result = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             //Assert
             result.ShouldBeNull();
@@ -170,7 +171,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void UpdateBuckyProfileForProvidedBuckyProfile()
+        public async Task UpdateBuckyProfileForProvidedBuckyProfile()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("528DD977-ED9E-49FD-9582-AE2BF11054DA");
@@ -183,16 +184,16 @@ namespace Barn.Tests.Data
                 Behaviours = null
             };
 
-            _buckyProfileRepo.Insert(buckyProfile);
+            await _buckyProfileRepo.InsertAsync(buckyProfile);
 
             buckyProfile.Name = "Updated BuckyProfile";
             buckyProfile.Description = "This is Updated BuckyProfile";
             //Act
-            var result = _buckyProfileRepo.Update(buckyProfile);
+            var result = await _buckyProfileRepo.UpdateAsync(buckyProfile);
 
             //Assert
             var buckyProfileListResult = _buckyProfileRepo.GetAll();
-            var buckyProfileResult = _buckyProfileRepo.GetById(buckyProfileId);
+            var buckyProfileResult = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             result.ShouldBeTrue();
             buckyProfileListResult.ShouldNotBeNull();
@@ -204,7 +205,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void NotUpdateBuckyProfileFoUnknownBuckyProfile()
+        public async Task NotUpdateBuckyProfileFoUnknownBuckyProfile()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("4E07CD0E-4EA5-4C04-AEF1-83BD7C1EF854");
@@ -218,11 +219,11 @@ namespace Barn.Tests.Data
             };
 
             //Act
-            var result = _buckyProfileRepo.Update(buckyProfile);
+            var result = await _buckyProfileRepo.UpdateAsync(buckyProfile);
 
             //Assert
             var buckyProfileListResult = _buckyProfileRepo.GetAll();
-            var buckyFound = _buckyProfileRepo.GetById(buckyProfileId);
+            var buckyFound = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             result.ShouldBeFalse();
             buckyProfileListResult.ShouldNotBeNull();
@@ -232,7 +233,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "UnitTest")]
-        public void DeleteBuckyProfileWithProvidedID()
+        public async Task DeleteBuckyProfileWithProvidedID()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("93063803-60E1-4B63-B095-2670922808AF");
@@ -245,14 +246,14 @@ namespace Barn.Tests.Data
                 Behaviours = null
             };
 
-            _buckyProfileRepo.Insert(buckyProfile);
+            await _buckyProfileRepo.InsertAsync(buckyProfile);
 
             //Act
-            _buckyProfileRepo.Delete(buckyProfileId);
+            await _buckyProfileRepo.DeleteAsync(buckyProfileId);
 
             //Assert
             var buckyProfileListResult = _buckyProfileRepo.GetAll();
-            var buckyFound = _buckyProfileRepo.GetById(buckyProfileId);
+            var buckyFound = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             buckyProfileListResult.ShouldNotBeNull();
             buckyProfileListResult.ShouldNotContain(buckyProfile);
@@ -261,7 +262,7 @@ namespace Barn.Tests.Data
 
         [Fact]
         [Trait("Category", "Integration")]
-        public void DeleteBuckyProfileAndBuckyBehaviours()
+        public async Task DeleteBuckyProfileAndBuckyBehaviours()
         {
             //Arrange
             var buckyProfileId = Guid.Parse("93063803-60E1-4B63-B095-2670922808AF");
@@ -283,13 +284,13 @@ namespace Barn.Tests.Data
                 })
             };
 
-            _buckyProfileRepo.Insert(buckyProfile);
+            await _buckyProfileRepo.InsertAsync(buckyProfile);
             //Act
-            _buckyProfileRepo.Delete(buckyProfileId);
+            await _buckyProfileRepo.DeleteAsync(buckyProfileId);
 
             //Assert
             var buckyProfileListResult = _buckyProfileRepo.GetAll();
-            var buckyFound = _buckyProfileRepo.GetById(buckyProfileId);
+            var buckyFound = await _buckyProfileRepo.GetAsyncById(buckyProfileId);
 
             buckyProfileListResult.ShouldNotBeNull();
             buckyProfileListResult.ShouldNotContain(buckyProfile);

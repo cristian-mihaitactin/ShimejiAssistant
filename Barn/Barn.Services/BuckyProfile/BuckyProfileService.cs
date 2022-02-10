@@ -25,16 +25,16 @@ namespace Barn.Services.BuckyProfile
             _buckyProfileRepo = buckyProfileRepo;
         }
 
-        public BuckyProfileDTO GetProfile(Guid id)
+        public async Task<BuckyProfileDTO> GetProfile(Guid id)
         {
             //Get profile and behaviours from sql
-            var buckyProfile = _buckyProfileRepo.GetById(id);
+            var buckyProfile = await _buckyProfileRepo.GetAsyncById(id);
             var profile = new BuckyProfileDTO(buckyProfile);
 
             //Get behaviour blobs
             foreach (var profileBehaviour in profile.Behaviours)
             {
-                var imageBytes = _behaviourClient.GetBehaviourBlob(profileBehaviour.BuckyBehaviour).Result;
+                var imageBytes = await _behaviourClient.GetBehaviourBlob(profileBehaviour.BuckyBehaviour);
                 profileBehaviour.ImageBytes = imageBytes.Image;
             }
 

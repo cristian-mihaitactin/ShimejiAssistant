@@ -1,6 +1,7 @@
 ﻿using System;
 using Barn.Services.Interfaces;
 using Barn.Entities.Users;
+using System.Threading.Tasks;
 
 namespace Barn.Services.User
 {
@@ -13,24 +14,24 @@ namespace Barn.Services.User
             _userRepo = userRepo;
         }
 
-        public bool CreateUser(Entities.Users.User user)
+        public async Task<bool> CreateUser(Entities.Users.User user)
         {
-            return _userRepo.Insert(user);
+            return await _userRepo.InsertAsync(user);
         }
 
-        public Entities.Users.User GetUserById(Guid id)
+        public async Task<Entities.Users.User> GetUserById(Guid id)
         {
-            return _userRepo.GetById(id);
+            return await _userRepo.GetAsyncById(id);
         }
 
-        public bool UpdateUser(Entities.Users.User user)
+        public async Task<bool> UpdateUser(Entities.Users.User user)
         {
-            return _userRepo.Update(user);
+            return await _userRepo.UpdateAsync(user);
         }
 
-        public void DeleteUser(Guid id)
+        public async Task DeleteUser(Guid id)
         {
-            _userRepo.Delete(id);
+            await _userRepo.DeleteAsync(id);
         }
     }
 }

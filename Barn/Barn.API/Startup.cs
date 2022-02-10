@@ -14,7 +14,6 @@ using Barn.Entities.Users;
 using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
 using Barn.Services.Plugins;
-using Barn.Services.User;
 using Barn.Services.UserPreferences;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -58,7 +57,7 @@ namespace Barn.API
             services.AddSwaggerGen();
 
             // --------------------------------- Services ---------------------------------//
-            services.AddScoped<IUserService, UserService>();
+            //services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             services.AddScoped<IBuckyProfileService, BuckyProfileService>();
             services.AddScoped<IPluginService, PluginService>();
