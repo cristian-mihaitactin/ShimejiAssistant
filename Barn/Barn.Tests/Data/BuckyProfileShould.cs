@@ -135,13 +135,23 @@ namespace Barn.Tests.Data
         {
             //Arrange
             var buckyProfileId = Guid.Parse("1040AE1F-F89F-4D40-8A6D-267765B678A7");
+            var buckyBehaviourId = Guid.Parse("A35DC724-6BB4-4F65-B7AF-AE0708944A35");
+
+            var buckyBehaviour = new BuckyBehaviour()
+            {
+                Id = buckyBehaviourId,
+                BuckyProfileId = buckyBehaviourId
+            };
 
             var buckyProfile = new BuckyProfile()
             {
                 Id = buckyProfileId,
                 Name = "GET",
                 Description = "This is GET profile",
-                Behaviours = null
+                Behaviours = new List<BuckyBehaviour>(new BuckyBehaviour[]
+                {
+                    buckyBehaviour
+                })
             };
 
             await _buckyProfileRepo.InsertAsync(buckyProfile);
@@ -151,6 +161,8 @@ namespace Barn.Tests.Data
 
             //Assert
             result.ShouldNotBeNull();
+            result.Behaviours.ShouldNotBeNull();
+            result.Behaviours.ShouldContain(buckyBehaviour);
             Assert.True(result.Id == buckyProfileId);
         }
 

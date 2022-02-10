@@ -30,6 +30,7 @@ namespace Barn.Data.EF.Repoes
             {
                 return null;
             }
+            result.Behaviours = _dbContext.BuckyBehaviours.Where(bb => bb.BuckyProfileId == id).ToList();
 
             return result;
         }
