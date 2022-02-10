@@ -12,8 +12,8 @@ namespace Barn.Services.BuckyProfile
 {
     public class BuckyProfileService: IBuckyProfileService
     {
-        private Guid DEFAULT_BUCKY_PROFILE = new Guid("8919E40E-D588-42F2-A0A8-4AFB9AD1589B");
-        private BehaviourClient _behaviourClient;
+        public Guid DEFAULT_BUCKY_PROFILE = new Guid("8919E40E-D588-42F2-A0A8-4AFB9AD1589B");
+        private IBehaviourClient _behaviourClient;
         private IGenericRepo<Guid, Entities.Bucky.BuckyProfile> _buckyProfileRepo;
         private IConfiguration _configuration;
 
@@ -22,6 +22,13 @@ namespace Barn.Services.BuckyProfile
         {
             _configuration = configuration;
             _behaviourClient = new BehaviourClient(_configuration.GetConnectionString("AzStorageConnectionString"));
+            _buckyProfileRepo = buckyProfileRepo;
+        }
+
+        public BuckyProfileService(IGenericRepo<Guid,
+            Entities.Bucky.BuckyProfile> buckyProfileRepo, IBehaviourClient behaviourClient)
+        {
+            _behaviourClient = behaviourClient;
             _buckyProfileRepo = buckyProfileRepo;
         }
 
