@@ -38,7 +38,6 @@ namespace Barn.API.Controllers
         //    return _userService.GetAll();
         //}
 
-        // GET api/<UserController>/5
         [HttpGet]
         [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
         [SwaggerResponse(500, "Error retrieving User")]
@@ -53,7 +52,6 @@ namespace Barn.API.Controllers
             return Ok(new UserModel(user));
         }
 
-        // PUT api/<UserController>/5
         [HttpPut]
         [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
         public async void Put([FromBody] UserModel value)
@@ -67,14 +65,14 @@ namespace Barn.API.Controllers
             // _userService.UpdateUser(value.ToEntity());
         }
 
-        // DELETE api/<UserController>/5
-        [HttpDelete]
-        [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-        public async Task Delete()
-        {
-            var user = await GetUser();
-            await _userManager.DeleteAsync(user);
-        }
+        // Only for admins
+        //[HttpDelete]
+        //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
+        //public async Task Delete()
+        //{
+        //    var user = await GetUser();
+        //    await _userManager.DeleteAsync(user);
+        //}
 
         private async Task<User> GetUser()
         {

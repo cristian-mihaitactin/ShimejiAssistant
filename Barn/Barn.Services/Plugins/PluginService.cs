@@ -29,27 +29,30 @@ namespace Barn.Services.Plugins
             _pluginClient = new PluginClient(_configuration.GetConnectionString("AzStorageConnectionString"));
         }
 
-        public Plugin GetPlugin(Guid id)
+        public async Task<Plugin> GetPlugin(Guid id)
         {
-            return _pluginRepo.GetById(id);
+            return await _pluginRepo.GetAsyncById(id);
         }
+
         public async Task<PluginPackageDTO> GetPluginPackageAsync(Guid id)
         {
-            var plugin = _pluginRepo.GetById(id);
+            var plugin = await _pluginRepo.GetAsyncById(id);
             var pluginBytes = await _pluginClient.GetPluginPackageBlob(plugin);
+            var pluginImageBlob = await _pluginClient.GetPluginImagesBlob(plugin);
 
             return new PluginPackageDTO
             {
                 FileName = plugin.Version + ".zip",
                 ZipBytes = pluginBytes.ZipBytes,
                 Version = plugin.Version,
-                Name = plugin.Name
+                Name = plugin.Name,
+                PluginImagesBlob = pluginImageBlob
             };
         }
 
         public async Task<PluginDTO> GetPluginWithImagesAsync(Guid id)
         {
-            var plugin = _pluginRepo.GetById(id);
+            var plugin = await _pluginRepo.GetAsyncById(id);
             var pluginImageBlob = await _pluginClient.GetPluginImagesBlob(plugin);
 
             return new PluginDTO
@@ -67,14 +70,14 @@ namespace Barn.Services.Plugins
             return _pluginRepo.GetAll().ToList();
         }
 
-        public void UpdatePlugin(Plugin plugin)
+        public async Task UpdatePlugin(Plugin plugin)
         {
-            throw new NotImplementedException();
+            await _pluginRepo.UpdateAsync(plugin);
         }
 
-        public void DeletePlugin(Guid id)
+        public async Task DeletePlugin(Guid id)
         {
-            throw new NotImplementedException();
+            await _pluginRepo.DeleteAsync(id);
         }
 
     }

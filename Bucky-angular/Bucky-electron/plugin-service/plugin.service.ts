@@ -17,6 +17,7 @@ import { PluginNotification } from "../models/plugin.notification";
 import { IPlugin } from "../models/iplugin";
 import { RegisteredPlugin } from "../models/registered.plugin";
 import { PluginInput } from "../models/plugin.input";
+import { BarnBuckyService } from "../barn-service/barn-bucky-service";
 
 const pluginRelativePath = "Plugins";
 const pluginPackageEndpoint = "/api/Plugin"
@@ -27,10 +28,14 @@ export class PluginService {
     registeredPlugins: BehaviorSubject<RegisteredPlugin[]>;
     pluginHandlers: Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>
 
-    constructor(private userStore: UserStore) {
+    constructor(private userStore: UserStore, 
+        private barnService: BarnBuckyService) {
         const userDataPath = app.getPath('userData');
+
         this.registeredPlugins = new BehaviorSubject<RegisteredPlugin[]>([]);
         this.pluginHandlers = new Map<string, {eventHandlerIn: Subject<PluginInput>, eventHandlerOut: Subject<PluginNotification>}>();
+
+        const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
 
         this.registeredPlugins.subscribe({
             //store all registered plugins in userstore
@@ -39,7 +44,7 @@ export class PluginService {
                 var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
                     if (!existingPlugins.includes(plugin.pluginModel)){
-                        this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint
+                        this.barnService.callBarn(userPreferencesEndpoint
                             + "/Plugin/" + plugin.pluginModel.id, "POST" as Method).subscribe({
                                 error: (err) => {
                                     console.error(err);
@@ -60,11 +65,10 @@ export class PluginService {
             error: (err) => {
                 console.error(err);
             }
-        });
+        });// end registeredPlugins subscribe
 
         this.pluginDirectory = path.join(userDataPath ,pluginRelativePath);
         
-        const userPlugins = userStore.get('pluginsInstalled')  as unknown as Array<PluginModel>;
         if (userPlugins !== undefined && userPlugins !== null && Array.isArray(userPlugins)) {
             if (userPlugins.length > 0)
             {
@@ -94,22 +98,66 @@ export class PluginService {
     }
 
     getAllPlugins() : Observable<PluginModel[]> {
-        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/`, "GET" as Method)
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel[])
             );
     }
 
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
-        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
-            .pipe(
-                map(res => res.data as PluginDetailsModel),
-                map(pdm => {
-                    pdm.html = this.registeredPlugins.value.find(element => element.plugin.id === id).plugin.getHtml()
-                    ;
-                    return pdm;
-                })
-            );
+        var pluginFound = this.registeredPlugins.value.find(profile => profile.plugin.id === id);
+        if (pluginFound !== undefined && pluginFound !== null){
+            console.log('getPluginDetails FOUND');
+            const pluginDetails = {
+                id: pluginFound.pluginModel.id,
+                name: pluginFound.pluginModel.name,
+                description: pluginFound.pluginModel.description,
+                version: pluginFound.pluginModel.version,
+                html: pluginFound.plugin.getHtml(),
+                pluginImageBlob: {
+                    icoBytes: '',
+                    pngBytes: '',
+                    svgBytes: ''
+                }
+            } as PluginDetailsModel;
+
+            pluginDetails.pluginImageBlob.icoBytes = fs.readFileSync(path.join(pluginFound.pluginModel.path,'../','ico' + '.ico'), 'base64');
+            pluginDetails.pluginImageBlob.pngBytes = fs.readFileSync(path.join(pluginFound.pluginModel.path,'../','png' + '.png'), 'base64');
+            pluginDetails.pluginImageBlob.svgBytes = fs.readFileSync(path.join(pluginFound.pluginModel.path,'../','svg' + '.svg'), 'base64');
+
+            return of(pluginDetails);
+        } else {
+            console.log('getPluginDetails NOOOOT FOUND');
+
+            return this.getPluginDetailsFromBarn(id);
+        }
+        
+        /*
+         id: string,
+    name: string,
+    description: string,
+    version: string,
+    html:string,
+    pluginImageBlob: {
+      icoBytes: string,
+      svgBytes: string,
+      pngBytes: string
+    }
+        */
+
+    }
+
+    private getPluginDetailsFromBarn(id:string): Observable<PluginDetailsModel>{
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}/Details`, "GET" as Method)
+        .pipe(
+            map(res => res.data as PluginDetailsModel),
+            map(pdm => {
+                var registeredPlugin = this.registeredPlugins.value.find(element => element.plugin.id === id);
+                pdm.html = registeredPlugin !== undefined && registeredPlugin !== null ? registeredPlugin.plugin.getHtml(): '';
+
+                return pdm;
+            })
+        );
     }
 
     clean() {
@@ -121,7 +169,7 @@ export class PluginService {
     registerUserPlugins(){
         const authtokens = this.userStore.getAuthTokens();
                 if(authtokens !== undefined && authtokens !== null){
-                    this.callBarnWithAuth(this.userStore.getAuthTokens().access_token, userPreferencesEndpoint, "GET" as Method)
+                    this.barnService.callBarn(userPreferencesEndpoint, "GET" as Method)
                         .pipe(
                             map(res => res.data),
                             map(userpref => userpref.plugins as Array<PluginModel>)
@@ -151,7 +199,7 @@ export class PluginService {
     }
 
     private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
-        return this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
+        return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginModel)
             );
@@ -159,7 +207,9 @@ export class PluginService {
 
     private downloadAndInstallPlugin(userPlugin: PluginModel){
         if (fs.existsSync(userPlugin.path)){
-            return;
+            const pluginModelString = fs.readFileSync(path.join(userPlugin.path,'details') + '.json', 'utf8');
+            const pluginModel = JSON.parse(pluginModelString) as PluginModel;
+            this.importPlugin(pluginModel);
         } else {
             this.getPluginModelByIdFromBarn(userPlugin.id)
                 .subscribe({
@@ -194,7 +244,7 @@ export class PluginService {
     private installPluginPackageBinaries(plugin: PluginModel) {
         console.log('installing package:', plugin)
 
-        this.callBarnWithoutCreds(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
+        this.barnService.callBarn(`${pluginPackageEndpoint}/${plugin.id}/PluginPackage`, "GET" as Method)
             .pipe(
                 map(res => res.data as PluginPackageModel)
             ).subscribe({
@@ -204,24 +254,34 @@ export class PluginService {
                     if (!fs.existsSync(pluginMainPath)) {
                         fs.mkdirSync(pluginMainPath, { recursive: true });
                     }
+                    //Write ico file
+                    fs.writeFileSync(path.join(pluginMainPath,'ico') + '.ico', value.pluginImagesBlob.icoBytes, 'base64');
+                    fs.writeFileSync(path.join(pluginMainPath,'png') + '.png', value.pluginImagesBlob.pngBytes, 'base64');
+                    fs.writeFileSync(path.join(pluginMainPath,'svg') + '.svg', value.pluginImagesBlob.svgBytes, 'base64');
 
                     const pluginZipPath = path.join(pluginMainPath, value.fileName)
                     fs.writeFileSync(pluginZipPath, value.zipBytes, 'base64');
 
                     const pluginFinalPath = path.join(pluginMainPath, value.version);
                     fs.createReadStream(pluginZipPath)
-                        .pipe(Extract({ path: pluginFinalPath }));
-                    
-                    // register plugin
-                    const installedPluginModel = {
-                        id: plugin.id,
-                        name: value.name,
-                        version: value.version,
-                        path: pluginFinalPath,
-                    } as PluginModel;
+                        .pipe(
+                            Extract({ path: pluginFinalPath })
+                                .on('finish', () => {
+                                    // register plugin
+                                    const installedPluginModel = {
+                                        id: plugin.id,
+                                        name: value.name,
+                                        version: value.version,
+                                        path: pluginFinalPath,
+                                        description: plugin.description
+                                    } as PluginModel;
 
-                    console.log('installedPluginModel: ', installedPluginModel);
-                    this.importPlugin(installedPluginModel);
+                                    fs.writeFileSync(path.join(pluginFinalPath,'details') + '.json', JSON.stringify(installedPluginModel), 'utf8');
+
+                                    console.log('installedPluginModel: ', installedPluginModel);
+                                    this.importPlugin(installedPluginModel);     
+                           })
+                        );
                 }
             });
     }
@@ -229,6 +289,8 @@ export class PluginService {
     private importPlugin(pluginModel: PluginModel){
         const pluginPath = pluginModel.path ?? path.join(this.pluginDirectory, pluginModel.name, pluginModel.version);
         
+        console.log('pluginPath', pluginPath)
+        console.log('fs.existsSync(pluginPath)', fs.existsSync(pluginPath))
         if (!fs.existsSync(pluginPath)){
             return;
         }
@@ -272,27 +334,5 @@ export class PluginService {
             this.registeredPlugins.next(existingPlugins);
         };
     });
-
-    }
-    
-    private callBarnWithoutCreds(endpoint: string, method: Method) : Observable<AxiosResponse> {
-        const options = {
-            baseURL: `${environment.baseApiUrl}`,
-            url: endpoint,
-            method: method, //"POST" as Method,
-        }
-        
-        return Axios.request(options)
-    }
-
-    private callBarnWithAuth(accessToken,endpoint: string, method: Method) : Observable<AxiosResponse> {
-        const options = {
-            baseURL: `${environment.baseApiUrl}`,
-            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            url: endpoint,
-            method: method //"POST" as Method,
-        }
-        
-        return Axios.request(options)
     }
 }

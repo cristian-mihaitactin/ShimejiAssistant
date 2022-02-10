@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Barn.Services.Interfaces
 {
     public interface IGenericRepo <K,V>
     {
-        V GetById(K id);
         IEnumerable<V> GetAll();
-        bool Insert(V entity);
-        bool Update(V entity);
-        void Delete(K id);
+        Task<V> GetAsyncById(K id);
+        Task<bool> InsertAsync(V entity);
+        Task<bool> UpdateAsync(V entity);
+        Task DeleteAsync(K id);
     }
 }

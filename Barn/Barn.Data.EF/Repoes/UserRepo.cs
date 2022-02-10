@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Barn.Data.EF;
 using Barn.Entities.Users;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Barn.Data.Mock
 {
@@ -21,21 +23,24 @@ namespace Barn.Data.Mock
 
         public IEnumerable<User> GetAll()
         {
-            return _dbContext.Users;
+            return _dbContext.Users.ToList();
         }
 
-        public User GetById(Guid id)
+        public async Task<User> GetAsyncById(Guid id)
         {
-            return _dbContext.Users.FirstOrDefault(u => u.Id == id);
+            var result = await _dbContext.Users.FindAsync(id);
+
+            return result;
         }
 
-        public bool Insert(User entity)
+        public async Task<bool> InsertAsync(User entity)
         {
             if (!_dbContext.Users.Contains(entity))
             {
-                _dbContext.Users.Add(entity);
-                _userPrefRepo.Insert(entity.UserPreferences);
-            } else
+                await _dbContext.Users.AddAsync(entity);
+                _dbContext.SaveChanges();
+            }
+            else
             {
                 return false;
             }
@@ -43,37 +48,48 @@ namespace Barn.Data.Mock
             return true;
         }
 
-        public bool Update(User entity)
+        public async Task<bool> UpdateAsync(User entity)
         {
-            if (!_dbContext.Users.Contains(entity))
-            {
-                return false;
-
-            }
-
-            var existingEntitiy = _dbContext.Users.FirstOrDefault(u => u.Id == entity.Id);
+            var existingEntitiy = await _dbContext.Users.FindAsync(entity.Id);
             if (existingEntitiy == null)
             {
                 return false;
+
             }
 
-            _dbContext.Users.Update(entity);
-            _userPrefRepo.Update(entity.UserPreferences);
+            try
+            {
+                _dbContext.Users.Update(entity);
+                await _userPrefRepo.UpdateAsync(entity.UserPreferences);
+
+                _dbContext.Entry(entity).State = EntityState.Modified;
+                _dbContext.Entry(entity.UserPreferences).State = EntityState.Modified;
+
+                _dbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
             return true;
         }
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
 
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
+            var entity = await _dbContext.Users.FindAsync(id);
 
-            if (user == null)
+            if (entity == null)
             {
                 return;
             }
 
-            _userPrefRepo.Delete(user.UserPreferences.Id);
-            _dbContext.Users.Remove(user);
+            await _userPrefRepo.DeleteAsync(entity.UserPreferences.Id);
+            _dbContext.Users.Remove(entity);
+
+            _dbContext.Entry(entity).State = EntityState.Deleted;
+
+            _dbContext.SaveChanges();
         }
     }
 }

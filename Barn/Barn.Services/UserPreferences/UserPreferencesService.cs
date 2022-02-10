@@ -3,6 +3,7 @@ using Barn.Services.BuckyProfile;
 using Barn.Services.Interfaces;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Barn.Services.UserPreferences
 {
@@ -21,22 +22,22 @@ namespace Barn.Services.UserPreferences
             _userPrefPluginsRepo = userPrefPluginsRepo;
         }
 
-        public void CreateDefaultUserPreference(Entities.Users.User user)
+        public async Task CreateDefaultUserPreference(Entities.Users.User user)
         {
             var newUserPref = new Entities.Users.UserPreferences();
             newUserPref.User = user;
             newUserPref.BuckyProfileID = _buckyProfService.GetDefaultProfile().Id;
 
-            this.CreateUserPreference(newUserPref);
+            await this.CreateUserPreference(newUserPref);
         }
-        public bool CreateUserPreference(Entities.Users.UserPreferences userPref)
+        public async Task<bool> CreateUserPreference(Entities.Users.UserPreferences userPref)
         {
-            return _userPrefRepo.Insert(userPref);
+            return await _userPrefRepo.InsertAsync(userPref);
         }
 
-        public Entities.Users.UserPreferences GetUserPreferenceById(Guid id)
+        public async Task<Entities.Users.UserPreferences> GetUserPreferenceById(Guid id)
         {
-            return _userPrefRepo.GetById(id);
+            return await _userPrefRepo.GetAsyncById(id);
         }
 
         public Entities.Users.UserPreferences GetUserPreferenceByUserId(Guid userId)
@@ -44,23 +45,23 @@ namespace Barn.Services.UserPreferences
             return _userPrefRepo.GetAll().Where(up => up.UserId == userId).FirstOrDefault();
         }
 
-        public void InstallPluginToUser(Guid userPrefId, Guid pluginId)
+        public async Task InstallPluginToUser(Guid userPrefId, Guid pluginId)
         {
-            _userPrefPluginsRepo.Insert(new UserPreferencesPlugins()
+            await _userPrefPluginsRepo.InsertAsync(new UserPreferencesPlugins()
             {
                 PluginId = pluginId,
                 UserPreferenceId = userPrefId
             });
         }
 
-        public bool UpdateUserPreference(Entities.Users.UserPreferences userPref)
+        public async Task<bool> UpdateUserPreference(Entities.Users.UserPreferences userPref)
         {
-            return _userPrefRepo.Update(userPref);
+            return await _userPrefRepo.UpdateAsync(userPref);
         }
 
-        public void DeleteUserPreference(Guid id)
+        public async Task DeleteUserPreference(Guid id)
         {
-            _userPrefRepo.Delete(id);
+            await _userPrefRepo.DeleteAsync(id);
         }
     }
 }

@@ -11,7 +11,6 @@ namespace Barn.Data.EF
 {
     public class ApplicationDbContext: IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
-        // a Db set is where we tell entity framework where to map a class (entity) to a table
         public DbSet<User> Users { get; set; }
         public DbSet<UserPreferences> UsersPreferences { get; set; }
         public DbSet<BuckyProfile> BuckyProfiles { get; set; }
