@@ -258,5 +258,44 @@ namespace Barn.Tests.Data
             buckyProfileListResult.ShouldNotContain(buckyProfile);
             buckyFound.ShouldBeNull();
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void DeleteBuckyProfileAndBuckyBehaviours()
+        {
+            //Arrange
+            var buckyProfileId = Guid.Parse("93063803-60E1-4B63-B095-2670922808AF");
+            var buckBehaviourId = Guid.Parse("0F34D7AA-D211-480C-81C2-A0E685C57536");
+            var buckyBehaviour = new BuckyBehaviour()
+            {
+                BuckyProfileId = buckyProfileId,
+                Id = buckBehaviourId,
+                Name = "Delete me"
+            };
+
+            var buckyProfile = new BuckyProfile()
+            {
+                Id = buckyProfileId,
+                Name = "Delete ME",
+                Description = "I need to be deleted",
+                Behaviours = new List<BuckyBehaviour>(new BuckyBehaviour[] {
+                    buckyBehaviour
+                })
+            };
+
+            _buckyProfileRepo.Insert(buckyProfile);
+            //Act
+            _buckyProfileRepo.Delete(buckyProfileId);
+
+            //Assert
+            var buckyProfileListResult = _buckyProfileRepo.GetAll();
+            var buckyFound = _buckyProfileRepo.GetById(buckyProfileId);
+
+            buckyProfileListResult.ShouldNotBeNull();
+            buckyProfileListResult.ShouldNotContain(buckyProfile);
+            buckyFound.ShouldBeNull();
+
+            DbContext.BuckyBehaviours.ShouldNotContain(buckyBehaviour);
+        }
     }
 }
