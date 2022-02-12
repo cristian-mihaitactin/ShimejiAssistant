@@ -143,14 +143,17 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
       return frag;
     }
 
-    frag.concat(`<ul>
+    frag = frag.concat(`<ul>
     `);
 
     alarmList.forEach((value,index) => {
-      frag.concat(`<li>${value.hour}:${value.minute} - Enabled: ${value.enabled}</li>`);
+      if (value.enabled){
+        frag = frag.concat(`<li>${value.hour}:${value.minute}</li>`);
+      }
     });
-    frag.concat(`</ul>
+    frag = frag.concat(`</ul>
     `);
+    console.log('frag:', frag);
 
     return frag;
   }

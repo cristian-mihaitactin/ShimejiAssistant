@@ -35,6 +35,8 @@ export class AlarmService {
     }
 
     addAlarm(alarm:Alarm) {
+        if (alarm.hour !== undefined && alarm.hour !== ""
+        && alarm.minute !== undefined && alarm.minute !== "")
         this.alarmList.push(alarm);
 
         this.writeAlarmsToFile();
