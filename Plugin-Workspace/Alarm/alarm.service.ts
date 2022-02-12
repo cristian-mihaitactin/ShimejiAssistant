@@ -5,7 +5,8 @@ import { elementAt } from "rxjs-compat/operator/elementAt";
 export interface Alarm {
     hour:string,
     minute:string,
-    enabled: boolean
+    enabled: boolean,
+    utcString: string
 }
 
 const alarmsFileName = "alarms.json"
@@ -35,6 +36,8 @@ export class AlarmService {
     }
 
     addAlarm(alarm:Alarm) {
+        if (alarm.hour !== undefined && alarm.hour !== ""
+        && alarm.minute !== undefined && alarm.minute !== "")
         this.alarmList.push(alarm);
 
         this.writeAlarmsToFile();

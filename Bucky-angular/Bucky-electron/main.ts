@@ -159,6 +159,12 @@ const initIpc = () => {
   ipcMain.on("plugin-input", (event, arg:PluginInput) => {
     pluginService.handlePluginInput(arg);
   });
+
+  
+  ipcMain.on("plugin-get-html", (event, pluginId:string) => {
+    var pluginHtml = pluginService.getPluginHtml(pluginId);
+    event.reply("plugin-get-html-response", pluginHtml);
+  });
 }// end of initIpc()
 
 app.on("ready", () => {
