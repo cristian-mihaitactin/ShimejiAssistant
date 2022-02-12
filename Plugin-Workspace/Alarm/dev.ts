@@ -1,86 +1,95 @@
 import { PluginNotification } from "./interfaces/plugin.notification";
 import { Subject } from "rxjs";
 import { Plugin } from './main'
-// import fs = require('fs');
-import http = require('http');
 import { PluginInput } from "interfaces/plugin.input";
 
+// import fs = require('fs');
+import http = require('http');
 
-// fs.readFile('./index.html', function (err, html) {
-//     if (err) {
-//         throw err; 
-//     }       
-//     http.createServer(function(request, response) {  
-//         response.writeHeader(200, {"Content-Type": "text/html"});  
-//         response.write(html);  
-//         response.end();  
-//     }).listen(8000);
-// });
+const express = require('express');
+const app = express();
+const server = http.createServer(app);
 
-const html =`<div><label for="appt">Choose a time for your meeting:</label>
-<input type="time" id="appt" name="appt"
-       min="00:00" max="23:59" required> <button onclick="pluginClick(event)">click here</button></div>
-<script>
-function pluginClick(event,data) {
-  var input = document.getElementById("appt");
-  console.log(input.value);
-  var timeArray = input.value.split(':');
+const { Server } = require("socket.io");
+const io = new Server(server);
 
-// Create a new event, allow bubbling, and provide any data you want to pass to the "detail" property
-const eventAwesome = new CustomEvent('plugin-input', {
-  bubbles: false,
-  detail: {
-    plugin-id: '',
-    data: {
-        action: "add",
-        hour: timeArray[0],
-        minute:timeArray[1]
-    }
-}
+app.get('/', (req, res) => {
+  const scriptDependencies = `
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+  </head> 
+  `
+  const listerScript = `
+  <script>
+    var socket = io();
+    window.addEventListener('plugin-input', (e) => {
+      e.preventDefault();
+      console.log('plugin-input');
+      console.log(e);
+      socket.emit('socket-plugin-input', e.detail);
+    });
+  </script>`
+
+  const liveUpdateScript = `
+  <script>
+  var socket = io();
+  socket.on('update-html', function (msg) {
+      console.log('update-html', msg);
+      $('#plugin-container').html(msg.data)
+  });
+  </script>
+  `
+
+  const notificationContainer = `
+  <div id="notification-container" style="border: black; border-width: 1px; border-style: double; padding: 5px 5px 5px 5px; margin-bottom: 10px">
+  </div>
+  <script>
+  var socket = io();
+  socket.on('update-notification', function (msg) {
+      console.log('update-notification', msg);
+      $('#notification-container').text(msg.data)
+  });
+  </script>
+  `
+
+  const pluginHtmlContainer = `
+  <div id="plugin-container" style="border: black; border-width: 1px; border-style: dashed; padding: 5px 5px 5px 5px;">
+    ${plugin.getHtml()}
+  </div>
+  `
+  
+  const htmlString = scriptDependencies + '\n' + notificationContainer + '\n' + pluginHtmlContainer + '\n' + listerScript + '\n' + liveUpdateScript;
+    res.writeHead(200, {"Content-Type": "text/html"});  
+    res.write(htmlString);
 });
-}
-</script>
-`;
 
-http.createServer()
-.on('request', function(req, response) {
+server.listen(8080, () => {
+  console.log('listening on *:8080');
+});
 
-    response.writeHead(200, {"Content-Type": "text/html"});  
-    response.write(html);
-    response.end();  
-    //response.end('Hello HTTP!');
-	// var email = req.url.substr(req.url.lastIndexOf('/')+1)
-	// if(!email) {
-	// 	res.writeHead(404)
-	// 	return res.end()
-	// }
+const eventHandlerIn:Subject<PluginInput> = new Subject<PluginInput>();
+const eventHandlerOut:Subject<PluginNotification> = new Subject<PluginNotification>();
+const id = "My Alarm";
 
-	// http.get('http://www.gravatar.com/avatar/'+crypto.createHash('md5').update(email).digest('hex'), function(resp) {
-	// 	resp.pipe(res)
-	// })
+eventHandlerOut.subscribe({
+  next: value => {
+    console.log('eventHandlerOut.subscribe: ', value);
+    io.emit('update-html', { data:value.data }); 
+    io.emit('update-notification', { data:value.notificationMessage }); 
+  },
+  error: err =>
+  {
+    console.error(err);
+  }
 })
-.listen(8080)
 
-/*
-var server = http.createServer(function(request, response) {  
-    response.writeHead(200, {"Content-Type": "text/html"});  
-    response.end('Hello HTTP!');});
-server.listen();
-*/
-// var testSubjectIn = new Subject<PluginInput>();
-// var testSubjectOut = new Subject<PluginNotification>();
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('socket-plugin-input', (msg) => {
+    console.log('message received: ', msg);
+    eventHandlerIn.next(msg);
+  })
+});
 
-// testSubjectOut.subscribe({
-//     next: (val) => {
-//       console.log(val);
-//     },
-//     error: (val) => {
-//       console.log('error: ', val);
-//     }
-//   })
-
-
-// var plugin = new Plugin(testSubjectIn , testSubjectOut, '19', '20');
-
-
-// console.log("HEELLOO")
+const plugin = new Plugin(eventHandlerIn,eventHandlerOut,id);
