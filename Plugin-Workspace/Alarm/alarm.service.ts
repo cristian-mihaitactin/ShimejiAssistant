@@ -5,8 +5,8 @@ import { elementAt } from "rxjs-compat/operator/elementAt";
 export interface Alarm {
     hour:string,
     minute:string,
-    enabled: boolean
-    utcString:string
+    enabled: boolean,
+    utcString: string
 }
 
 const alarmsFileName = "alarms.json"

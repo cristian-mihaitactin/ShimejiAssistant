@@ -46,6 +46,22 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
   
     this.dispatchEvent(alarmEvent);
     }
+
+    function removeAlarm(event,hour,minute) {
+    const alarmEvent = new CustomEvent('plugin-input', {
+      bubbles: true,
+      detail: {
+        pluginId: '${id}',
+        data: {
+            action: 'remove',
+            hour: hour,
+            minute:minute
+        }
+      }
+    });
+  
+    this.dispatchEvent(alarmEvent);
+    }
     </script>
     `;
 
@@ -54,6 +70,28 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
         var alarmMessage = value.data as AlarmMessage;
         if(alarmMessage.action === 'add') {
           this.addAlarm(alarmMessage.hour, alarmMessage.minute);
+        } 
+        if(alarmMessage.action === 'remove') {
+          if (parseInt(alarmMessage.hour) < 9) {
+            alarmMessage.hour = '0' + alarmMessage.hour;
+          }
+          if (parseInt(alarmMessage.minute) < 9) {
+            alarmMessage.minute = '0' + alarmMessage.minute;
+          }
+
+          this.alarmService.removeAlarm({
+            hour: alarmMessage.hour,
+            minute: alarmMessage.minute,
+            enabled: false,
+            utcString: ''
+          });
+    
+          eventHandlerOut.next({
+            data: `<div style=>Alarm for "${alarmMessage.hour}:${alarmMessage.minute}" Removed</div>
+            ${this.getHtml()}`,
+            notificationMessage: "Alarm Removed",
+            actionType: 8
+          });
         }
       },
       error: (err) => {
@@ -71,6 +109,8 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
 
     toUTC.setHours(parseInt(timeHour))
     toUTC.setMinutes(parseInt(timeMinute));
+    toUTC.setSeconds(0);
+    toUTC.setMilliseconds(0);
 
     if (now > toUTC) {
       toUTC = new Date(toUTC.getTime() + (1000 * 60 * 60 * 24));
@@ -112,7 +152,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
         toUTC.setHours(parseInt(alarm.hour))
         toUTC.setMinutes(parseInt(alarm.minute));
     
-        if (now.getUTCHours() >= toUTC.getUTCHours() && now.getUTCMinutes() >= toUTC.getUTCMinutes()) {
+        if (now >= toUTC) {
           console.log("WAKE UP");
           alarm.enabled = false;
           
@@ -153,7 +193,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
 
     alarmList.forEach((value,index) => {
       if (value.enabled){
-        frag = frag.concat(`<li>${value.hour}:${value.minute}</li>`);
+        frag = frag.concat(`<li>${value.hour}:${value.minute} (<a href="#" onclick="removeAlarm(event,${value.hour},${value.minute})">Disable</a>)</li>`);
       }
     });
     frag = frag.concat(`</ul>
