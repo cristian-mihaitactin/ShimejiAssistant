@@ -198,6 +198,17 @@ export class PluginService {
         }
     }
 
+    getPluginHtml(pluginId: string) {
+        var pluginFound = this.registeredPlugins.value.find(p => p.plugin.id === pluginId);
+
+        if (pluginFound !== undefined && pluginFound !== null)
+        {
+            return pluginFound.plugin.getHtml();
+        }
+
+        return '';
+    }
+
     private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
         return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(

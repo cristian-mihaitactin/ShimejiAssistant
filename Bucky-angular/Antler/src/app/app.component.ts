@@ -114,6 +114,12 @@ export class AppComponent implements OnInit {
         }
         });
 
+      electron.ipcRenderer.on('plugin-get-html-response',(event, pluginHtml) => {
+        //const html = this.getPluginHtml(pluginId);
+        var activatedPlugin = document.getElementById("notification-container");
+        let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + pluginHtml + '</div>');
+        activatedPlugin.appendChild(frag);
+      });
      }
 
   ngOnInit() {
@@ -149,8 +155,8 @@ export class AppComponent implements OnInit {
     window.addEventListener('plugin-input', (e: CustomEvent) => {
       /*
       detail:
-data: {action: 'add', hour: '02', minute: '03'}
-pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
+        data: {action: 'add', hour: '02', minute: '03'}
+        pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
       */
       console.log('plugin-input:',e);
       electron.ipcRenderer.send('plugin-input', e.detail);
@@ -169,12 +175,6 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
       wX = e.pageX;
       wY = e.pageY;
 
-      /*
-      const draggedBehaviour = this.buckyBehaviours.find(bb=> bb.actionTypeString === 'Dragged');
-      this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
-        + draggedBehaviour.imageBytes);
-      this.cdr.detectChanges();
-      */
       this.setBuckyBehaviour('Dragged');
     };
 
@@ -235,16 +235,15 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
       return; 
     }
 
-    
-    
     //get html of clicked plugin
     const pluginId = event.srcElement.pluginId;
     if (pluginId === undefined || pluginId === null || pluginId === ''){
       return;
     }
-    const html = this.getPluginHtml(pluginId);
-    let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
-    activatedPlugin.appendChild(frag);
+    // const html = this.getPluginHtml(pluginId);
+    // let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
+    // activatedPlugin.appendChild(frag);
+    electron.ipcRenderer.send("plugin-get-html", pluginId);
   }
   
   private getPluginHtml(id:string) {

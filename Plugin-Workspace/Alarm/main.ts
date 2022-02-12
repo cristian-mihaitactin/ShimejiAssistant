@@ -193,7 +193,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
 
     alarmList.forEach((value,index) => {
       if (value.enabled){
-        frag = frag.concat(`<li>${value.hour}:${value.minute} (<a href="#" onclick="removeAlarm(event,${value.hour},${value.minute})">Disable</a>)</li>`);
+        frag = frag.concat(`<li>${value.hour}:${value.minute} (<a style="cursor: pointer;" onclick="removeAlarm(event,${value.hour},${value.minute})">REMOVE</a>)</li>`);
       }
     });
     frag = frag.concat(`</ul>
