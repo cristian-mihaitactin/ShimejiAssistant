@@ -23,6 +23,7 @@ export class PluginDetailsComponent implements OnInit {
   constructor(private _sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef) {
       electron.ipcRenderer.on('plugin-details-response', (_event: any, arg: PluginDetailsModel) => {
+        console.log('plugin-details-response.arg:', arg);
         this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,'
         + arg.pluginImageBlob.pngBytes);
         this.pluginName = arg.name;

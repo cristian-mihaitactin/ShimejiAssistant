@@ -13,6 +13,7 @@ namespace Barn.Services.Plugins
         public byte[] ZipBytes { get; set; }
         public string Version { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public PluginImagesBlob PluginImagesBlob  { get;set; }
     }
 }

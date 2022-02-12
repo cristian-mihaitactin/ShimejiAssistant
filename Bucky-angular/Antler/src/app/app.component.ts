@@ -87,6 +87,8 @@ export class AppComponent implements OnInit {
           };
         }
 
+        activatedPlugin.style.display == "inline-block";
+
         const html = arg.data;
         let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + html + '</div>');
         activatedPlugin.appendChild(frag);
@@ -220,12 +222,20 @@ pluginId: "76433374-9d88-43f9-aaa1-c6a9c1c8592e"
     }
 
     var activatedPlugin = document.getElementById("notification-container");
+    if (activatedPlugin.style.display !== "none") {
+      activatedPlugin.style.display = "none";
+    } else {
+      activatedPlugin.style.display = "inline-block";
+    }
+    
     if (activatedPlugin !== null && activatedPlugin !== undefined && activatedPlugin.firstChild){
       while (activatedPlugin.firstChild) {
         activatedPlugin.removeChild(activatedPlugin.firstChild);
       };
       return; 
     }
+
+    
     
     //get html of clicked plugin
     const pluginId = event.srcElement.pluginId;

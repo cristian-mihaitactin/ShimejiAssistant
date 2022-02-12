@@ -3,11 +3,11 @@
   [src]="imagePath" width="250" height="200"/>
 </div>
 
-<div style="  display:flex;">
+<div style="display:grid;">
   <div id="notification-message" style="display:none;"></div>
   <div *ngFor="let pluginModel of displayedPlugins">
     <img [src]="pluginModel.imgBytes" [pluginId]=pluginModel.id (click)=this.pluginIcoClick($event) width="30" height="30"/>
   </div>
 </div>
-<div id="notification-container">
+<div id="notification-container" style="display: none;">
 </div>

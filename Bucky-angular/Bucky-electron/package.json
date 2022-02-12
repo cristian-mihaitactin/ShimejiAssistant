@@ -9,7 +9,8 @@
     "postbuild": "",
     "copy-files": "copyfiles -u 3 bucky_profile/profiles/8919e40e-d588-42f2-a0a8-4afb9ad1589b/* dist/default_profile/8919e40e-d588-42f2-a0a8-4afb9ad1589b/",
     "dev-dotenv": "electron -r dotenv/config .",
-    "dev": "electron ."
+    "dev": "electron .",
+    "test": "npx ava"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/unzip-stream": "^0.3.1",
+    "ava": "^4.0.1",
     "copyfiles": "^2.4.1",
     "electron": "^16.0.4"
   }

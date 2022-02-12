@@ -46,6 +46,7 @@ namespace Barn.Services.Plugins
                 ZipBytes = pluginBytes.ZipBytes,
                 Version = plugin.Version,
                 Name = plugin.Name,
+                Description = plugin.Description,
                 PluginImagesBlob = pluginImageBlob
             };
         }
