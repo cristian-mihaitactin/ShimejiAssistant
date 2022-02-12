@@ -6,6 +6,7 @@ export interface Alarm {
     hour:string,
     minute:string,
     enabled: boolean
+    utcString:string
 }
 
 const alarmsFileName = "alarms.json"

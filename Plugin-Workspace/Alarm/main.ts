@@ -66,19 +66,24 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
   private addAlarm(timeHour:string, timeMinute:string) {
     // Each plugin receives an even handler with which it communicates with the electron app (ping when ready)
 
-    var thisAlarm = {
-      hour: timeHour,
-      minute: timeMinute,
-      enabled: true
-    };
-
-    this.alarmService.addAlarm(thisAlarm);
-
     var now = new Date();
     var toUTC = new Date();
 
-    toUTC.setHours(parseInt(thisAlarm.hour))
-    toUTC.setMinutes(parseInt(thisAlarm.minute));
+    toUTC.setHours(parseInt(timeHour))
+    toUTC.setMinutes(parseInt(timeMinute));
+
+    if (now > toUTC) {
+      toUTC = new Date(toUTC.getTime() + (1000 * 60 * 60 * 24));
+    }
+
+    var thisAlarm = {
+      hour: timeHour,
+      minute: timeMinute,
+      enabled: true,
+      utcString:toUTC.toUTCString()
+    };
+
+    this.alarmService.addAlarm(thisAlarm);
 
     let dateDifference = toUTC.valueOf() - now.valueOf();
     var minutes = Math.floor((dateDifference/1000)/60);
@@ -103,7 +108,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
       function checkAlarm(alarm: Alarm, functionAlarmService: AlarmService, pluginOut: Subject<PluginNotification>): void  {
         var now = new Date();
     
-        var toUTC = new Date();
+        var toUTC = new Date(alarm.utcString);
         toUTC.setHours(parseInt(alarm.hour))
         toUTC.setMinutes(parseInt(alarm.minute));
     
