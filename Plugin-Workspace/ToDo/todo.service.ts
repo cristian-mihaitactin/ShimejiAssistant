@@ -39,6 +39,22 @@ export class ToDoService {
         return this.toDoSectionList;
     }
 
+    getToDo(toDoTitle, toDoSectionTitle): ToDo {
+        var toDoSectionIndex = this.toDoSectionList.findIndex(tds => tds.title === toDoSectionTitle);
+
+        if (toDoSectionIndex < 0) {
+            return;
+        } 
+        
+        var toDoIndex = this.toDoSectionList[toDoSectionIndex].toDoList.findIndex(td => td.title === toDoTitle);
+
+        if (toDoIndex < 0) {
+            return;
+        }
+        
+        return this.toDoSectionList[toDoSectionIndex].toDoList[toDoIndex];
+    }
+
     addSection(toDoSection: ToDoSection){
         var toDoSectionIndex = this.toDoSectionList.findIndex(tds => tds.title === toDoSection.title);
 

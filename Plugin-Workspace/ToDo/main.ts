@@ -8,6 +8,7 @@ import * as fs from "fs";
 import { ToDo, ToDoSection, ToDoService } from "./todo.service";
 import { PluginInput, ToDoMessage } from "interfaces/plugin.input";
 import { emitKeypressEvents } from "readline";
+import { Guid } from './interfaces/guid'
 
 const Plugin: IPluginConstructor = class Plugin implements IPlugin {
   eventHandlerIn:Subject<PluginInput>;
@@ -100,6 +101,23 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     this.dispatchEvent(toDoEvent);
     }
 
+    function toDoCheckboxClicked(cb, toDoTitle, sectionTitle) {
+      
+      const toDoEvent = new CustomEvent('plugin-input', {
+        bubbles: true,
+        detail: {
+          pluginId: '${id}',
+          data: {
+              action: 'toggle-todo',
+              title: toDoTitle,
+              sectionTitle: sectionTitle
+          }
+        }
+      });
+  
+    this.dispatchEvent(toDoEvent);
+    }
+
     </script>
     `;
 
@@ -167,6 +185,26 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
             
             break; 
           } 
+          case 'toggle-todo': {
+            console.log('toggle-todo.message:', toDoMessage);
+            var toDo = this.toDoService.getToDo(toDoMessage.title, toDoMessage.sectionTitle);
+            console.log('toggle-todo.toDo:', toDo);
+
+            if (toDo === undefined || toDo === null){
+              return;
+            }
+            toDo.enabled = !toDo.enabled;
+            this.toDoService.updateToDo(toDo);
+
+            eventHandlerOut.next({
+              data: `<div style=>ToDo "${toDoMessage.title}" updated</div>
+              ${this.getHtml()}`,
+              notificationMessage: "ToDo updated",
+              actionType: 8
+            });
+            
+            break; 
+          } 
           default: { 
              //statements; 
              break; 
@@ -197,8 +235,16 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
           `);
         if (value.toDoList !== undefined && value.toDoList !== null && value.toDoList.length > 0){
           
-          value.toDoList.forEach(element => {
-            frag = frag.concat(`<li>${element.title} (<a style="cursor: pointer;" onclick="removeToDo(event,'${element.title}','${value.title}')">REMOVE</a>)</li>`);
+          value.toDoList.forEach((element, index) => {
+            var toDoId = Guid.newGuid();
+            frag = frag.concat(`<li>
+              <input type="checkbox" name="${toDoId}" value="${element.title}" onclick="toDoCheckboxClicked(this,'${element.title}','${value.title}')"`,
+              element.enabled ? "" : "checked",
+              `>
+              <label for="${toDoId}">`, 
+              element.enabled ? element.title : `<del>${element.title}</del>`,
+               `</label> (<a style="cursor: pointer;" onclick="removeToDo(event,'${element.title}','${value.title}')">REMOVE</a>)
+            </li>`);
           });
         }
 
