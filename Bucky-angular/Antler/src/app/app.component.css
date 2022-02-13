@@ -17,6 +17,8 @@
   background-color: lightblue;
   border-style: dashed;
   border-width: 1px;
+  max-height: 200px;
+  overflow: auto;
 }
 
 #notification-message{
