@@ -51,7 +51,7 @@ export class UserStore {
 
   resetToDefault() {
     this.data = parseDataFile(this.path, this.defaults, true);
-    this.setDefaultBuckyProfile();
+    //this.setDefaultBuckyProfile();
   }
 
   getAuthTokens(): AuthTokenModel {
