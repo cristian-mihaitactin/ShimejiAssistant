@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
           console.log('arg is not ok. Try again')
           electron.ipcRenderer.send('get-initial-bucky-profile', '');
         }else {
-          console.log(arg) // prints "pong"
+          console.log(arg);
           this.buckyProfile.next(arg);
         }
         this.cdr.detectChanges();
@@ -55,6 +55,15 @@ export class AppComponent implements OnInit {
         console.log('user-plugins-response arg:');
         console.log(arg);
         this.plugins.next(arg);        
+      });
+      
+      electron.ipcRenderer.on('logged-out', (event, arg: string) => {
+        console.log('user logged out');
+        
+        electron.ipcRenderer.send('get-initial-bucky-profile', '');
+        electron.ipcRenderer.send("get-user-plugins", '');   
+        this.displayedPlugins = [];
+        this.cdr.detectChanges();  
       });
 
       electron.ipcRenderer.on('plugin-details-response', (event, arg: PluginDetailsModel) => {

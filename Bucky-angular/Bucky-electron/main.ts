@@ -274,6 +274,15 @@ app.on("ready", () => {
           });
           userService.userIsLoggedIn();
           mainWindow.webContents.send("logged-in", true);
+          buckyProfileService.defaultBuckyProfile.subscribe({
+            next: value => {
+              buckyWindow.webContents.send("selected-bucky-profile", value);
+              mainWindow.webContents.send("selected-bucky-profile", value);
+            },
+            error: err => {
+              console.error(err);
+            }
+          });
         },
         error: (error) => {
           event.reply("login-reply", 
@@ -314,6 +323,8 @@ app.on("ready", () => {
   ipcMain.on('logout-request', (event, arg) => {
     authService.logout();
     pluginService.clean();
+
+    buckyWindow.webContents.send("logged-out",)
     mainWindow.webContents.send("logged-in", false);
   });
 

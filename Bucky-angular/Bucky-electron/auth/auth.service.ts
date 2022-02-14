@@ -29,6 +29,7 @@ export class AuthService {
 
     private userEndpoint = '/api/User'
     private userPreferencesEndpoint = '/api/UserPeferences'
+    private userBuckyProfile = '/api/User/Profile'
     public userBehaviour: BehaviorSubject<UserModel>;
 
     state$: Observable<AuthStateModel>;
@@ -222,15 +223,18 @@ export class AuthService {
                 this.userBehaviour.next(newUserData);
             }
         });
-        this.callCallBarn(accessToken, this.userPreferencesEndpoint, "GET" as Method).subscribe({
+        this.callCallBarn(accessToken, this.userBuckyProfile, "GET" as Method).subscribe({
             next: (barnValue: any) => {
-                var buckyProfile = barnValue.buckyProfile as BuckyProfileModel;
+                var buckyProfile = barnValue as BuckyProfileModel;
 
-                buckyProfile.behaviours.forEach((element, index) => {
-                    buckyProfile.behaviours[index].imageBytes = '';
-                  });
-
-                this.localStorage.set('buckyProfile',barnValue.buckyProfile);
+                console.log('auth-service.buckyProfile', buckyProfile);
+                if (buckyProfile.behaviours){
+                    buckyProfile.behaviours.forEach((element, index) => {
+                        buckyProfile.behaviours[index].imageBytes = '';
+                      });
+    
+                    this.localStorage.set('buckyProfile',barnValue.buckyProfile);
+                } 
             }
         });
     }

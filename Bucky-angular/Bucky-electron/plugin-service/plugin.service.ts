@@ -12,7 +12,7 @@ import { UserStore } from "../helpers/user-store";
 import { PluginModel } from "../models/plugin.model";
 import { PluginPackageModel } from "../models/plugin.package.model";
 import { PluginDetailsModel } from "../models/plugin.details.model";
-import { read } from "fs-jetpack";
+import { exists, read } from "fs-jetpack";
 import { PluginNotification } from "../models/plugin.notification";
 import { IPlugin } from "../models/iplugin";
 import { RegisteredPlugin } from "../models/registered.plugin";
@@ -162,7 +162,7 @@ export class PluginService {
 
     clean() {
         const fsExtra = require('fs-extra')
-
+        this.registeredPlugins.next([]);
         fsExtra.emptyDirSync(this.pluginDirectory);
     }
 

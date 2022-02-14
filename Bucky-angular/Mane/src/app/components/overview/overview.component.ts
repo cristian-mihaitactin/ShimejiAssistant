@@ -33,6 +33,10 @@ export class OverviewComponent implements OnInit {
     electron.ipcRenderer.on("all-plugins-response", (_event: any, arg: PluginModel[]) => {
       this.plugins.next(arg);
     });
+     
+    electron.ipcRenderer.on("selected-bucky-profile", (_event: any, arg: BuckyProfileModel) => {
+      electron.ipcRenderer.send('get-all-bucky-profiles', '');
+    });
   }
 
   ngOnInit(): void {
