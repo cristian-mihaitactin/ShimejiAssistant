@@ -12,10 +12,10 @@ DECLARE @PluginId uniqueidentifier
 SET @PluginId = NEWID()
 
 DECLARE @PluginName nvarchar(MAX)
-SET @PluginName = 'Alarm'
+SET @PluginName = 'ToDo'
 
 DECLARE @PluginDescription nvarchar(MAX)
-SET @PluginDescription = 'Set alarms using your Assistant'
+SET @PluginDescription = 'Add Todos and sections to improve your life'
 
 DECLARE @PluginVersion nvarchar(MAX)
 SET @PluginVersion = '1.0.0'
@@ -46,7 +46,7 @@ DECLARE @PluginNotifActionType int
 SET @PluginNotifActionType = 1 --Notification
 
 DECLARE @PluginNotifMessage nvarchar(max)
-SET @PluginNotifMessage = '!!!Alarm!!!'
+SET @PluginNotifMessage = 'To Do?'
 
 INSERT INTO [dbo].[PluginNotifications]
            ([Id]
