@@ -211,31 +211,20 @@ export class AuthService {
 
     private storeUserInfo(accessToken){
         console.log('in storeUserInfo')
-        this.callCallBarn(accessToken, this.userEndpoint, "GET" as Method).pipe(
-            tap(res => {
-                var barnValue = res.data
-                console.log('in storeUserInfo.barnValue', barnValue)
-                var newUserData: UserModel = {
-                    username: barnValue.data.userName,
-                    email: barnValue.data.email
+        this.callCallBarn(accessToken, this.userEndpoint, "GET" as Method)
+            .subscribe({
+                next: (barnValue) => {
+
+                    var newUserData: UserModel = {
+                        username: barnValue.data.userName,
+                        email: barnValue.data.email
+                    }
+
+                    this.storeUserData(newUserData);
+
+                    this.userBehaviour.next(newUserData);
                 }
-
-                this.storeUserData(newUserData);
-
-                this.userBehaviour.next(newUserData);
-            })
-        )/*.subscribe({
-            next: (barnValue) => {
-                var newUserData: UserModel = {
-                    username: barnValue.data.userName,
-                    email: barnValue.data.email
-                }
-
-                this.storeUserData(newUserData);
-
-                this.userBehaviour.next(newUserData);
-            }
-        });*/
+        }); 
 
         this.callCallBarn(accessToken, this.userBuckyProfile, "GET" as Method)
             .subscribe({

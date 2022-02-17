@@ -39,6 +39,8 @@ export class SideviewComponent implements OnInit {
     electron.ipcRenderer.on('logged-in', (_event: any, arg:boolean) => {
       console.log('logged-in:' + arg)  
       this.loggedIn = arg;
+      electron.ipcRenderer.send('user-info-request', '');
+
       this.cdr.detectChanges();
     });
 
