@@ -201,11 +201,12 @@ export class AuthService {
     private storeUserData(userData: UserModel) {
         this.localStorage.set('username',userData.username);
         this.localStorage.set('email',userData.email);
+        this.userBehaviour.next(userData);
     }
     private getDefaultUser() : UserModel{
         return {
-            username: environment.default_user.username,
-            email: environment.default_user.username
+            username: this.localStorage.get('username') ?? environment.default_user.username,
+            email: this.localStorage.get('email') ?? environment.default_user.username
         }
     }
 

@@ -244,20 +244,26 @@ app.on("ready", () => {
   
   ipcMain.on("user-info-request", (event,arg) => {
     console.log('user-info');
-    console.log(authService.userBehaviour.getValue())
-    event.reply('user-info-reply', authService.userBehaviour.getValue())
+    authService.userBehaviour.subscribe({
+      next: (value) => {
+        console.log(value)
+        event.reply('user-info-reply', value)
+      },
+      error: (error) => {
+        console.error(error);
+      }
+    });
   });
   
-  authService.userBehaviour.subscribe({
-    next: (value) => {
-      console.log('user-info - subscribed');
-      console.log(value)
-      mainWindow.webContents.send('user-info-reply', value)
-    },
-    error: (error) => {
-      console.error(error);
-    }
-  });
+  // authService.userBehaviour.subscribe({
+  //   next: (value) => {
+  //     console.log(value)
+  //     mainWindow.webContents.send('user-info-reply', value)
+  //   },
+  //   error: (error) => {
+  //     console.error(error);
+  //   }
+  // });
 
   ipcMain.on('login-request', (event, arg) => {
     authService.login(arg).subscribe(
