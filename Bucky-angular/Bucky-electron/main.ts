@@ -97,7 +97,6 @@ const initIpc = () => {
   });
 
   ipcMain.on("get-bucky-assitant-profile-by-id", (event,arg) => {
-    console.log('get-bucky-assitant-profile-by-id', arg);
     if(arg !== undefined && arg !== null) {
       buckyProfileService.getBuckyProfileById(arg)
         .subscribe({
@@ -115,7 +114,6 @@ const initIpc = () => {
     pluginService.registeredPlugins
       .subscribe({
         next: (value) => {
-          console.log('in get-user-plugins');
           var pluginModels = [];
           value.forEach((val, index) => {
             pluginModels.push(val.pluginModel);
@@ -274,6 +272,7 @@ app.on("ready", () => {
           });
           userService.userIsLoggedIn();
           mainWindow.webContents.send("logged-in", true);
+          buckyWindow.webContents.send("logged-in", true);
           buckyProfileService.defaultBuckyProfile.subscribe({
             next: value => {
               buckyWindow.webContents.send("selected-bucky-profile", value);

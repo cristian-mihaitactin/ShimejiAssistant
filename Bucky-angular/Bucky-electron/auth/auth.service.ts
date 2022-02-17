@@ -151,11 +151,10 @@ export class AuthService {
             // params: params,
         }
         
-        // return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options).pipe(
         return Axios.request(options)
         .pipe(
                 tap(res  => {
-                    const tokens: AuthTokenModel = res.data;//res.data.json();
+                    const tokens: AuthTokenModel = res.data;
                     const now = new Date();
                     tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
     
@@ -211,7 +210,21 @@ export class AuthService {
     }
 
     private storeUserInfo(accessToken){
-        this.callCallBarn(accessToken, this.userEndpoint, "GET" as Method).subscribe({
+        console.log('in storeUserInfo')
+        this.callCallBarn(accessToken, this.userEndpoint, "GET" as Method).pipe(
+            tap(res => {
+                var barnValue = res.data
+                console.log('in storeUserInfo.barnValue', barnValue)
+                var newUserData: UserModel = {
+                    username: barnValue.data.userName,
+                    email: barnValue.data.email
+                }
+
+                this.storeUserData(newUserData);
+
+                this.userBehaviour.next(newUserData);
+            })
+        )/*.subscribe({
             next: (barnValue) => {
                 var newUserData: UserModel = {
                     username: barnValue.data.userName,
@@ -222,26 +235,19 @@ export class AuthService {
 
                 this.userBehaviour.next(newUserData);
             }
-        });
-        this.callCallBarn(accessToken, this.userBuckyProfile, "GET" as Method).subscribe({
-            next: (barnValue: any) => {
-                var buckyProfile = barnValue as BuckyProfileModel;
+        });*/
 
-                console.log('auth-service.buckyProfile', buckyProfile);
-                if (buckyProfile.behaviours){
-                    buckyProfile.behaviours.forEach((element, index) => {
-                        buckyProfile.behaviours[index].imageBytes = '';
-                      });
-    
-                    this.localStorage.set('buckyProfile',barnValue.buckyProfile);
-                } 
-            }
+        this.callCallBarn(accessToken, this.userBuckyProfile, "GET" as Method)
+            .subscribe({
+                next: (barnValue: any) => {
+                    var buckyProfile = barnValue.data;// as BuckyProfileModel;
+        
+                    this.localStorage.setBuckyProfile(buckyProfile);
+                }
         });
     }
 
     private callCallBarn(accessToken, url:string, method: Method) {
-
-        console.log('calling barn')
         const options = {
             baseURL: `${environment.baseApiUrl}`,
             url: url,

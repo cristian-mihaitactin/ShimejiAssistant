@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { AuthTokenModel } from "../auth/models/auth-tokens-model";
 import { BuckyProfileModel } from "bucky_profile/bucky-profile-model";
 import { environment } from "../environments/environment";
+import { BehaviorSubject, Subject } from "rxjs";
 
 const profilePath = 'buckyProfile'
 const defaultProfilePath = 'default_profile'
@@ -14,13 +15,16 @@ export class UserStore {
     private path: string;
     private data: string[];
     private defaults: string[];
+
+  defaultBuckyProfile: Subject<BuckyProfileModel>
+
   constructor(opts) {
     const userDataPath = app.getPath('userData');
     this.path = path.join(userDataPath, opts.configName + '.json');
     /*defaults: {
       username: string;
       email: string;
-      buckyProfile: string;
+      buckyProfile: BuckyProfileModel;
       pluginsInstalled: string;
     }*/
     this.defaults = opts.defaults;
@@ -31,6 +35,8 @@ export class UserStore {
     if (!fs.existsSync(buckyPath)){
       this.setDefaultBuckyProfile();
     }
+
+    this.defaultBuckyProfile = new Subject<BuckyProfileModel>();
   }
   
   public get(key) {
@@ -88,7 +94,8 @@ export class UserStore {
       fs.mkdirSync(buckyPath, { recursive: true });
     }
 
-    buckyProfile.behaviours.forEach((element, index) => {
+    this.defaultBuckyProfile.next(buckyProfile);
+    newBuckyProfile.behaviours.forEach((element, index) => {
       fs.writeFileSync(path.join(buckyPath, element.actionTypeString) + '.png', element.imageBytes, 'base64');
       buckyProfile.behaviours[index].imageBytes = '';
     });

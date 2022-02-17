@@ -29,6 +29,12 @@ export class BuckyProfileService {
     this.barnService = barnService;
 
     this.defaultBuckyProfile = new BehaviorSubject(this.userStore.getUserBuckyProfile());
+    this.userStore.defaultBuckyProfile.subscribe({
+      next: value => {
+        console.log('bucky-profile.userStore.defaultBuckyProfile.subscribe', value);
+        this.defaultBuckyProfile.next(value);
+      }
+    })
   }
 
     // getUserBuckyProfile() : BuckyProfileModel {//Observable<BuckyProfileModel> {

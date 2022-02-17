@@ -40,7 +40,6 @@ export class PluginService {
         this.registeredPlugins.subscribe({
             //store all registered plugins in userstore
             next: (value) => {
-                console.log('regitered plugins value')
                 var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
                     if (!existingPlugins.includes(plugin.pluginModel)){
@@ -107,7 +106,6 @@ export class PluginService {
     getPluginDetails (id:string) : Observable<PluginDetailsModel> {
         var pluginFound = this.registeredPlugins.value.find(profile => profile.plugin.id === id);
         if (pluginFound !== undefined && pluginFound !== null){
-            console.log('getPluginDetails FOUND');
             const pluginDetails = {
                 id: pluginFound.pluginModel.id,
                 name: pluginFound.pluginModel.name,
@@ -127,7 +125,6 @@ export class PluginService {
 
             return of(pluginDetails);
         } else {
-            console.log('getPluginDetails NOOOOT FOUND');
 
             return this.getPluginDetailsFromBarn(id);
         }
@@ -175,8 +172,8 @@ export class PluginService {
                             map(userpref => userpref.plugins as Array<PluginModel>)
                         ).subscribe({
                             next: (val) => {
-                                console.log('val for subscribe');
-                                console.log(val);
+                                //clean registeredPlugins
+                                this.registeredPlugins.next([]);
                                 if (val !== undefined && val !== null) {
                                     val.forEach((plugin, index) => {
                                         this.downloadAndInstallPlugin(plugin);

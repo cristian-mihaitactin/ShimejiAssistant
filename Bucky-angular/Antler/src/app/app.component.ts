@@ -45,7 +45,6 @@ export class AppComponent implements OnInit {
           console.log('arg is not ok. Try again')
           electron.ipcRenderer.send('get-initial-bucky-profile', '');
         }else {
-          console.log(arg);
           this.buckyProfile.next(arg);
         }
         this.cdr.detectChanges();
@@ -129,6 +128,11 @@ export class AppComponent implements OnInit {
         let frag = document.createRange().createContextualFragment('<div id="activatedPlugin">' + pluginHtml + '</div>');
         activatedPlugin.appendChild(frag);
       });
+
+      electron.ipcRenderer.on('logged-in', (event, arg) => {
+        electron.ipcRenderer.send('get-initial-bucky-profile', '');
+        electron.ipcRenderer.send("get-user-plugins", '');
+      })
      }
 
   ngOnInit() {
