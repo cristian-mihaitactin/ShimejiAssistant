@@ -327,6 +327,7 @@ app.on("ready", () => {
                 pluginService.postPluginToBarnUser(value.pluginModel.id).subscribe({
                   next: value => {
                     console.log('posted plugin', value);
+                    pluginService.registerUserPlugins();
                   },
                   error: err => {
                     console.error(err);
