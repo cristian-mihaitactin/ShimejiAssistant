@@ -1,9 +1,7 @@
 import { app } from "electron";
-import { environment } from "../environments/environment";
 
-import { BehaviorSubject, flatMap, from, fromEventPattern, map, Observable, of, Subject } from "rxjs";
+import { BehaviorSubject, map, Observable, of, Subject } from "rxjs";
 import { AxiosResponse, Method } from "axios";
-import Axios from "axios-observable";
 import * as path from "path";
 import * as fs from "fs";
 import { Extract } from 'unzip-stream'
@@ -12,7 +10,6 @@ import { UserStore } from "../helpers/user-store";
 import { PluginModel } from "../models/plugin.model";
 import { PluginPackageModel } from "../models/plugin.package.model";
 import { PluginDetailsModel } from "../models/plugin.details.model";
-import { exists, read } from "fs-jetpack";
 import { PluginNotification } from "../models/plugin.notification";
 import { IPlugin } from "../models/iplugin";
 import { RegisteredPlugin } from "../models/registered.plugin";
@@ -43,8 +40,7 @@ export class PluginService {
                 var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
                     if (!existingPlugins.includes(plugin.pluginModel)){
-                        this.barnService.callBarn(userPreferencesEndpoint
-                            + "/Plugin/" + plugin.pluginModel.id, "POST" as Method).subscribe({
+                        this.postPluginToBarnUser(plugin.pluginModel.id).subscribe({
                                 error: (err) => {
                                     console.error(err);
                                 }
@@ -206,6 +202,10 @@ export class PluginService {
         return '';
     }
 
+    postPluginToBarnUser(pluginId: string): Observable<AxiosResponse>{
+        return this.barnService.callBarn(userPreferencesEndpoint
+            + "/Plugin/" + pluginId, "POST" as Method);
+    } 
     private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
         return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(

@@ -56,8 +56,9 @@ export class UserStore {
   }
 
   resetToDefault() {
+    this.defaults['username'] = environment.default_user.username;
     this.data = parseDataFile(this.path, this.defaults, true);
-    //this.setDefaultBuckyProfile();
+    this.setDefaultBuckyProfile();
   }
 
   getAuthTokens(): AuthTokenModel {

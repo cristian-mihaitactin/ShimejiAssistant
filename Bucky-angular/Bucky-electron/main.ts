@@ -207,11 +207,12 @@ app.on("ready", () => {
   buckyWindow.setAlwaysOnTop(true, 'screen');
   mainWindow.setMenu(null)
 
+  /*
   if (environment.config === "development") {
     buckyWindow.openDevTools();
     mainWindow.openDevTools();
   }
-
+*/
   ipcMain.on("is-logged-in", (event,arg) => {
     if (userService.userIsLoggedIn()){
       event.reply("logged-in", true);
@@ -265,11 +266,8 @@ app.on("ready", () => {
   //   }
   // });
 
-  ipcMain.on('login-request', (event, arg) => {
-    authService.login(arg).subscribe(
-      {
-        next: (value) => {
-          pluginService.registerUserPlugins()
+  function loginActions(event){
+    pluginService.registerUserPlugins()
           event.reply("login-reply", 
           {
             result: 'Logged In',
@@ -288,6 +286,12 @@ app.on("ready", () => {
               console.error(err);
             }
           });
+  }
+  ipcMain.on('login-request', (event, arg) => {
+    authService.login(arg).subscribe(
+      {
+        next: (value) => {
+          loginActions(event);
         },
         error: (error) => {
           event.reply("login-reply", 
@@ -311,7 +315,31 @@ app.on("ready", () => {
             isError: false,
             error: null 
           });
-          mainWindow.webContents.send("logged-in", true);
+
+          authService.login({
+              username: arg.username,
+              password: arg.password
+          }).subscribe({
+            next: value => {
+              var userBuckyProfile = userStore.getUserBuckyProfile();
+              buckyProfileService.setBuckyProfileById(userBuckyProfile.id);
+
+              pluginService.registeredPlugins.value.forEach((value,index) => {
+                pluginService.postPluginToBarnUser(value.pluginModel.id).subscribe({
+                  next: value => {
+                    console.log('posted plugin', value);
+                    pluginService.registerUserPlugins();
+                  },
+                  error: err => {
+                    console.error(err);
+                  }
+                });
+              })
+              loginActions(event);
+            }
+          });
+
+          
         },
         error: (error) => {
           event.reply("register-reply", 
@@ -330,7 +358,7 @@ app.on("ready", () => {
     pluginService.clean();
 
     buckyWindow.webContents.send("logged-out",)
-    mainWindow.webContents.send("logged-in", false);
+    mainWindow.webContents.send("logged-out",)
   });
 
 //////////////////
