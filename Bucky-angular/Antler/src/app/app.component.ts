@@ -263,7 +263,6 @@ export class AppComponent implements OnInit {
       while (activatedPlugin.firstChild) {
         activatedPlugin.removeChild(activatedPlugin.firstChild);
       };
-      return; 
     }
 
     //get html of clicked plugin
