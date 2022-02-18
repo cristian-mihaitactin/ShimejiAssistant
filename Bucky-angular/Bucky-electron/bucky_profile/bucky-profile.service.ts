@@ -42,7 +42,6 @@ export class BuckyProfileService {
     // }
 
     getBuckyProfileById(id: string): Observable<BuckyProfileModel> {
-      console.log('getBuckyProfileById', id);
       const buckyProfile = (this.userStore.get('buckyProfile') ?? environment.default_user.buckyProfile) as BuckyProfileModel;
 
       return this.barnService.callBarn(`${profileUrl}/${id}`, "GET" as Method, new Map([['Content-Type', 'application/x-www-form-urlencoded' ]]))
@@ -75,7 +74,8 @@ export class BuckyProfileService {
     }
     
     setBuckyProfileById(buckyProfileId:string) {
-      console.log('setBuckyProfileById', buckyProfileId);
+      console.log('PUTTING new profile', buckyProfileId);
+
       return this.barnService.callBarn( `${userPreferencesEndpoint}`,
         "PUT" as Method, new Map([['Content-Type', 'application/json' ]]),JSON.stringify({
           buckyProfileID: buckyProfileId

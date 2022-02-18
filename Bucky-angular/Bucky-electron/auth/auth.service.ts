@@ -72,8 +72,8 @@ export class AuthService {
                     console.error('Register error')
                     console.error(res);
                     return new Error(res.response.data);
-                })),
-                tap(res => this.scheduleRefresh()));
+                }))
+            );
     }
 
     login(user: LoginModel): Observable<any> {

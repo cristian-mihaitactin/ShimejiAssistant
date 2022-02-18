@@ -265,11 +265,8 @@ app.on("ready", () => {
   //   }
   // });
 
-  ipcMain.on('login-request', (event, arg) => {
-    authService.login(arg).subscribe(
-      {
-        next: (value) => {
-          pluginService.registerUserPlugins()
+  function loginActions(event){
+    pluginService.registerUserPlugins()
           event.reply("login-reply", 
           {
             result: 'Logged In',
@@ -288,6 +285,12 @@ app.on("ready", () => {
               console.error(err);
             }
           });
+  }
+  ipcMain.on('login-request', (event, arg) => {
+    authService.login(arg).subscribe(
+      {
+        next: (value) => {
+          loginActions(event);
         },
         error: (error) => {
           event.reply("login-reply", 
@@ -311,13 +314,23 @@ app.on("ready", () => {
             isError: false,
             error: null 
           });
-          var userBuckyProfile = userStore.getUserBuckyProfile();
-          buckyProfileService.setBuckyProfileById(userBuckyProfile.id);
 
-          pluginService.registeredPlugins.value.forEach((value,index) => {
-            pluginService.postPluginToBarnUser(value.pluginModel.id);
-          })
-          mainWindow.webContents.send("logged-in", true);
+          authService.login({
+              username: arg.username,
+              password: arg.password
+          }).subscribe({
+            next: value => {
+              var userBuckyProfile = userStore.getUserBuckyProfile();
+              buckyProfileService.setBuckyProfileById(userBuckyProfile.id);
+
+              pluginService.registeredPlugins.value.forEach((value,index) => {
+                pluginService.postPluginToBarnUser(value.pluginModel.id);
+              })
+              loginActions(event);
+            }
+          });
+
+          
         },
         error: (error) => {
           event.reply("register-reply", 
