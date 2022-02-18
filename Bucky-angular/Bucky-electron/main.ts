@@ -324,7 +324,14 @@ app.on("ready", () => {
               buckyProfileService.setBuckyProfileById(userBuckyProfile.id);
 
               pluginService.registeredPlugins.value.forEach((value,index) => {
-                pluginService.postPluginToBarnUser(value.pluginModel.id);
+                pluginService.postPluginToBarnUser(value.pluginModel.id).subscribe({
+                  next: value => {
+                    console.log('posted plugin', value);
+                  },
+                  error: err => {
+                    console.error(err);
+                  }
+                });
               })
               loginActions(event);
             }
