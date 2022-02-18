@@ -198,8 +198,6 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
     });
     frag = frag.concat(`</ul>
     `);
-    console.log('frag:', frag);
-
     return frag;
   }
 

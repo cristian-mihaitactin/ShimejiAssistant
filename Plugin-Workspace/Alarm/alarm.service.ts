@@ -53,9 +53,13 @@ export class AlarmService {
     }
 
     removeAlarm(alarm:Alarm) {
-        const index = this.alarmList.findIndex((element, index) => element.hour === alarm.hour && element.minute === alarm.minute);
+        const index = this.alarmList.findIndex((element, index) => "" + element.hour === "" + alarm.hour && "" + element.minute === "" + alarm.minute);
         if (index > -1) {
             this.alarmList.splice(index, 1);
+        } else {
+            if (this.alarmList.length === 1) {
+                this.alarmList = [];
+            }
         }
         this.writeAlarmsToFile();
     }
