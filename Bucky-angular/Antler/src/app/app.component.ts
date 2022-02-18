@@ -71,6 +71,15 @@ export class AppComponent implements OnInit {
         }
         activatedPlugin.style.display = "none";
 
+        var pluginMessage = document.getElementById("notification-message");
+        if (pluginMessage !== null && pluginMessage !== undefined && pluginMessage.firstChild){
+          while (pluginMessage.firstChild) {
+            pluginMessage.removeChild(pluginMessage.firstChild);
+          };
+        }
+
+        pluginMessage.style.display = "none";
+        
         this.cdr.detectChanges();  
       });
 

@@ -207,11 +207,12 @@ app.on("ready", () => {
   buckyWindow.setAlwaysOnTop(true, 'screen');
   mainWindow.setMenu(null)
 
+  /*
   if (environment.config === "development") {
     buckyWindow.openDevTools();
     mainWindow.openDevTools();
   }
-
+*/
   ipcMain.on("is-logged-in", (event,arg) => {
     if (userService.userIsLoggedIn()){
       event.reply("logged-in", true);
