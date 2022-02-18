@@ -33,22 +33,30 @@ export class SideviewComponent implements OnInit {
   constructor(
     private modalService: NgbModal,
     private cdr: ChangeDetectorRef
-    ) {}
+    ) {
+      electron.ipcRenderer.on('logged-in', (_event: any, arg:boolean) => {
+        console.log('logged-in:' + arg)  
+        this.loggedIn = arg;
+        electron.ipcRenderer.send('user-info-request', '');
+  
+        this.cdr.detectChanges();
+      });
+  
+      electron.ipcRenderer.on('logged-out', (_event: any, arg:boolean) => {
+        this.loggedIn = false;
+        electron.ipcRenderer.send('user-info-request', '');
+        this.cdr.detectChanges();
+      });
+  
+      electron.ipcRenderer.on('user-info-reply', (_event: any, arg: any) => {
+        console.log('user-info-reply:',arg);
+        this.userName = arg.username; 
+        this.cdr.detectChanges();
+      });
+    }
 
   ngOnInit() {
-    electron.ipcRenderer.on('logged-in', (_event: any, arg:boolean) => {
-      console.log('logged-in:' + arg)  
-      this.loggedIn = arg;
-      electron.ipcRenderer.send('user-info-request', '');
-
-      this.cdr.detectChanges();
-    });
-
-    electron.ipcRenderer.on('user-info-reply', (_event: any, arg: any) => {
-      console.log('user-info-reply:',arg);
-      this.userName = arg.username; 
-      this.cdr.detectChanges();
-    });
+    
 
     electron.ipcRenderer.send('is-logged-in', ''); 
     electron.ipcRenderer.send('user-info-request', '');

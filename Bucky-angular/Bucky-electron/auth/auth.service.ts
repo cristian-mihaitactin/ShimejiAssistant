@@ -72,7 +72,8 @@ export class AuthService {
                     console.error('Register error')
                     console.error(res);
                     return new Error(res.response.data);
-                })));
+                })),
+                tap(res => this.scheduleRefresh()));
     }
 
     login(user: LoginModel): Observable<any> {
@@ -94,8 +95,8 @@ export class AuthService {
             this.refreshSubscription$.unsubscribe();
         }
         this.removeToken();
-        this.userBehaviour.next(this.getDefaultUser());
         this.localStorage.resetToDefault();
+        this.userBehaviour.next(this.getDefaultUser());
         console.log('end logout')
     }
 
@@ -206,7 +207,7 @@ export class AuthService {
     private getDefaultUser() : UserModel{
         return {
             username: this.localStorage.get('username') ?? environment.default_user.username,
-            email: this.localStorage.get('email') ?? environment.default_user.username
+            email: this.localStorage.get('email') ?? environment.default_user.email
         }
     }
 

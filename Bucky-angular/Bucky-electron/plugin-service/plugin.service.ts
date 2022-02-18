@@ -1,7 +1,7 @@
 import { app } from "electron";
 
 import { BehaviorSubject, map, Observable, of, Subject } from "rxjs";
-import { Method } from "axios";
+import { AxiosResponse, Method } from "axios";
 import * as path from "path";
 import * as fs from "fs";
 import { Extract } from 'unzip-stream'
@@ -40,8 +40,7 @@ export class PluginService {
                 var existingPlugins:PluginModel[] = [];
                 value?.forEach((plugin,index) => {
                     if (!existingPlugins.includes(plugin.pluginModel)){
-                        this.barnService.callBarn(userPreferencesEndpoint
-                            + "/Plugin/" + plugin.pluginModel.id, "POST" as Method).subscribe({
+                        this.postPluginToBarnUser(plugin.pluginModel.id).subscribe({
                                 error: (err) => {
                                     console.error(err);
                                 }
@@ -203,6 +202,10 @@ export class PluginService {
         return '';
     }
 
+    postPluginToBarnUser(pluginId: string): Observable<AxiosResponse>{
+        return this.barnService.callBarn(userPreferencesEndpoint
+            + "/Plugin/" + pluginId, "POST" as Method);
+    } 
     private getPluginModelByIdFromBarn(id:string) : Observable<PluginModel> {
         return this.barnService.callBarn(`${pluginPackageEndpoint}/${id}`, "GET" as Method)
             .pipe(

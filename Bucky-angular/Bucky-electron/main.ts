@@ -311,6 +311,12 @@ app.on("ready", () => {
             isError: false,
             error: null 
           });
+          var userBuckyProfile = userStore.getUserBuckyProfile();
+          buckyProfileService.setBuckyProfileById(userBuckyProfile.id);
+
+          pluginService.registeredPlugins.value.forEach((value,index) => {
+            pluginService.postPluginToBarnUser(value.pluginModel.id);
+          })
           mainWindow.webContents.send("logged-in", true);
         },
         error: (error) => {
@@ -330,7 +336,7 @@ app.on("ready", () => {
     pluginService.clean();
 
     buckyWindow.webContents.send("logged-out",)
-    mainWindow.webContents.send("logged-in", false);
+    mainWindow.webContents.send("logged-out",)
   });
 
 //////////////////

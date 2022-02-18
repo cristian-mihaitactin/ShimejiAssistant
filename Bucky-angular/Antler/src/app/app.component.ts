@@ -62,6 +62,15 @@ export class AppComponent implements OnInit {
         electron.ipcRenderer.send('get-initial-bucky-profile', '');
         electron.ipcRenderer.send("get-user-plugins", '');   
         this.displayedPlugins = [];
+        var activatedPlugin = document.getElementById("notification-container");
+        
+        if (activatedPlugin !== null && activatedPlugin !== undefined && activatedPlugin.firstChild){
+          while (activatedPlugin.firstChild) {
+            activatedPlugin.removeChild(activatedPlugin.firstChild);
+          };
+        }
+        activatedPlugin.style.display = "none";
+
         this.cdr.detectChanges();  
       });
 
