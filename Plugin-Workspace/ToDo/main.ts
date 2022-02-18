@@ -81,8 +81,8 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
       this.dispatchEvent(toDoEvent);
     }
 
-    function addToDo(event,sectionTitle) {
-      var input = document.getElementById("apptodo");
+    function addToDo(event,sectionTitle, sectionIndex) {
+      var input = document.getElementById("apptodo-" + sectionIndex);
       console.log(input.value);
       var toDoTitle = input.value;
     
@@ -250,7 +250,7 @@ const Plugin: IPluginConstructor = class Plugin implements IPlugin {
 
         frag = frag.concat(`<li>
         <div><label for="apptodo">Add ToDo:</label>
-        <input type="text" id="apptodo" name="apptodo"> <button onclick="addToDo(event, '${value.title}')">Add</button></div>
+        <input type="text" id="apptodo-${index}" name="apptodo-${index}"> <button onclick="addToDo(event, '${value.title}', ${index})">Add</button></div>
         </div>
         </li>`);
         frag = frag.concat(`</ul>

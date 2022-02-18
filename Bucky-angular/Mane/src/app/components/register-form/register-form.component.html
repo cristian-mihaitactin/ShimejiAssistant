@@ -43,7 +43,7 @@
             <div *ngIf="submitted && registerForm.get('password')!.errors" class="invalid-feedback">
                 <div *ngIf="registerForm.get('password')!.hasError('required')">Password is required</div>
                 <div *ngIf="registerForm.get('password')!.hasError('minlength')">Password must be at least 6 characters</div>
-                <div *ngIf="registerForm.get('password')!.hasError('pattern')">Password must have at least one number, one non alphanumeric characte, one uppercase character and one lowercase character.</div>
+                <div *ngIf="registerForm.get('password')!.hasError('pattern')">Password must have at least one number, one non alphanumeric character, one uppercase character and one lowercase character.</div>
             </div>
         </div>
         <div class="form-group">
